@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef } from 'react';
-import { School, Award, TrendingUp, Search, SlidersHorizontal, MapPin, Download, CheckSquare, Layers, BarChart3, Clock, HelpCenter, Flame, ShieldCheck } from 'lucide-react';
+import { School, Award, TrendingUp, Search, SlidersHorizontal, MapPin, Download, CheckSquare, Layers, BarChart3, Clock } from 'lucide-react';
 import { massiveJosaaData, CollegeData } from './josaaData';
 
 interface ExtendedCollegeData extends CollegeData {
