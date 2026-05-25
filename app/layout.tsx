@@ -2,8 +2,8 @@ import './globals.css';
 import Link from 'next/link';
 
 export const metadata = {
-  title: 'CollegeAchiver - JoSAA Predictor',
-  description: 'Handcrafted JoSAA Counselling Predictor',
+  title: 'CollegeAchiver - JoSAA 2026 Matrix Portal',
+  description: 'Precision Intelligence for JoSAA / CSAB Counselling Forecasting',
 };
 
 export default function RootLayout({
@@ -13,42 +13,45 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className="bg-zinc-50 text-zinc-900 antialiased">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+        <style>{`
+          body { font-family: 'Plus Jakarta Sans', sans-serif; }
+          .font-mono { font-family: 'JetBrains Mono', monospace !important; }
+        `}</style>
+      </head>
+      <body className="bg-[#f8f9ff] text-[#0b1c30] antialiased">
         
-        {/* 🗺️ RESPONSIVE NAVBAR */}
-        <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-zinc-200 px-4 py-3.5">
-          <div className="max-w-4xl mx-auto flex justify-between items-center">
+        {/* 🗺️ FIXED RIGID NAVBAR */}
+        <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-[#c6c6cd] px-6 py-3.5">
+          <div className="max-w-6xl mx-auto flex justify-between items-center">
             
-            {/* Logo / Brand Name */}
-            <Link href="/" className="text-xl font-bold tracking-tight text-zinc-950 hover:opacity-90 transition-opacity">
-              College<span className="text-indigo-600">Achiver</span>
+            {/* Corrected Active Logo Group */}
+            <Link href="/" className="text-base font-bold tracking-tight text-[#0b1c30] flex items-center gap-2">
+              <span className="h-4 w-4 bg-[#000000] inline-block rounded-[2px]"></span>
+              CollegeAchiver <span className="text-[10px] font-mono text-[#76777d] font-normal">v4.2</span>
             </Link>
             
-            {/* Nav Links - Added 'Home' with touch-friendly spacing for mobile */}
-            <div className="flex items-center gap-5 text-sm font-semibold text-zinc-600">
-              <Link href="/" className="hover:text-indigo-600 transition-colors py-1">
-                Home
-              </Link>
-              <Link href="/about" className="hover:text-indigo-600 transition-colors py-1">
-                About
-              </Link>
-              <Link href="/contact" className="hover:text-indigo-600 transition-colors py-1">
-                Contact
-              </Link>
+            {/* Info Status Text */}
+            <div className="text-xs font-mono text-[#76777d] hidden sm:block">
+              🟢 SYSTEM ONLINE
             </div>
-
           </div>
         </nav>
 
-        {/* Main Content Area */}
+        {/* Dynamic Content */}
         {children}
 
-        {/* 📋 UNIVERSAL FOOTER */}
-        <footer className="bg-white border-t border-zinc-200 mt-12 py-8 text-center text-xs text-zinc-500 px-4">
-          <p>© 2026 CollegeAchiver. Built for JEE Main & Advanced Aspirants.</p>
-          <div className="flex justify-center gap-5 mt-3 font-medium text-zinc-400">
-            <Link href="/privacy" className="hover:text-zinc-600 hover:underline transition-colors">Privacy Policy</Link>
-            <Link href="/terms" className="hover:text-zinc-600 hover:underline transition-colors">Terms of Service</Link>
+        {/* 📋 ARCHITECTURAL FOOTER */}
+        <footer className="bg-white border-t border-[#c6c6cd] py-10 text-xs text-[#76777d] px-6">
+          <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div className="space-y-2 max-w-sm">
+              <div className="font-bold text-[#0b1c30]">CollegeAchiver Intelligence Systems</div>
+              <p className="text-[11px] leading-relaxed">The definitive engine for engineering counseling intelligence. Precision tools for JEE aspirants seeking seat optimization through data science.</p>
+            </div>
+            <p className="font-mono text-[10px]">© 2026 CollegeAchiver Systems. Data verified via JoSAA protocols.</p>
           </div>
         </footer>
 
