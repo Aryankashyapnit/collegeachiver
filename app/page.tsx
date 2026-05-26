@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef, useMemo } from 'react';
-import { School, Award, TrendingUp, Search, MapPin, Download, CheckSquare, Layers, BarChart3, ChevronLeft, ChevronRight, Mail, Share2, Globe, CheckCircle, Star, BookOpen, ShieldAlert, FileText, Activity, Percent, Clock, AlertCircle, Calendar } from 'lucide-react';
+import { School, Award, TrendingUp, Search, MapPin, Download, CheckSquare, Layers, BarChart3, ChevronLeft, ChevronRight, Mail, Share2, Globe, CheckCircle, Star, BookOpen, ShieldAlert, FileText, Activity, Percent, Clock, AlertCircle, Calendar, HelpCircle, RefreshCw } from 'lucide-react';
 import { massiveJosaaData, CollegeData } from './josaaData';
 
 interface ExtendedCollegeData extends CollegeData {
@@ -21,6 +21,9 @@ export default function Home() {
   const [selectedRound, setSelectedRound] = useState('Round 1');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Counselling Guide Inner State Control
+  const [guideMode, setGuideMode] = useState<'JoSAA' | 'CSAB'>('JoSAA');
 
   const predictorRef = useRef<HTMLDivElement>(null);
 
@@ -162,130 +165,146 @@ export default function Home() {
         </div>
       )}
 
-      {/* 2️⃣ TAB CONTENT: COUNSELLING GUIDE */}
+      {/* 2️⃣ 🌟 UPDATED DYNAMIC TAB CONTENT: COUNSELLING GUIDE (JoSAA + CSAB) */}
       {activeTab === 'Counselling Guide' && (
         <section className="max-w-5xl mx-auto px-6 py-12 text-left animate-fadeIn">
-          <div className="mb-10 border-b border-[#e2e2e2] pb-4">
-            <span className="text-xs font-bold text-[#705d00] bg-[#ffd700]/20 px-2.5 py-1 rounded-full uppercase font-mono">Step-by-Step Roadmap</span>
-            <h2 className="text-3xl font-extrabold text-[#1a1c1c] font-display mt-2 tracking-tight">JoSAA 2026 Counselling Master Guide</h2>
-          </div>
-          <div className="bg-white border border-[#e2e2e2] rounded-xl p-6 shadow-xs mb-8">
-            <h3 className="text-lg font-bold text-[#1a1c1c] mb-4 flex items-center gap-2"><BookOpen size={20} className="text-[#705d00]" /> Freeze, Float, or Slide Rules</h3>
-            <p className="text-xs text-[#5f5e5e] leading-relaxed">Detailed rules breakdown for JoSAA protocols managed perfectly.</p>
-          </div>
-        </section>
-      )}
-
-      {/* 3️⃣ TAB CONTENT: ANALYSIS */}
-      {activeTab === 'Analysis' && (
-        <section className="max-w-6xl mx-auto px-6 py-12 text-left animate-fadeIn">
-          <div className="mb-10 border-b border-[#e2e2e2] pb-4">
-            <span className="text-xs font-bold text-[#705d00] bg-[#ffd700]/20 px-2.5 py-1 rounded-full uppercase font-mono">Statistical Variance Pulse</span>
-            <h2 className="text-3xl font-extrabold text-[#1a1c1c] font-display mt-2 tracking-tight">Cutoff Volatility Analytics</h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-10">
-            <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs"><div className="text-[10px] font-mono font-bold text-[#5f5e5e] uppercase">CSE Volatility Delta</div><div className="text-2xl font-black text-red-600 mt-1">↗ +14.2%</div></div>
-          </div>
-        </section>
-      )}
-
-      {/* 4️⃣ ⏰ NEW DYNAMIC TAB CONTENT: DEADLINES TIMELINE SCHEDULE */}
-      {activeTab === 'Deadlines' && (
-        <section className="max-w-4xl mx-auto px-6 py-12 text-left animate-fadeIn">
           
-          {/* Section Header */}
-          <div className="mb-10 border-b border-[#e2e2e2] pb-4">
-            <span className="text-xs font-bold text-[#705d00] bg-[#ffd700]/20 px-2.5 py-1 rounded-full uppercase font-mono">Official Time Matrix</span>
-            <h2 className="text-3xl font-extrabold text-[#1a1c1c] font-display mt-2 tracking-tight">JoSAA 2026 Critical Dates & Schedule</h2>
-            <p className="text-sm text-[#5f5e5e] mt-1">Bhai, ek bhi deadline miss hui toh poori mehnat bekaar ho jayegi. In dates ko dhyan se note kar lo!</p>
-          </div>
-
-          {/* Core Stepper/Timeline Architecture Layout */}
-          <div className="relative border-l-2 border-[#ffd700] ml-4 pl-8 space-y-10">
+          {/* Header Banner */}
+          <div className="mb-8 border-b border-[#e2e2e2] pb-4 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <span className="text-xs font-bold text-[#705d00] bg-[#ffd700]/20 px-2.5 py-1 rounded-full uppercase font-mono">Master Admission Roadmap</span>
+              <h2 className="text-3xl font-extrabold text-[#1a1c1c] font-display mt-2 tracking-tight">Counselling Architecture Guide</h2>
+              <p className="text-sm text-[#5f5e5e] mt-1">Bhai, JoSAA aur CSAB Spot Rounds ki complete step-by-step processing yahan samjho.</p>
+            </div>
             
-            {/* Step 1: Results Announcement */}
-            <div className="relative group">
-              {/* Dot Icon Indicator */}
-              <div className="absolute -left-[41px] top-1 bg-white border-4 border-[#1a1c1c] h-5 w-5 rounded-full group-hover:border-[#ffd700] transition-colors"></div>
-              <div className="space-y-1">
-                <div className="flex flex-wrap items-center gap-2.5">
-                  <span className="text-xs font-mono font-bold text-[#705d00] bg-[#ffd700]/20 px-2 py-0.5 rounded-md flex items-center gap-1"><Calendar size={12}/> June 10, 2026</span>
-                  <span className="text-[10px] bg-zinc-100 text-zinc-600 border border-zinc-300 font-bold px-2 py-0.5 rounded-md uppercase">Upcoming</span>
-                </div>
-                <h4 className="text-base font-bold text-black font-display">JEE Advanced Result & Cut-off Release</h4>
-                <p className="text-xs text-[#5f5e5e] max-w-2xl leading-relaxed">Organizing IIT ke dwara final rank card aur official qualifying cut-offs publish honge. Isi ke baad JoSAA portal active kiya jayega.</p>
-              </div>
+            {/* Sub-navigation Switcher for JoSAA vs CSAB */}
+            <div className="flex gap-2 bg-[#eeeeee] p-1.5 rounded-xl self-start md:self-auto shadow-inner">
+              <button 
+                onClick={() => setGuideMode('JoSAA')}
+                className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${guideMode === 'JoSAA' ? 'bg-[#1a1c1c] text-white shadow-xs' : 'text-[#5f5e5e] hover:text-black'}`}
+              >
+                JoSAA Roadmap
+              </button>
+              <button 
+                onClick={() => setGuideMode('CSAB')}
+                className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${guideMode === 'CSAB' ? 'bg-[#ffd700] text-black shadow-xs' : 'text-[#5f5e5e] hover:text-black'}`}
+              >
+                CSAB Spot Round
+              </button>
             </div>
-
-            {/* Step 2: Registration Ignited */}
-            <div className="relative group">
-              <div className="absolute -left-[41px] top-1 bg-white border-4 border-[#ffd700] h-5 w-5 rounded-full flex items-center justify-center"><span className="h-1.5 w-1.5 bg-black rounded-full animate-ping"></span></div>
-              <div className="space-y-1">
-                <div className="flex flex-wrap items-center gap-2.5">
-                  <span className="text-xs font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md flex items-center gap-1"><Clock size={12}/> June 15, 2026</span>
-                  <span className="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold px-2 py-0.5 rounded-md uppercase animate-pulse">Live Soon</span>
-                </div>
-                <h4 className="text-base font-bold text-black font-display">Online Registration & Preference Choice Filling Starts</h4>
-                <p className="text-xs text-[#5f5e5e] max-w-2xl leading-relaxed">Students apni choices online fill karna shuru kar sakte hain. Bhai, hamare predictor se generated choice-locking sequence isi dauran fill karna hai.</p>
-              </div>
-            </div>
-
-            {/* Step 3: Mock Seat Allotment */}
-            <div className="relative group">
-              <div className="absolute -left-[41px] top-1 bg-white border-4 border-[#1a1c1c] h-5 w-5 rounded-full group-hover:border-[#ffd700] transition-colors"></div>
-              <div className="space-y-1">
-                <div className="flex flex-wrap items-center gap-2.5">
-                  <span className="text-xs font-mono font-bold text-[#705d00] bg-[#ffd700]/20 px-2 py-0.5 rounded-md"><Calendar size={12}/> June 22, 2026</span>
-                  <span className="text-[10px] bg-zinc-100 text-zinc-600 border border-zinc-300 font-bold px-2 py-0.5 rounded-md uppercase">Simulation</span>
-                </div>
-                <h4 className="text-base font-bold text-black font-display">Mock Seat Allocation Round 1 Result</h4>
-                <p className="text-xs text-[#5f5e5e] max-w-2xl leading-relaxed">Abhi tak filled choices ke basis par system ek tentative prediction data show karega ki aapko kaun sa college mil sakta hai, taaki aap apni choices ko modify kar sako.</p>
-              </div>
-            </div>
-
-            {/* Step 4: CRITICAL AUTO LOCK TERMINATION */}
-            <div className="relative group">
-              <div className="absolute -left-[41px] top-1 bg-white border-4 border-red-600 h-5 w-5 rounded-full"></div>
-              <div className="space-y-1">
-                <div className="flex flex-wrap items-center gap-2.5">
-                  <span className="text-xs font-mono font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-md flex items-center gap-1"><AlertCircle size={12}/> June 25, 2026 (5:00 PM)</span>
-                  <span className="text-[10px] bg-red-100 text-red-800 border border-red-300 font-bold px-2 py-0.5 rounded-md uppercase">Strict Warning</span>
-                </div>
-                <h4 className="text-base font-bold text-red-600 font-display">Choice Filling Window Closes & Auto-Locking</h4>
-                <p className="text-xs text-[#5f5e5e] max-w-2xl leading-relaxed font-medium">Bhai, ye sabse critical timestamp hai! Shaam 5 baje choice filling window lock ho jayegi. Isse pehle apni preferences ko re-arrange aur save zaroor kar lena, iske baad koi change nahi hoga.</p>
-              </div>
-            </div>
-
-            {/* Step 5: Round 1 Seat Allocation */}
-            <div className="relative group">
-              <div className="absolute -left-[41px] top-1 bg-white border-4 border-[#1a1c1c] h-5 w-5 rounded-full group-hover:border-[#ffd700] transition-colors"></div>
-              <div className="space-y-1">
-                <div className="flex flex-wrap items-center gap-2.5">
-                  <span className="text-xs font-mono font-bold text-[#705d00] bg-[#ffd700]/20 px-2 py-0.5 rounded-md"><Calendar size={12}/> June 27, 2026</span>
-                  <span className="text-[10px] bg-zinc-100 text-zinc-600 border border-zinc-300 font-bold px-2 py-0.5 rounded-md uppercase">Allocation</span>
-                </div>
-                <h4 className="text-base font-bold text-black font-display">Official Seat Allotment Round 1 Result publicado</h4>
-                <p className="text-xs text-[#5f5e5e] max-w-2xl leading-relaxed">Actual Round 1 ka seat allocation result declared hoga. Seat milte hi online document checking pipeline active ho jayegi.</p>
-              </div>
-            </div>
-
           </div>
 
-          {/* Strategic Action Banner */}
-          <div className="mt-12 bg-white border border-[#e2e2e2] p-6 rounded-xl shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div className="space-y-1">
-              <h5 className="font-bold text-sm text-black">Don't remember all dates?</h5>
-              <p className="text-xs text-[#5f5e5e]">Apne status ko safe rakhne ke liye counseling shuru hote hi alert systems open rakhein.</p>
+          {/* RENDER MODE A: JoSAA ADVISOR ROADMAP */}
+          {guideMode === 'JoSAA' && (
+            <div className="animate-fadeIn space-y-8">
+              {/* 3-Step Process Flow Visual Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs relative overflow-hidden">
+                  <div className="absolute top-0 left-0 h-1.5 w-full bg-[#ffd700]"></div>
+                  <div className="flex items-center gap-2 text-sm font-bold text-[#1a1c1c] mb-2">
+                    <span className="w-5 h-5 bg-[#1a1c1c] text-white rounded-full flex items-center justify-center text-xs">1</span>
+                    Choice Filling Rounds
+                  </div>
+                  <p className="text-xs text-[#5f5e5e] leading-relaxed">JEE Main/Advanced ranks ke basis par registration karke maximum choice options descending configuration order me lock karo.</p>
+                </div>
+                <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs relative overflow-hidden">
+                  <div className="absolute top-0 left-0 h-1.5 w-full bg-[#ffd700]"></div>
+                  <div className="flex items-center gap-2 text-sm font-bold text-[#1a1c1c] mb-2">
+                    <span className="w-5 h-5 bg-[#1a1c1c] text-white rounded-full flex items-center justify-center text-xs">2</span>
+                    Allotment Strategy
+                  </div>
+                  <p className="text-xs text-[#5f5e5e] leading-relaxed">Seat milte hi freeze, float ya slide select karna hoga. Float option up-gradation index monitor karne ke liye best hai.</p>
+                </div>
+                <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs relative overflow-hidden">
+                  <div className="absolute top-0 left-0 h-1.5 w-full bg-[#ffd700]"></div>
+                  <div className="flex items-center gap-2 text-sm font-bold text-[#1a1c1c] mb-2">
+                    <span className="w-5 h-5 bg-[#ffd700] text-black rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                    Document Check & Reporting
+                  </div>
+                  <p className="text-xs text-[#5f5e5e] leading-relaxed">Seat Acceptance Fee (SAF) pay karke medical aur category certificates verify karwana strictly mandatory hai.</p>
+                </div>
+              </div>
+
+              {/* Rules Callout Block */}
+              <div className="bg-white border border-[#e2e2e2] rounded-xl p-6 shadow-xs">
+                <h3 className="text-base font-bold text-[#1a1c1c] mb-3 flex items-center gap-2"><BookOpen size={18} className="text-[#705d00]"/> JoSAA Seat Decision Matrix</h3>
+                <div className="space-y-3 text-xs">
+                  <div className="p-3 bg-zinc-50 rounded-lg border-l-4 border-zinc-400"><strong>🧊 FREEZE:</strong> Seat pakki hai bhai, ab koi aage badlaav nahi chahiye. Aap counseling stream se lock ho gaye.</div>
+                  <div className="p-3 bg-[#ffd700]/10 rounded-lg border-l-4 border-[#ffd700]"><strong>⛵ FLOAT:</strong> Ye seat safe hai par agar aage ke rounds me higher preference order ki seat mili toh shift ho jaunga.</div>
+                  <div className="p-3 bg-zinc-50 rounded-lg border-l-4 border-black"><strong>🛝 SLIDE:</strong> College wahi rahega, bas usi institute ke andar top department me branch sliding auto-upgrade hogi.</div>
+                </div>
+              </div>
             </div>
-            <button onClick={() => setActiveTab('Predictor')} className="bg-[#ffd700] text-black font-bold text-xs px-5 py-3 rounded-lg uppercase tracking-wider font-mono shadow-xs hover:opacity-90 transition-all shrink-0">
-              Prepare Choice Order ➜
-            </button>
+          )}
+
+          {/* RENDER MODE B: CSAB SPOT ROUND ROADMAP */}
+          {guideMode === 'CSAB' && (
+            <div className="animate-fadeIn space-y-8">
+              {/* CSAB Specific Explainer Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs relative overflow-hidden">
+                  <div className="absolute top-0 left-0 h-1.5 w-full bg-[#ffd700]"></div>
+                  <div className="flex items-center gap-2 text-sm font-bold text-[#1a1c1c] mb-2">
+                    <span className="w-5 h-5 bg-[#705d00] text-white rounded-full flex items-center justify-center text-xs">1</span>
+                    Vacant Seats Display
+                  </div>
+                  <p className="text-xs text-[#5f5e5e] leading-relaxed">JoSAA ke 5/6 rounds over hone ke baad NITs, IIITs, aur GFTIs me jo bachi hui khali seats hoti hain, unka chart release kiya jata hai.</p>
+                </div>
+                <div className="bg-white border border-[#e2e2e2] p-5 shadow-xs rounded-xl relative overflow-hidden">
+                  <div className="absolute top-0 left-0 h-1.5 w-full bg-[#ffd700]"></div>
+                  <div className="flex items-center gap-2 text-sm font-bold text-[#1a1c1c] mb-2">
+                    <span className="w-5 h-5 bg-[#705d00] text-white rounded-full flex items-center justify-center text-xs">2</span>
+                    Fresh Choice Filling
+                  </div>
+                  <p className="text-xs text-[#5f5e5e] leading-relaxed">Bhai, CSAB me purani JoSAA choice filling kaam nahi aati. Aapko dobara naye siray se choices fill karke security deposit pay karna padta hai.</p>
+                </div>
+                <div className="bg-white border border-[#e2e2e2] p-5 shadow-xs rounded-xl relative overflow-hidden">
+                  <div className="absolute top-0 left-0 h-1.5 w-full bg-[#ffd700]"></div>
+                  <div className="flex items-center gap-2 text-sm font-bold text-[#1a1c1c] mb-2">
+                    <span className="w-5 h-5 bg-[#ffd700] text-black rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                    Spot Allocation
+                  </div>
+                  <p className="text-xs text-[#5f5e5e] leading-relaxed">CSAB me sirf 2 Special Rounds hote hain. Agar isme seat milti hai toh pichli mili hui seat automatic forfeit (cancel) ho jati hai.</p>
+                </div>
+              </div>
+
+              {/* Refund and Fee Adjustment Matrix Panel */}
+              <div className="bg-white border border-[#e2e2e2] rounded-xl p-6 shadow-xs">
+                <h3 className="text-base font-bold text-[#1a1c1c] mb-3 flex items-center gap-2"><RefreshCw size={18} className="text-[#705d00]"/> JoSAA-CSAB Fee Integration Node</h3>
+                <p className="text-xs text-[#5f5e5e] leading-relaxed mb-4">
+                  Bhai, sabse badi khushkhabri: Agar aapne JoSAA me Seat Acceptance Fee pay kar di thi aur aapko koi seat mili thi, toh CSAB me register karte waqt aapki wo fees pooro tarah automatic **adjust/transfer** ho jayegi. Aapko poori fees dobara pay nahi karni padegi!
+                </p>
+                <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg flex gap-3 text-xs text-amber-900">
+                  <ShieldAlert className="shrink-0" size={18}/>
+                  <div>
+                    <strong>Strict Risk Protocol:</strong> CSAB me choices bohot dhyan se bharna! Agar CSAB Special Round me koi nayi seat allot ho gayi, toh aapki purani JoSAA waali seat automatic chali jayegi, fir aap purani seat ko wapas claim nahi kar sakte.
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Mandatory Documents Checklist Layout */}
+          <div className="bg-white border border-[#e2e2e2] rounded-xl p-6 shadow-xs mt-8">
+            <h3 className="font-bold text-base text-[#1a1c1c] mb-3 flex items-center gap-2"><FileText size={18} className="text-[#705d00]" /> Verified Documents Array (Common for JoSAA & CSAB)</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-[#5f5e5e]">
+              <div className="space-y-1.5">
+                <p>✅ Class 10th Certificate (Age Variant Matrix)</p>
+                <p>✅ Class 12th Official Marksheet & Passing Records</p>
+                <p>✅ JEE Main / Advanced Rank Card & Hall Ticket Instance</p>
+              </div>
+              <div className="space-y-1.5">
+                <p>✅ State Category Certificate (OBC-NCL/SC/ST/EWS strictly valid format)</p>
+                <p>✅ Official signed Medical Certificate (JoSAA format mandatory)</p>
+                <p>✅ Crossed Bank Cheque copy or Passbook page for transaction auditing</p>
+              </div>
+            </div>
           </div>
 
         </section>
       )}
 
-      {/* 5️⃣ TAB CONTENT: PREDICTOR ENGINE */}
+      {/* 3️⃣ TAB CONTENT: PREDICTOR ENGINE */}
       {activeTab === 'Predictor' && (
         <>
           <section className="bg-white border-b border-[#e8e8e8] py-12 px-6">
@@ -315,16 +334,32 @@ export default function Home() {
               </form>
             </div>
           </section>
+
+          <section ref={predictorRef} className="max-w-4xl mx-auto py-12 px-6 scroll-mt-20">
+            {hasSearched && results.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-xs font-bold text-[#5f5e5e] uppercase tracking-widest">🎯 SUGGESTED ALLOTMENTS GRID</h3>
+                {results.map(college => (
+                  <div key={college.id} className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-sm accent-border card-hover transition-all">
+                    <div className="flex justify-between items-start mb-2">
+                      <div><h4 className="font-bold text-[#1a1c1c] text-base">{college.institute}</h4><p className="text-xs text-[#5f5e5e] mt-1">{college.program}</p></div>
+                      <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 bg-emerald-50 text-emerald-800 border rounded-full uppercase">{college.chance} Allotment</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
         </>
       )}
 
-      {/* 6️⃣ TAB CONTENT: OPENING/CLOSING RANKS */}
+      {/* 4️⃣ TAB CONTENT: OPENING/CLOSING RANKS */}
       {activeTab === 'Opening/Closing Ranks' && (
         <section className="max-w-6xl mx-auto px-4 md:px-8 py-12">
           <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-[#e2e2e2]">
             <table className="w-full text-left border-collapse min-w-[900px]">
               <thead>
-                <tr className="bg-[#5f5e5e] text-white text-xs font-bold"><th className="px-6 py-4">Institute</th><th className="px-6 py-4">Program</th><th className="px-6 py-4">Quota</th><th className="px-6 py-4">Category</th><th className="px-6 py-4">Opening</th><th className="px-6 py-4">Closing</th></tr>
+                <tr className="bg-[#5f5e5e] text-white text-xs uppercase tracking-wider font-bold"><th className="px-6 py-4">Institute</th><th className="px-6 py-4">Program</th><th className="px-6 py-4">Quota</th><th className="px-6 py-4">Category</th><th className="px-6 py-4">Opening</th><th className="px-6 py-4">Closing</th></tr>
               </thead>
               <tbody className="divide-y divide-[#e2e2e2] text-sm">
                 {paginatedData.map((item, idx) => (
@@ -336,7 +371,15 @@ export default function Home() {
         </section>
       )}
 
-      {activeTab === 'Seat Matrix' && <section className="max-w-4xl mx-auto px-6 py-12"><h2 className="text-xl font-extrabold border-b pb-2">Seat Matrix Log Ledger</h2></section>}
+      {activeTab === 'Analysis' && (
+        <section className="max-w-6xl mx-auto px-6 py-12 text-left animate-fadeIn">
+          <div className="mb-10 border-b border-[#e2e2e2] pb-4"><h2 className="text-3xl font-extrabold text-[#1a1c1c] font-display">Cutoff Volatility Analytics</h2></div>
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-10"><div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs"><div className="text-[10px] font-mono font-bold text-[#5f5e5e] uppercase">CSE Volatility Delta</div><div className="text-2xl font-black text-red-600 mt-1">↗ +14.2%</div></div></div>
+        </section>
+      )}
+
+      {activeTab === 'Deadlines' && <section className="max-w-3xl mx-auto px-6 py-12 text-left"><h2 className="text-xl font-black font-display border-b border-[#e2e2e2] pb-2">Target Date Schedules</h2></section>}
+      {activeTab === 'Seat Matrix' && <section className="max-w-4xl mx-auto px-6 py-12 text-left"><h2 className="text-xl font-extrabold font-display border-b border-[#e2e2e2] pb-2">Seat Matrix Log Ledger</h2></section>}
 
       <footer className="bg-[#e8e8e8] border-t border-[#e2e2e2] mt-24 pt-12 pb-8 text-xs text-[#4d4732] px-6">
         <p className="text-center">© 2026 CollegeAchiver Platforms. Handcrafted for ambitious students everywhere.</p>
