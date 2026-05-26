@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef, useMemo, useEffect } from 'react';
-import { School, Award, TrendingUp, Search, MapPin, Download, CheckSquare, Layers, BarChart3, ChevronLeft, ChevronRight, Mail, Share2, Globe, CheckCircle, Star, BookOpen, ShieldAlert, FileText, Activity, Percent, Clock, AlertCircle, Calendar, RefreshCw, MessageSquare, X, Send, Lock, User, UserPlus, LayoutDashboard, Database, UserCog, ShieldCheck, PlusCircle, Eye, QrCode, MessageCircle } from 'lucide-react';
+import { School, ChevronLeft, ChevronRight, Calendar, MessageSquare, X, Send, LayoutDashboard, Database, UserCog, ShieldCheck, PlusCircle, Eye, QrCode, MessageCircle } from 'lucide-react';
 import { massiveJosaaData, CollegeData } from './josaaData';
 import { supabase } from './supabaseClient'; // 🚀 Connected Cloud Core Client Node
 
@@ -56,7 +56,7 @@ export default function Home() {
 
   // Telemetry Traffic counters
   const [totalVisits, setTotalVisits] = useState(1248); 
-  const [studentSessions, setStudentSessions] = useState<StudentLog[]>([
+  const [studentSessions] = useState<StudentLog[]>([
     { email: 'student.test@achiver.in', tokenType: 'OTP_EMAIL_OK', queriesCount: 12, status: 'ONLINE', timestamp: '12:15 PM' },
     { email: 'sanya.patel@delhi.edu', tokenType: 'OAUTH_GOOGLE_OK', queriesCount: 8, status: 'OFFLINE', timestamp: '11:20 AM' }
   ]);
@@ -76,7 +76,6 @@ export default function Home() {
   const [passwordInput, setPasswordInput] = useState('');
 
   const [adminView, setAdminView] = useState<'Overview' | 'Database' | 'Users'>('Overview');
-  const [adminSearch, setAdminSearch] = useState('');
 
   // Form Inputs State Buffers
   const [newInst, setNewInst] = useState('');
@@ -175,12 +174,12 @@ export default function Home() {
     alert(`✨ Welcome back bhai! Logged in as: ${emailInput}`);
     setIsSignInOpen(false);
   };
-// ⚙️ WRITE OPERATION
+
+  // ⚙️ WRITE OPERATION
   const handleAddCutoffRecord = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newInst || !newProg || !newOpenRank || !newCloseRank) return alert("Form k cells ko fill karein!");
 
-    // Sirf wahi columns jo Supabase table me 100% exist karte hain
     const newRowData = {
       institute: newInst,
       program: newProg,
@@ -213,7 +212,6 @@ export default function Home() {
       alert(`🚨 Crash Error: ${err?.message || "Unknown Network Crash"}`);
     }
   };
-  
 
   const handleAddDeadlineEvent = (e: React.FormEvent) => {
     e.preventDefault();
@@ -446,14 +444,14 @@ export default function Home() {
                 <button onClick={() => setAdminView('Users')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left ${adminView === 'Users' ? 'bg-[#ffd700] text-black font-bold' : 'hover:bg-zinc-800'}`}><UserCog size={16} /> Premium Gate Setup</button>
               </div>
             </div>
-            <button onClick={() => { setActiveTab('Home'); setAdminSearch(''); }} className="w-full bg-zinc-800 hover:bg-red-950 text-zinc-300 font-bold py-2.5 rounded-xl text-xs uppercase font-mono text-center shadow-md cursor-pointer"> Exit Control Desk</button>
+            <button onClick={() => { setActiveTab('Home'); }} className="w-full bg-zinc-800 hover:bg-red-950 text-zinc-300 font-bold py-2.5 rounded-xl text-xs uppercase font-mono text-center shadow-md cursor-pointer"> Exit Control Desk</button>
           </aside>
 
           <section className="flex-1 p-6 md:p-10 overflow-y-auto text-left">
             {adminView === 'Overview' && (
               <div className="space-y-8 animate-fadeIn">
                 <h2 className="text-2xl font-extrabold text-white">System Core Control Overview</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="bg-[#1a1b1e] border-2 border-[#ffd700]/40 p-6 rounded-2xl relative shadow-lg">
                     <div className="absolute top-0 right-0 p-4 text-[#ffd700]/20"><Eye size={20}/></div>
                     <div className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">Total Website Live Visits</div>
