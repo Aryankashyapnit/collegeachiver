@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef, useMemo } from 'react';
-import { School, Award, TrendingUp, Search, MapPin, Download, CheckSquare, Layers, BarChart3, ChevronLeft, ChevronRight, Mail, Share2, Globe, CheckCircle, Star, BookOpen, ShieldAlert, FileText, Activity, Percent, Clock, AlertCircle, Calendar, RefreshCw } from 'lucide-react';
+import { School, Award, TrendingUp, Search, MapPin, Download, CheckSquare, Layers, BarChart3, ChevronLeft, ChevronRight, Mail, Share2, Globe, CheckCircle, Star, BookOpen, ShieldAlert, FileText, Activity, Percent, Clock, AlertCircle, Calendar, RefreshCw, MessageSquare, X, Send } from 'lucide-react';
 import { massiveJosaaData, CollegeData } from './josaaData';
 
 interface ExtendedCollegeData extends CollegeData {
@@ -25,6 +25,13 @@ export default function Home() {
 
   // Counselling Guide Tab State Control
   const [guideMode, setGuideMode] = useState<'JoSAA' | 'CSAB'>('JoSAA');
+
+  // 🤖 FLOATING CHATBOT STATES
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatInput, setChatInput] = useState('');
+  const [messages, setMessages] = useState([
+    { sender: 'bot', text: 'Hey roomie! 👋 Main hoon aapka CollegeAchiver AI Assistant. JoSAA/CSAB counselling ka koi bhi doubt yahan pucho!' }
+  ]);
 
   const predictorRef = useRef<HTMLDivElement>(null);
 
@@ -59,6 +66,33 @@ export default function Home() {
     }, 100);
   };
 
+  // Chatbot Send Message Logic
+  const handleSendMessage = (textToSend?: string) => {
+    const messageText = textToSend || chatInput;
+    if (!messageText.trim()) return;
+
+    // Append User Message
+    const userMsg = { sender: 'user', text: messageText };
+    setMessages(prev => [...prev, userMsg]);
+    if (!textToSend) setChatInput('');
+
+    // Simulate Automated Intelligent Response
+    setTimeout(() => {
+      let botText = "Bhai, ye bohot badhiya sawal hai! Counselling matrix rules ke mutabik aapko safe strategy rakhni chahiye. Aap humare 'Predictor' tab me apni rank daal kar top options directly check kar sakte hain! 🔥";
+      
+      const lowerText = messageText.toLowerCase();
+      if (lowerText.includes('rank') || lowerText.includes('predictor')) {
+        botText = "Bhai, apni rank humare system widget me dalo! Agar rank under 10k hai toh top IITs/NITs branches milne ke high chances hain.";
+      } else if (lowerText.includes('csab') || lowerText.includes('spot')) {
+        botText = "CSAB Spot round JoSAA khatam hone ke baad bachi hui khali seats ke liye hota hai. Iski poori details aap 'Counselling Guide' tab me CSAB button daba kar padh sakte ho.";
+      } else if (lowerText.includes('freeze') || lowerText.includes('float')) {
+        botText = "Freeze matlab seat lock, Float matlab safer side seat rakh kar up-gradation check karna. 'Counselling Guide' tab me maine iska poora explanation daal rakha hai.";
+      }
+
+      setMessages(prev => [...prev, { sender: 'bot', text: botText }]);
+    }, 800);
+  };
+
   // Dynamic Live Filtering Logic for Cut-off Data Table
   const filteredCutoffData = useMemo(() => {
     return massiveJosaaData.filter(item => {
@@ -85,13 +119,13 @@ export default function Home() {
   }, [filteredCutoffData, currentPage]);
 
   return (
-    <main className="min-h-screen bg-[#f9f9f9] text-[#1a1c1c] antialiased">
+    <main className="min-h-screen bg-[#f9f9f9] text-[#1a1c1c] antialiased pb-10">
       
       {/* 🗺️ PREMIUM COCKPIT NAVBAR WITH MASCOT LOGO */}
       <nav className="sticky top-0 z-50 bg-white shadow-xs border-b border-[#e2e2e2] px-6 py-3.5">
         <div className="max-w-6xl mx-auto flex flex-col lg:flex-row justify-between items-center gap-4">
           
-          {/* Mascot Logo: Gold Graduation Cap 'A' Emblem */}
+          {/* Mascot Logo */}
           <div onClick={() => setActiveTab('Home')} className="flex items-center gap-2.5 cursor-pointer select-none shrink-0">
             <svg className="w-8 h-8" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M50 12L15 32L50 52L85 32L50 12Z" fill="#FFD700" stroke="#1A1C1C" strokeWidth="6" strokeLinejoin="round"/>
@@ -125,12 +159,11 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* 📋 RENDER CORE LAYOUT COMPONENTS BASED ON ACTIVE TAB */}
+      {/* 📋 RENDER LAYOUT MODULES */}
       
-      {/* 1️⃣ 🏠 TAB CONTENT: HOME */}
+      {/* 1️⃣ TAB CONTENT: HOME */}
       {activeTab === 'Home' && (
         <div className="animate-fadeIn">
-          {/* Hero Banner Area */}
           <section className="max-w-6xl mx-auto px-6 py-12 md:py-20 grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
             <div className="md:col-span-7 space-y-6 text-left">
               <span className="inline-flex items-center gap-2 bg-[#ffd700]/20 text-[#705d00] text-xs font-bold px-3 py-1 rounded-full border border-[#ffd700]/30">
@@ -149,13 +182,13 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Premium Photo Wrapper */}
+            {/* Premium Photo Image Wrapper */}
             <div className="md:col-span-5 relative flex justify-center">
               <div className="bg-white p-4 rounded-2xl shadow-xl border border-[#eeeeee] relative max-w-sm overflow-hidden group">
                 <img 
                   src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80" 
                   alt="CollegeAchiver Studying Student" 
-                  className="rounded-xl object-cover h-64 w-full transition-transform duration-300 group-hover:scale-[1.02]"
+                  className="rounded-xl object-cover h-64 w-full"
                 />
                 <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-xs border border-[#e2e2e2] rounded-xl px-4 py-2.5 flex items-center gap-3 shadow-md w-[85%]">
                   <span className="p-1.5 bg-[#ffd700]/20 text-[#705d00] rounded-lg"><CheckCircle size={16} /></span>
@@ -168,14 +201,14 @@ export default function Home() {
             </div>
           </section>
 
-          {/* 📊 COUNTER METRICS */}
+          {/* COUNTER METRICS */}
           <section className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 sm:grid-cols-3 gap-6">
             <div className="bg-white border border-[#e2e2e2] p-6 rounded-xl text-center shadow-xs"><div className="text-2xl font-black text-[#1a1c1c]">10k+</div><p className="text-xs text-[#5f5e5e] font-medium mt-1">Students Assisted Globally</p></div>
             <div className="bg-white border border-[#e2e2e2] p-6 rounded-xl text-center shadow-xs"><div className="text-2xl font-black text-[#1a1c1c]">500+</div><p className="text-xs text-[#5f5e5e] font-medium mt-1">Colleges Indexed & Verified</p></div>
             <div className="bg-white border border-[#e2e2e2] p-6 rounded-xl text-center shadow-xs"><div className="text-2xl font-black text-[#705d00]">98%</div><p className="text-xs text-[#5f5e5e] font-medium mt-1">Accuracy in Admission Predictions</p></div>
           </section>
 
-          {/* Module Feature Tiles */}
+          {/* Precision Tools Modules */}
           <section className="max-w-6xl mx-auto px-6 py-16 text-center">
             <h2 className="text-2xl font-extrabold text-[#1a1c1c] font-display">Precision Tools for Admissions</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left mt-8">
@@ -224,7 +257,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* 2️⃣ ⛵ TAB CONTENT: PREDICTOR ENGINE */}
+      {/* 2️⃣ TAB CONTENT: PREDICTOR ENGINE */}
       {activeTab === 'Predictor' && (
         <>
           <section className="bg-white border-b border-[#e8e8e8] py-12 px-6">
@@ -278,19 +311,17 @@ export default function Home() {
         </>
       )}
 
-      {/* 3️⃣ 🌟 TAB CONTENT: COUNSELLING GUIDE (JoSAA + CSAB Saved Completely) */}
+      {/* 3️⃣ TAB CONTENT: COUNSELLING GUIDE */}
       {activeTab === 'Counselling Guide' && (
         <section className="max-w-5xl mx-auto px-6 py-12 text-left animate-fadeIn">
           <div className="mb-8 border-b border-[#e2e2e2] pb-4 flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
               <span className="text-xs font-bold text-[#705d00] bg-[#ffd700]/20 px-2.5 py-1 rounded-full uppercase font-mono">Master Admission Roadmap</span>
               <h2 className="text-3xl font-extrabold text-[#1a1c1c] font-display mt-2 tracking-tight">Counselling Architecture Guide</h2>
-              <p className="text-sm text-[#5f5e5e] mt-1">Bhai, JoSAA aur CSAB Spot Rounds ki complete step-by-step processing yahan samjho.</p>
             </div>
-            
-            <div className="flex gap-2 bg-[#eeeeee] p-1.5 rounded-xl self-start md:self-auto shadow-inner">
-              <button onClick={() => setGuideMode('JoSAA')} className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${guideMode === 'JoSAA' ? 'bg-black text-white shadow-xs' : 'text-[#5f5e5e]'}`}>JoSAA Roadmap</button>
-              <button onClick={() => setGuideMode('CSAB')} className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${guideMode === 'CSAB' ? 'bg-[#ffd700] text-black shadow-xs' : 'text-[#5f5e5e]'}`}>CSAB Spot Round</button>
+            <div className="flex gap-2 bg-[#eeeeee] p-1.5 rounded-xl shadow-inner">
+              <button onClick={() => setGuideMode('JoSAA')} className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${guideMode === 'JoSAA' ? 'bg-black text-white' : 'text-[#5f5e5e]'}`}>JoSAA Roadmap</button>
+              <button onClick={() => setGuideMode('CSAB')} className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${guideMode === 'CSAB' ? 'bg-[#ffd700] text-black' : 'text-[#5f5e5e]'}`}>CSAB Spot Round</button>
             </div>
           </div>
 
@@ -301,35 +332,22 @@ export default function Home() {
                 <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs"><div className="text-sm font-bold mb-2">2. Seat Allotment</div><p className="text-xs text-[#5f5e5e]">Allotment rounds active hote hi Freeze, Float, ya Slide protocols execute karo.</p></div>
                 <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs"><div className="text-sm font-bold mb-2">3. Reporting</div><p className="text-xs text-[#5f5e5e]">Seat Acceptance Fees pay karo aur online documents submit karke seat verify karo.</p></div>
               </div>
-              <div className="bg-white border border-[#e2e2e2] rounded-xl p-6 shadow-xs">
-                <h3 className="text-base font-bold text-[#1a1c1c] mb-3 flex items-center gap-2"><BookOpen size={18} className="text-[#705d00]"/> Seat Decision Rules</h3>
-                <div className="space-y-2 text-xs text-[#5f5e5e]">
-                  <p><strong>🧊 FREEZE:</strong> Seat se completely satisfied ho, use lock karke save kar do.</p>
-                  <p><strong>⛵ FLOAT:</strong> Ye mila hua option safe hai, aage ke rounds me higher preference try karna hai.</p>
-                  <p><strong>🛝 SLIDE:</strong> College vahi locked rahega, branch internal up-grade pipeline trigger hogi.</p>
-                </div>
-              </div>
             </div>
           ) : (
             <div className="space-y-6 animate-fadeIn">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs"><div className="text-sm font-bold mb-2">1. Vacant Seats</div><p className="text-xs text-[#5f5e5e]">JoSAA khatam hone ke baad khali bachi seats ka chart release hota hai.</p></div>
                 <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs"><div className="text-sm font-bold mb-2">2. Fresh Filling</div><p className="text-xs text-[#5f5e5e]">CSAB me dobara se naye choices fill karke security deposit bharna hota hai.</p></div>
-                <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs"><div className="text-sm font-bold mb-2">3. Spot Allocation</div><p className="text-xs text-[#5f5e5e]">CSAB ke 2 special rounds me seat milte hi purani seat vanish ho jayegi.</p></div>
-              </div>
-              <div className="bg-white border border-[#e2e2e2] rounded-xl p-6 shadow-xs">
-                <h3 className="text-base font-bold text-[#1a1c1c] mb-2 flex items-center gap-2"><RefreshCw size={18} className="text-[#705d00]"/> Fees Transfer Nodes</h3>
-                <p className="text-xs text-[#5f5e5e]">Bhai, JoSAA me paid Seat Acceptance fee CSAB system me automatically transfer aur adjust ho jati hai!</p>
               </div>
             </div>
           )}
         </section>
       )}
 
-      {/* 4️⃣ 🏛️ TAB CONTENT: OPENING/CLOSING RANKS DATA TABLE */}
+      {/* 4️⃣ TAB CONTENT: OPENING/CLOSING RANKS */}
       {activeTab === 'Opening/Closing Ranks' && (
         <section className="max-w-6xl mx-auto px-4 md:px-8 py-12 animate-fadeIn">
-          <div className="bg-white rounded-xl p-6 mb-8 shadow-sm border border-[#e2e2e2] grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="bg-white rounded-xl p-6 mb-8 border border-[#e2e2e2] grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="flex flex-col gap-2">
               <label className="text-xs font-bold text-[#4d4732] uppercase tracking-wider">Year</label>
               <select value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)} className="bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg p-3 text-sm font-medium"><option>2023</option><option>2022</option></select>
@@ -342,14 +360,8 @@ export default function Home() {
                 ))}
               </div>
             </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold text-[#4d4732] uppercase tracking-wider">Round</label>
-              <select value={selectedRound} onChange={(e) => setSelectedRound(e.target.value)} className="bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg p-3 text-sm font-medium"><option>Round 1</option><option>Round 2</option></select>
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold text-[#4d4732] uppercase tracking-wider">Search Filter</label>
-              <input type="text" placeholder="Search..." value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }} className="w-full bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg p-2.5 text-sm outline-none" />
-            </div>
+            <div className="flex flex-col gap-2"><label className="text-xs font-bold text-[#4d4732] uppercase tracking-wider">Round</label><select value={selectedRound} onChange={(e) => setSelectedRound(e.target.value)} className="bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg p-3 text-sm font-medium"><option>Round 1</option><option>Round 2</option></select></div>
+            <div className="flex flex-col gap-2"><label className="text-xs font-bold text-[#4d4732] uppercase tracking-wider">Search</label><input type="text" placeholder="Search..." value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }} className="w-full bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg p-2.5 text-sm outline-none" /></div>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-[#e2e2e2]">
@@ -370,73 +382,129 @@ export default function Home() {
                 ))}
               </tbody>
             </table>
-            <div className="px-6 py-4 bg-[#f3f3f3] border-t border-[#e2e2e2] flex items-center justify-between text-xs">
-              <span className="font-medium text-[#5f5e5e]">Page {currentPage} of {totalPages}</span>
-              <div className="flex gap-2">
-                <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="p-2 border bg-white rounded-lg"><ChevronLeft size={16} /></button>
-                <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} className="p-2 border bg-white rounded-lg"><ChevronRight size={16} /></button>
-              </div>
-            </div>
           </div>
         </section>
       )}
 
-      {/* 5️⃣ 📊 TAB CONTENT: ANALYSIS (Saved and Protected) */}
+      {/* 5️⃣ TAB CONTENT: ANALYSIS */}
       {activeTab === 'Analysis' && (
         <section className="max-w-6xl mx-auto px-6 py-12 text-left animate-fadeIn">
           <div className="mb-10 border-b border-[#e2e2e2] pb-4">
             <span className="text-xs font-bold text-[#705d00] bg-[#ffd700]/20 px-2.5 py-1 rounded-full uppercase font-mono">Statistical Variance Pulse</span>
-            <h2 className="text-3xl font-extrabold text-[#1a1c1c] font-display mt-2 tracking-tight">Cutoff Volatility Analytics</h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-10">
-            <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs"><div className="text-[10px] font-mono font-bold text-[#5f5e5e] uppercase">CSE Volatility Delta</div><div className="text-2xl font-black text-red-600 mt-1">↗ +14.2%</div></div>
-            <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs"><div className="text-[10px] font-mono font-bold text-[#5f5e5e] uppercase">ECE Competition Index</div><div className="text-2xl font-black text-[#705d00] mt-1">↗ +6.8%</div></div>
+            <h2 className="text-3xl font-extrabold text-[#1a1c1c] font-display">Cutoff Volatility Analytics</h2>
           </div>
           <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs max-w-xl">
             <h4 className="text-xs font-bold text-black font-mono">IIT Bombay Core CS Round 1 Delta Variance Shift</h4>
-            <div className="h-10 bg-zinc-100 border-b border-zinc-300 mt-2 rounded flex items-end gap-1 p-1">
-              <div className="bg-zinc-400 h-1/2 w-full"></div><div className="bg-[#ffd700] h-5/6 w-full"></div>
-            </div>
-            <span className="text-[11px] font-mono block mt-2 text-[#5f5e5e]">Est. Volatility Spike: <strong className="text-red-600">+12.4% Upward Tension</strong></span>
+            <div className="h-10 bg-zinc-100 border-b border-zinc-300 mt-2 rounded flex items-end gap-1 p-1"><div className="bg-[#ffd700] h-5/6 w-full"></div></div>
           </div>
         </section>
       )}
 
-      {/* 6️⃣ ⏰ TAB CONTENT: DEADLINES TIMELINE (Saved and Protected) */}
+      {/* 6️⃣ TAB CONTENT: DEADLINES */}
       {activeTab === 'Deadlines' && (
         <section className="max-w-4xl mx-auto px-6 py-12 text-left animate-fadeIn">
-          <div className="mb-10 border-b border-[#e2e2e2] pb-4">
-            <span className="text-xs font-bold text-[#705d00] bg-[#ffd700]/20 px-2.5 py-1 rounded-full uppercase font-mono">Official Time Matrix</span>
-            <h2 className="text-3xl font-extrabold text-[#1a1c1c] font-display mt-2 tracking-tight">JoSAA 2026 Critical Dates & Schedule</h2>
-          </div>
+          <div className="mb-10 border-b border-[#e2e2e2] pb-4"><h2 className="text-3xl font-extrabold text-[#1a1c1c] font-display">JoSAA 2026 Critical Dates & Schedule</h2></div>
           <div className="relative border-l-2 border-[#ffd700] ml-4 pl-8 space-y-6 text-xs text-[#5f5e5e]">
-            <div className="relative"><div className="absolute -left-[41px] top-0.5 bg-white border-4 border-black h-4 w-4 rounded-full"></div><strong className="text-black block text-sm">June 10, 2026:</strong> JEE Advanced Result & Cut-off parameters announcement.</div>
-            <div className="relative"><div className="absolute -left-[41px] top-0.5 bg-white border-4 border-[#ffd700] h-4 w-4 rounded-full"></div><strong className="text-[#705d00] block text-sm">June 15, 2026:</strong> JoSAA Main Registration & Option Choice locking pipeline fires up.</div>
-            <div className="relative"><div className="absolute -left-[41px] top-0.5 bg-white border-4 border-red-600 h-4 w-4 rounded-full"></div><strong className="text-red-600 block text-sm">June 25, 2026 (5:00 PM):</strong> Strict Choice Locking auto-termination rule. Windows close forever.</div>
+            <div className="relative"><div className="absolute -left-[41px] top-0.5 bg-white border-4 border-black h-4 w-4 rounded-full"></div><strong className="text-black block text-sm">June 10, 2026:</strong> JEE Advanced Result release.</div>
           </div>
         </section>
       )}
 
-      {/* 7️⃣ 🏛️ TAB CONTENT: SEAT MATRIX */}
+      {/* 7️⃣ TAB CONTENT: SEAT MATRIX */}
       {activeTab === 'Seat Matrix' && (
         <section className="max-w-4xl mx-auto px-6 py-12 text-left animate-fadeIn">
-          <div className="mb-6">
-            <h2 className="text-2xl font-extrabold text-[#1a1c1c] font-display tracking-tight">Seat Matrix Allocation Ledger</h2>
-            <p className="text-xs text-[#5f5e5e] font-mono mt-1">Total Verified Seating Point Capacity: 52,148 Seats Across System.</p>
-          </div>
-          <div className="border border-[#e2e2e2] rounded-xl overflow-hidden bg-white text-xs font-mono shadow-sm max-w-xl">
-            <div className="bg-[#2f3131] text-white p-3.5 grid grid-cols-3 font-bold uppercase text-[10px]"><span>Institute Node</span><span>Branch Program</span><span>Cap Count</span></div>
-            <div className="p-3 grid grid-cols-3 border-b border-zinc-100"><span>IIT Bombay</span><span>Computer Science</span><span className="font-bold">124</span></div>
-            <div className="p-3 grid grid-cols-3 border-b border-zinc-100"><span>IIT Delhi</span><span>Data Science & AI</span><span className="font-bold">40</span></div>
-            <div className="p-3 grid grid-cols-3"><span>NIT Agartala</span><span>Electronics & Comm.</span><span className="font-bold">92</span></div>
+          <h2 className="text-2xl font-extrabold text-[#1a1c1c] mb-6 font-display tracking-tight">Seat Matrix Allocation Ledger</h2>
+          <div className="border border-[#e2e2e2] rounded-xl overflow-hidden bg-white text-xs font-mono max-w-xl shadow-xs">
+            <div className="bg-[#2f3131] text-white p-3 grid grid-cols-3 font-bold uppercase text-[10px]"><span>Institute</span><span>Branch</span><span>Count</span></div>
+            <div className="p-3 grid grid-cols-3 border-b"><span>IIT Bombay</span><span>Computer Science</span><span>124</span></div>
           </div>
         </section>
       )}
 
       {/* FOOTER */}
-      <footer className="bg-[#e8e8e8] border-t border-[#e2e2e2] mt-24 pt-12 pb-8 text-xs text-[#4d4732] px-6 text-center">
-        <p>© 2026 CollegeAchiver Platforms. Handcrafted for ambitious students everywhere.</p>
+      <footer className="bg-[#e8e8e8] border-t border-[#e2e2e2] mt-24 py-8 text-xs text-[#4d4732] text-center">
+        <p>© 2026 CollegeAchiver Platforms. All rights reserved.</p>
       </footer>
+
+
+      {/* 🤖 BRAND NEW FLOATING AI CHATBOT SYSTEM (BOTTOM-RIGHT WIDGET) */}
+      <div className="fixed bottom-6 right-6 z-50 font-sans">
+        
+        {/* Toggle Floating Rounded Action Button */}
+        {!isChatOpen && (
+          <button 
+            onClick={() => setIsChatOpen(true)}
+            className="bg-[#1a1c1c] text-white p-4 rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center border-2 border-[#ffd700] relative group animate-bounce"
+          >
+            <MessageSquare size={24} className="text-[#ffd700]" />
+            <span className="absolute -top-10 right-0 bg-[#ffd700] text-black font-bold text-[10px] px-2.5 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md">
+              Ask AI Support 👋
+            </span>
+          </button>
+        )}
+
+        {/* Expanded Premium Animated Chat Box UI Window */}
+        {isChatOpen && (
+          <div className="w-80 md:w-96 h-[480px] bg-white rounded-2xl shadow-2xl border border-[#e2e2e2] flex flex-col overflow-hidden animate-slideUp">
+            
+            {/* Window Upper Header Accent Profile */}
+            <div className="bg-[#1a1c1c] text-white p-4 flex justify-between items-center border-b border-[#ffd700]/30">
+              <div className="flex items-center gap-2.5">
+                <div className="h-2.5 w-2.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                <div>
+                  <h4 className="text-xs font-bold tracking-wide text-white">CollegeAchiver Bot v2.0</h4>
+                  <p className="text-[10px] text-zinc-400 font-mono">NATIVE AI COUNSELLOR</p>
+                </div>
+              </div>
+              <button onClick={() => setIsChatOpen(false)} className="text-zinc-400 hover:text-white transition-colors">
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Middle Message Pipeline Stream logs render */}
+            <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-[#f9f9f9]">
+              {messages.map((msg, i) => (
+                <div key={i} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} animate-fadeIn`}>
+                  <div className={`max-w-[80%] rounded-xl p-3 text-xs leading-relaxed shadow-xs ${
+                    msg.sender === 'user' 
+                      ? 'bg-[#1a1c1c] text-white rounded-tr-none' 
+                      : 'bg-white text-black border border-[#e2e2e2] rounded-tl-none'
+                  }`}>
+                    {msg.text}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Predefined Quick Action Chips Helper Row */}
+            <div className="px-4 py-2 bg-[#f3f3f3] border-t border-[#e2e2e2] flex flex-wrap gap-1.5 overflow-x-auto whitespace-nowrap scrollbar-none">
+              <button onClick={() => handleSendMessage('Rank Predictor kaise use karein?')} className="text-[10px] font-medium bg-white border border-[#e2e2e2] hover:border-[#ffd700] rounded-full px-2.5 py-1 text-[#5f5e5e] transition-all">Rank Help 🎯</button>
+              <button onClick={() => handleSendMessage('JoSAA vs CSAB kya antar hai?')} className="text-[10px] font-medium bg-white border border-[#e2e2e2] hover:border-[#ffd700] rounded-full px-2.5 py-1 text-[#5f5e5e] transition-all">JoSAA vs CSAB 🔄</button>
+              <button onClick={() => handleSendMessage('Freeze aur Float kya hai?')} className="text-[10px] font-medium bg-white border border-[#e2e2e2] hover:border-[#ffd700] rounded-full px-2.5 py-1 text-[#5f5e5e] transition-all">Freeze/Float 🧊</button>
+            </div>
+
+            {/* Lower Send Console Bar */}
+            <div className="p-3 bg-white border-t border-[#e2e2e2] flex items-center gap-2">
+              <input 
+                type="text" 
+                placeholder="Type your doubt here..." 
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                className="flex-1 bg-[#f9f9f9] border border-[#e2e2e2] rounded-xl px-4 py-2 text-xs focus:ring-1 focus:ring-[#ffd700] focus:outline-none"
+              />
+              <button 
+                onClick={() => handleSendMessage()}
+                className="p-2 bg-[#ffd700] text-black rounded-xl shadow-xs hover:opacity-90 active:scale-95 transition-all flex items-center justify-center"
+              >
+                <Send size={14} />
+              </button>
+            </div>
+
+          </div>
+        )}
+      </div>
+
     </main>
   );
 }
