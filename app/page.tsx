@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef, useMemo } from 'react';
-import { School, Award, TrendingUp, Search, MapPin, Download, CheckSquare, Layers, BarChart3, ChevronLeft, ChevronRight, Mail, Share2, Globe, CheckCircle, Star } from 'lucide-react';
+import { School, Award, TrendingUp, Search, MapPin, Download, CheckSquare, Layers, BarChart3, ChevronLeft, ChevronRight, Mail, Share2, Globe, CheckCircle, Star, BookOpen, ShieldAlert, FileText, HelpCircle } from 'lucide-react';
 import { massiveJosaaData, CollegeData } from './josaaData';
 
 interface ExtendedCollegeData extends CollegeData {
@@ -135,14 +135,13 @@ export default function Home() {
               </div>
             </div>
 
-            {/* 📸 FIXED HERO IMAGE WRAPPER (Swapped to target screenarya2.png config) */}
             <div className="md:col-span-5 relative flex justify-center">
               <div className="bg-white p-4 rounded-2xl shadow-xl border border-[#eeeeee] relative max-w-sm overflow-hidden group">
                 <img 
-  src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80" 
-  alt="CollegeAchiver Studying Student" 
-  className="rounded-xl object-cover h-64 w-full transition-transform duration-300 group-hover:scale-[1.02]"
-/>
+                  src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80" 
+                  alt="CollegeAchiver Studying Student" 
+                  className="rounded-xl object-cover h-64 w-full transition-transform duration-300 group-hover:scale-[1.02]"
+                />
                 <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-xs border border-[#e2e2e2] rounded-xl px-4 py-2.5 flex items-center gap-3 shadow-md w-[85%]">
                   <span className="p-1.5 bg-[#ffd700]/20 text-[#705d00] rounded-lg"><CheckCircle size={16} /></span>
                   <div className="text-left">
@@ -154,63 +153,105 @@ export default function Home() {
             </div>
           </section>
 
-          {/* 📊 COUNTER METRICS */}
+          {/* METRICS COUNTER */}
           <section className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 sm:grid-cols-3 gap-6">
             <div className="bg-white border border-[#e2e2e2] p-6 rounded-xl text-center shadow-xs"><div className="text-2xl font-black text-[#1a1c1c]">10k+</div><p className="text-xs text-[#5f5e5e] font-medium mt-1">Students Assisted Globally</p></div>
             <div className="bg-white border border-[#e2e2e2] p-6 rounded-xl text-center shadow-xs"><div className="text-2xl font-black text-[#1a1c1c]">500+</div><p className="text-xs text-[#5f5e5e] font-medium mt-1">Colleges Indexed & Verified</p></div>
             <div className="bg-white border border-[#e2e2e2] p-6 rounded-xl text-center shadow-xs"><div className="text-2xl font-black text-[#705d00]">98%</div><p className="text-xs text-[#5f5e5e] font-medium mt-1">Accuracy in Admission Predictions</p></div>
           </section>
-
-          {/* Precision Tools Modules */}
-          <section className="max-w-6xl mx-auto px-6 py-16 text-center">
-            <h2 className="text-2xl font-extrabold text-[#1a1c1c]">Precision Tools for Admissions</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left mt-8">
-              <div onClick={() => setActiveTab('Predictor')} className="bg-white border border-[#e2e2e2] p-6 rounded-xl flex justify-between gap-4 shadow-xs hover:border-[#ffd700] cursor-pointer transition-all">
-                <div className="space-y-2">
-                  <span className="text-[10px] font-bold text-[#705d00] bg-[#ffd700]/20 px-2 py-0.5 rounded-full uppercase">AI Powered</span>
-                  <h4 className="font-bold text-base text-black">Rank Prediction Engine</h4>
-                  <p className="text-xs text-[#5f5e5e] leading-relaxed">Leveraging 10+ years of historical data from JoSAA to give you the most accurate college match.</p>
-                </div>
-                <div className="p-4 bg-[#f9f9f9] rounded-xl text-[#705d00] h-12 w-12 flex items-center justify-center shrink-0"><BarChart3 size={20} /></div>
-              </div>
-              <div onClick={() => setActiveTab('Counselling Guide')} className="bg-white border border-[#e2e2e2] p-6 rounded-xl flex justify-between gap-4 shadow-xs hover:border-[#ffd700] cursor-pointer transition-all">
-                <div className="space-y-2">
-                  <span className="text-[10px] font-bold text-[#5f5e5e] bg-[#eeeeee] px-2 py-0.5 rounded-full uppercase">Guidance</span>
-                  <h4 className="font-bold text-base text-black">Counselling Roadmap</h4>
-                  <p className="text-xs text-[#5f5e5e] leading-relaxed">A step-by-step personalized guide through the admission maze from verification to allotment.</p>
-                </div>
-                <div className="p-4 bg-[#f9f9f9] rounded-xl text-zinc-600 h-12 w-12 flex items-center justify-center shrink-0"><Layers size={20} /></div>
-              </div>
-            </div>
-          </section>
-
-          {/* Testimonials */}
-          <section className="bg-[#2f3131] text-white py-16 px-6 border-t border-black">
-            <div className="max-w-6xl mx-auto text-center">
-              <h3 className="text-2xl font-bold text-white">Trusted by Thousands</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left mt-10">
-                <div className="bg-white/5 border border-white/10 p-5 rounded-xl space-y-3">
-                  <div className="flex gap-1 text-[#ffd700]"><Star size={12} fill="#ffd700" /><Star size={12} fill="#ffd700" /><Star size={12} fill="#ffd700" /><Star size={12} fill="#ffd700" /><Star size={12} fill="#ffd700" /></div>
-                  <p className="text-xs text-[#e2e2e2] italic">"The rank predictor was surprisingly accurate! It gave me the confidence to apply for IIT Delhi."</p>
-                  <div className="flex items-center gap-2 pt-2 border-t border-white/5 text-xs"><strong>AK</strong> <span>Aryan Khanna (IITD '27)</span></div>
-                </div>
-                <div className="bg-white/5 border border-white/10 p-5 rounded-xl space-y-3">
-                  <div className="flex gap-1 text-[#ffd700]"><Star size={12} fill="#ffd700" /><Star size={12} fill="#ffd700" /><Star size={12} fill="#ffd700" /><Star size={12} fill="#ffd700" /><Star size={12} fill="#ffd700" /></div>
-                  <p className="text-xs text-[#e2e2e2] italic">"The counselling roadmap simplified the entire JoSAA process flawlessly."</p>
-                  <div className="flex items-center gap-2 pt-2 border-t border-white/5 text-xs"><strong>SP</strong> <span>Sanya Patel (NITT '27)</span></div>
-                </div>
-                <div className="bg-white/5 border border-white/10 p-5 rounded-xl space-y-3">
-                  <div className="flex gap-1 text-[#ffd700]"><Star size={12} fill="#ffd700" /><Star size={12} fill="#ffd700" /><Star size={12} fill="#ffd700" /><Star size={12} fill="#ffd700" /><Star size={12} fill="#ffd700" /></div>
-                  <p className="text-xs text-[#e2e2e2] italic">"Best platform for college prediction. The clean UI and data-backed results are top notch."</p>
-                  <div className="flex items-center gap-2 pt-2 border-t border-white/5 text-xs"><strong>RV</strong> <span>Rohan Verma (BITS '27)</span></div>
-                </div>
-              </div>
-            </div>
-          </section>
         </div>
       )}
 
-      {/* OTHER TABS RENDER MATRIX AS IS */}
+      {/* 2️⃣ 🌟 NEW DYNAMIC TAB CONTENT: COUNSELLING GUIDE */}
+      {activeTab === 'Counselling Guide' && (
+        <section className="max-w-5xl mx-auto px-6 py-12 text-left animate-fadeIn">
+          
+          {/* Header Banner */}
+          <div className="mb-10 border-b border-[#e2e2e2] pb-4">
+            <span className="text-xs font-bold text-[#705d00] bg-[#ffd700]/20 px-2.5 py-1 rounded-full uppercase font-mono">Step-by-Step Roadmap</span>
+            <h2 className="text-3xl font-extrabold text-[#1a1c1c] font-display mt-2 tracking-tight">JoSAA 2026 Counselling Master Guide</h2>
+            <p className="text-sm text-[#5f5e5e] mt-1">Bhai, engineering admission process ko aasan bhasha me samjho aur apni seat secure karo.</p>
+          </div>
+
+          {/* 3-Step Process Flow Visual Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs relative overflow-hidden group hover:border-[#ffd700] transition-all">
+              <div className="absolute top-0 left-0 h-1.5 w-full bg-[#ffd700]"></div>
+              <div className="flex items-center gap-2 text-sm font-bold text-[#1a1c1c] mb-2">
+                <span className="w-6 h-6 bg-[#1a1c1c] text-white rounded-full flex items-center justify-center text-xs">1</span>
+                Registration & Choice Filling
+              </div>
+              <p className="text-xs text-[#5f5e5e] leading-relaxed">JoSAA website par login karke apni profile verify karo, aur hamare predictor ki di hui best choice-list priority order me fill karo.</p>
+            </div>
+
+            <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs relative overflow-hidden group hover:border-[#ffd700] transition-all">
+              <div className="absolute top-0 left-0 h-1.5 w-full bg-[#ffd700]"></div>
+              <div className="flex items-center gap-2 text-sm font-bold text-[#1a1c1c] mb-2">
+                <span className="w-6 h-6 bg-[#1a1c1c] text-white rounded-full flex items-center justify-center text-xs">2</span>
+                Seat Allotment Round Result
+              </div>
+              <p className="text-xs text-[#5f5e5e] leading-relaxed">Har round ke baad system aapko seat allot karega. Allotment milte hi aapse teen bhasha me options puchega: Freeze, Float, ya Slide.</p>
+            </div>
+
+            <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs relative overflow-hidden group hover:border-[#ffd700] transition-all">
+              <div className="absolute top-0 left-0 h-1.5 w-full bg-[#ffd700]"></div>
+              <div className="flex items-center gap-2 text-sm font-bold text-[#1a1c1c] mb-2">
+                <span className="w-6 h-6 bg-[#ffd700] text-black rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                Document Upload & Fees
+              </div>
+              <p className="text-xs text-[#5f5e5e] leading-relaxed">Seat confirm karne ke liye online reporting karni hogi, seat acceptance fee pay karo aur documents up-to-date verify karwao.</p>
+            </div>
+          </div>
+
+          {/* Golden Core Concepts Block (Freeze, Float, Slide Core Rules) */}
+          <div className="bg-white border border-[#e2e2e2] rounded-xl p-6 shadow-xs mb-8">
+            <h3 className="text-lg font-bold text-[#1a1c1c] mb-4 flex items-center gap-2">
+              <BookOpen size={20} className="text-[#705d00]" /> Sabse Important: In Teen Options Ko Samjho
+            </h3>
+            
+            <div className="space-y-4 text-xs">
+              <div className="p-3 bg-zinc-50 rounded-lg border-l-4 border-zinc-400">
+                <strong className="text-black text-sm">🧊 FREEZE:</strong> Agar aapko jo college aur branch mili hai aap usse 100% khush hain, toh use freeze kar do. Aapki seat final ho jayegi aur aap aage ke rounds se bahar ho jayenge.
+              </div>
+              <div className="p-3 bg-[#ffd700]/10 rounded-lg border-l-4 border-[#ffd700]">
+                <strong className="text-[#705d00] text-sm">⛵ FLOAT:</strong> (Sabse Popular) Iska matlab aapko abhi mili seat toh safe hai, par agar aage ke rounds me aapko isse upar ki koi behtar choice milti hai, toh aap use lena chahenge. Agar upar ki seat nahi mili, toh ye safe rahegi.
+              </div>
+              <div className="p-3 bg-zinc-50 rounded-lg border-l-4 border-[#1a1c1c]">
+                <strong className="text-black text-sm">🛝 SLIDE:</strong> Iska matlab aapko mila hua college toh pasand hai, par aap usi same college ke andar koi behtar branch (jaise Civil se ECE/CSE) up-grade karwana chahte hain.
+              </div>
+            </div>
+          </div>
+
+          {/* Mandatory Documents Verification Checklist */}
+          <div className="bg-white border border-[#e2e2e2] rounded-xl p-6 shadow-xs grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="font-bold text-base text-[#1a1c1c] mb-3 flex items-center gap-2"><FileText size={18} className="text-[#705d00]" /> Mandatory Documents Checklist</h3>
+              <ul className="text-xs text-[#5f5e5e] space-y-2">
+                <li className="flex items-center gap-2">✅ Class 10th Certificate (DOB proof)</li>
+                <li className="flex items-center gap-2">✅ Class 12th Marksheet & Passing Certificate</li>
+                <li className="flex items-center gap-2">✅ JEE Main / Advanced Admit Card & Rank Card</li>
+                <li className="flex items-center gap-2">✅ Category Certificate (OBC-NCL/SC/ST/EWS if applicable)</li>
+                <li className="flex items-center gap-2">✅ Medical Certificate (Official JoSAA format me signed)</li>
+              </ul>
+            </div>
+            
+            <div className="bg-[#2f3131] text-white p-5 rounded-xl flex flex-col justify-between">
+              <div>
+                <h4 className="font-bold text-sm text-[#ffd700] mb-2 flex items-center gap-1.5"><ShieldAlert size={16} /> Bhai, Galti Mat Karna:</h4>
+                <p className="text-xs text-[#dadada] leading-relaxed">
+                  Agar Round 1 me seat allot hoti hai aur aapne documents verify ya seat fee online upload nahi ki, toh aapki seat automatic cancel ho jayegi aur aap pure counseling process se bahar fekh diye jaoge. Isliye dates ka dhyan strictly rakhna!
+                </p>
+              </div>
+              <button onClick={() => setActiveTab('Predictor')} className="mt-4 bg-[#ffd700] text-[#221b00] font-bold text-xs py-2.5 px-4 rounded-lg uppercase tracking-wider hover:opacity-90 self-start transition-all">
+                Check My Chances Now ➜
+              </button>
+            </div>
+          </div>
+
+        </section>
+      )}
+
+      {/* Baaki saare tabs previous settings ke hisab se constant chalenge */}
       {activeTab === 'Predictor' && (
         <>
           <section className="bg-white border-b border-[#e8e8e8] py-12 px-6">
@@ -240,12 +281,13 @@ export default function Home() {
               </form>
             </div>
           </section>
+
           <section ref={predictorRef} className="max-w-4xl mx-auto py-12 px-6 scroll-mt-20">
             {hasSearched && results.length > 0 && (
               <div className="space-y-4">
                 <h3 className="text-xs font-bold text-[#5f5e5e] uppercase tracking-widest">🎯 SUGGESTED ALLOTMENTS GRID</h3>
                 {results.map(college => (
-                  <div key={college.id} className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-sm accent-border transition-all">
+                  <div key={college.id} className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-sm accent-border card-hover transition-all">
                     <div className="flex justify-between items-start mb-2">
                       <div><h4 className="font-bold text-[#1a1c1c] text-base">{college.institute}</h4><p className="text-xs text-[#5f5e5e] mt-1">{college.program}</p></div>
                       <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 bg-emerald-50 text-emerald-800 border rounded-full uppercase">{college.chance} Allotment</span>
@@ -258,14 +300,12 @@ export default function Home() {
         </>
       )}
 
-      {activeTab === 'Counselling Guide' && <section className="max-w-4xl mx-auto px-6 py-12 text-left"><h2 className="text-2xl font-extrabold border-b pb-2">JoSAA Student Counselling Guide</h2></section>}
-
       {activeTab === 'Opening/Closing Ranks' && (
         <section className="max-w-6xl mx-auto px-4 md:px-8 py-12">
           <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-[#e2e2e2]">
             <table className="w-full text-left border-collapse min-w-[900px]">
               <thead>
-                <tr className="bg-[#5f5e5e] text-white text-xs font-bold"><th className="px-6 py-4">Institute</th><th className="px-6 py-4">Program</th><th className="px-6 py-4">Quota</th><th className="px-6 py-4">Category</th><th className="px-6 py-4">Opening</th><th className="px-6 py-4">Closing</th></tr>
+                <tr className="bg-[#5f5e5e] text-white text-xs uppercase tracking-wider font-bold"><th className="px-6 py-4">Institute</th><th className="px-6 py-4">Program</th><th className="px-6 py-4">Quota</th><th className="px-6 py-4">Category</th><th className="px-6 py-4">Opening</th><th className="px-6 py-4">Closing</th></tr>
               </thead>
               <tbody className="divide-y divide-[#e2e2e2] text-sm">
                 {paginatedData.map((item, idx) => (
@@ -277,9 +317,9 @@ export default function Home() {
         </section>
       )}
 
-      {activeTab === 'Analysis' && <section className="max-w-6xl mx-auto px-6 py-12"><h2 className="text-xl font-extrabold border-b pb-2">Analysis Shift Charts</h2></section>}
-      {activeTab === 'Deadlines' && <section className="max-w-3xl mx-auto px-6 py-12"><h2 className="text-xl font-black border-b pb-2">Target Date Schedules</h2></section>}
-      {activeTab === 'Seat Matrix' && <section className="max-w-4xl mx-auto px-6 py-12"><h2 className="text-xl font-extrabold border-b pb-2">Seat Matrix Log Ledger</h2></section>}
+      {activeTab === 'Analysis' && <section className="max-w-6xl mx-auto px-6 py-12"><h2 className="text-xl font-extrabold font-display border-b border-[#e2e2e2] pb-2">Analysis Shift Charts</h2></section>}
+      {activeTab === 'Deadlines' && <section className="max-w-3xl mx-auto px-6 py-12"><h2 className="text-xl font-black border-b border-[#e2e2e2] pb-2">Target Date Schedules</h2></section>}
+      {activeTab === 'Seat Matrix' && <section className="max-w-4xl mx-auto px-6 py-12"><h2 className="text-xl font-extrabold border-b border-[#e2e2e2] pb-2">Seat Matrix Log Ledger</h2></section>}
 
       <footer className="bg-[#e8e8e8] border-t border-[#e2e2e2] mt-24 pt-12 pb-8 text-xs text-[#4d4732] px-6">
         <p className="text-center">© 2026 CollegeAchiver Platforms. Handcrafted for ambitious students everywhere.</p>
