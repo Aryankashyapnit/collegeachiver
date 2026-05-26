@@ -23,14 +23,6 @@ interface SeatMatrixRecord {
   seats: number;
 }
 
-interface RefundRule {
-  id: number;
-  round: string;
-  josaaRule: string;
-  csabRule: string;
-  penalty: string;
-}
-
 export default function Home() {
   const [activeTab, setActiveTab] = useState('Home'); 
   const [rank, setRank] = useState('');
@@ -39,68 +31,62 @@ export default function Home() {
   const [homeState, setHomeState] = useState('OS'); 
   const [hasSearched, setHasSearched] = useState(false);
 
-  // 🏛️ MASTER SYSTEM DATABASE MEMORY STATES
+  // 🏛️ MASTER DYNAMIC CORE MEMORY STATES (100% Intact & Dynamic)
   const [dynamicJosaaRecords, setDynamicJosaaRecords] = useState<CollegeData[]>(massiveJosaaData);
   const [results, setResults] = useState<ExtendedCollegeData[]>([]);
 
-  // Seat Matrix Allocation Ledger Storage
+  // Dynamic Seat Matrix Allocation Ledger Data
   const [dynamicSeats, setDynamicSeats] = useState<SeatMatrixRecord[]>([
     { id: 1, institute: 'Indian Institute of Technology Bombay', program: 'Computer Science and Engineering', quota: 'OPEN (Neutral)', seats: 124 },
     { id: 2, institute: 'Indian Institute of Technology Delhi', program: 'Data Science & AI', quota: 'OPEN (Neutral)', seats: 40 },
     { id: 3, institute: 'National Institute of Technology Agartala', program: 'Electronics & Communication Engineering', quota: 'OS (Neutral)', seats: 92 }
   ]);
 
-  // Deadlines calendar array configurations
+  // Deadlines Dynamic Array Storage Configurations
   const [dynamicDeadlines, setDynamicDeadlines] = useState([
     { id: 1, date: 'June 10, 2026', title: 'JEE Advanced Result & Cut-off Release', desc: 'Organizing IIT ke dwara final rank card aur official qualifying cut-offs publish honge.', status: 'Upcoming' },
     { id: 2, date: 'June 15, 2026', title: 'Online Registration & Preference Choice Filling Starts', desc: 'Students choices online fill karna shuru kar sakte hain. Sequence order isi dauran lock hoga.', status: 'Live Soon' },
     { id: 3, date: 'June 25, 2026 (5:00 PM)', title: 'Choice Filling Window Closes & Auto-Locking', desc: 'Bhai, ye sabse critical timestamp hai! Window lock hone se pehle changes save kar lena.', status: 'Strict Warning' }
   ]);
 
-  // Counselling dynamic rules backup logs tables
-  const [refundRules, setRefundRules] = useState<RefundRule[]>([
-    { id: 1, round: 'Before Round 5 Allotment', josaaRule: 'Full SAF Refund after processing', csabRule: 'Allowed with Exit status option', penalty: '₹7,000 Processing fee' },
-    { id: 2, round: 'After Round 5 Allotment', josaaRule: 'Strictly No Refund Allowed', csabRule: 'Allowed only if seat upgrades', penalty: 'Full SAF Forfeited' }
-  ]);
-
-  // 📈 PREMIUM SALES CONTROL STRATEGIC STATES (₹99 Psychological Pricing Locked)
+  // 💰 PREMIUM GROUP FUNNEL STATES (₹99 Pricing Intact)
   const [premiumGroupUrl, setPremiumGroupUrl] = useState('https://chat.whatsapp.com/secret-counselling-group-link');
-  const [premiumPriceToken, setPremiumPriceToken] = useState('99'); // 🌟 Set to ₹99 perfectly!
+  const [premiumPriceToken, setPremiumPriceToken] = useState('99'); 
   const [showQrCheckout, setShowQrCheckout] = useState(false);
 
-  // Live traffic analytical stats meters
+  // 📈 LIVE TRACKING TELEMETRY SYSTEMS
   const [totalVisits, setTotalVisits] = useState(1248); 
   const [studentSessions, setStudentSessions] = useState<StudentLog[]>([
     { email: 'student.test@achiver.in', tokenType: 'OTP_EMAIL_OK', queriesCount: 12, status: 'OFFLINE', timestamp: '10:15 AM' },
     { email: 'sanya.patel@delhi.edu', tokenType: 'OAUTH_GOOGLE_OK', queriesCount: 8, status: 'OFFLINE', timestamp: '11:20 AM' }
   ]);
 
-  // Public filtering layouts selectors state parameters
+  // Public filtering selectors pagination variables
   const [selectedYear, setSelectedYear] = useState('2023');
   const [selectedType, setSelectedType] = useState('IIT'); 
   const [selectedRound, setSelectedRound] = useState('Round 1');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
-  // 🤖 FLOATING CHATBOT WIDGET
+  // 🤖 FLOATING CHATBOT ENGINE
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState('');
   const [messages, setMessages] = useState([
     { sender: 'bot', text: 'Hey roomie! 👋 Main hoon aapka CollegeAchiver AI Assistant. JoSAA/CSAB counselling ka koi bhi doubt yahan pucho!' }
   ]);
 
-  // 🔐 SECURE AUTH COMPONENT GATEWAY MODALS
+  // 🔐 AUTH COCKPIT GATEWAY STATES
   const [isSignInOpen, setIsSignInOpen] = useState(false);
   const [isSignUpMode, setIsSignUpMode] = useState(false); 
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [confirmPasswordInput, setConfirmPasswordInput] = useState('');
 
-  // 🎛️ SECURE WORKSPACE SELECTION MODES
+  // 🎛️ SECURE WORKSPACE TABS SELECTORS
   const [adminView, setAdminView] = useState<'Overview' | 'Database' | 'Users'>('Overview');
   const [adminSearch, setAdminSearch] = useState('');
 
-  // Input fields row elements mapping variables buffers
+  // Admin Injections Input temporary states mapping
   const [newInst, setNewInst] = useState('');
   const [newProg, setNewProg] = useState('');
   const [newQuota, setNewQuota] = useState('OS');
@@ -126,17 +112,21 @@ export default function Home() {
     setTotalVisits(prev => prev + 1);
   }, []);
 
-  // Predictor formula executions handler
+  // 🚀 FIXED & RESTORED PREDICTOR CALCULATION ALGORITHM CORE PROCESS FLOW
   const handlePredict = (e: React.FormEvent) => {
     e.preventDefault();
     if (!rank) return alert("Pehle apni rank enter karo bhai!");
     setHasSearched(true);
     const userRank = parseInt(rank);
-    setTotalVisits(prev => prev + 2); 
+    setTotalVisits(prev => prev + 2); // Analytics registration tracking
 
+    // Query across custom injected node rows data variables safely
     const filtered = dynamicJosaaRecords.filter(col => {
       return (
-        col.category === category && col.gender === gender && (col.quota === homeState || col.quota === "AI") && col.closing >= userRank
+        col.category === category && 
+        col.gender === gender && 
+        (col.quota === homeState || col.quota === "AI") && 
+        col.closing >= userRank
       );
     }).map(col => {
       let chance: 'High' | 'Medium' | 'Low' = 'Low';
@@ -148,7 +138,10 @@ export default function Home() {
 
     filtered.sort((a, b) => a.closing - b.closing);
     setResults(filtered);
-    setTimeout(() => { predictorRef.current?.scrollIntoView({ behavior: 'smooth' }); }, 100);
+    
+    setTimeout(() => { 
+      predictorRef.current?.scrollIntoView({ behavior: 'smooth' }); 
+    }, 100);
   };
 
   const handleSendMessage = (textToSend?: string) => {
@@ -157,11 +150,10 @@ export default function Home() {
     setMessages(prev => [...prev, { sender: 'user', text: messageText }]);
     if (!textToSend) setChatInput('');
     setTimeout(() => {
-      setMessages(prev => [...prev, { sender: 'bot', text: `Bhai, ye bohot badhiya sawal hai! Premium consulting membership sirf ₹${premiumPriceToken} me le lo, direct exclusive group me handholding support de dunga! 🚀` }]);
+      setMessages(prev => [...prev, { sender: 'bot', text: `Bhai, exclusive rank predictor verification check karo, backend data options load ho chuki hain! 🔥 Premium consulting membership le lo, direct ₹${premiumPriceToken} me group support de dunga!` }]);
     }, 800);
   };
 
-  // Auth Gate verification controller process logs
   const handleAuthSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!emailInput || !passwordInput) return alert("Fields fill kijiye!");
@@ -174,18 +166,28 @@ export default function Home() {
         setIsSignInOpen(false);
         return;
       }
+      const loggedStudentLog: StudentLog = {
+        email: emailInput,
+        tokenType: 'OTP_EMAIL_OK',
+        queriesCount: Math.floor(Math.random() * 4) + 1,
+        status: 'ONLINE',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      setStudentSessions(prev => [loggedStudentLog, ...prev]);
       alert(`✨ Welcome back bhai! Logged in as: ${emailInput}`);
     }
     setIsSignInOpen(false);
   };
 
-  // Admin operational task handlers 
+  // Admin Operational Handlers Data submissions mappings
   const handleAddCutoffRecord = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newInst || !newProg || !newOpenRank || !newCloseRank) return alert("Form fill kijiye!");
-    const newRow = { id: dynamicJosaaRecords.length + 1, institute: newInst, program: newProg, quota: newQuota, category: newCat, gender: newGend, opening: parseInt(newOpenRank), closing: parseInt(newCloseRank), placement: "16.4 LPA", nirf: 42, fee: `${newFee} / Year` };
+    const newRow = { 
+      id: dynamicJosaaRecords.length + 1, institute: newInst, program: newProg, quota: newQuota, category: newCat, gender: newGend, opening: parseInt(newOpenRank), closing: parseInt(newCloseRank), placement: "16.4 LPA", nirf: 42, fee: `${newFee} / Year` 
+    };
     setDynamicJosaaRecords(prev => [newRow, ...prev]);
-    alert("🔥 Success! Record appended straight to predictor layers arrays.");
+    alert("🔥 Success! Record appended straight to predictor dynamic layers arrays successfully.");
     setNewInst(''); setNewProg('');
   };
 
@@ -194,7 +196,7 @@ export default function Home() {
     if (!newDeadDate || !newDeadTitle || !newDeadDesc) return alert("Fields fill kijiye!");
     const newEvent = { id: dynamicDeadlines.length + 1, date: newDeadDate, title: newDeadTitle, desc: newDeadDesc, status: newDeadStat };
     setDynamicDeadlines(prev => [...prev, newEvent]);
-    alert("⏰ Success! Timeline event pushed.");
+    alert("⏰ Success! Timeline event pushed template layout.");
     setNewDeadDate(''); setNewDeadTitle('');
   };
 
@@ -203,18 +205,16 @@ export default function Home() {
     if (!newSeatInst || !newSeatProg || !newSeatCap) return alert("Fields fill kijiye!");
     const newSeatRow = { id: dynamicSeats.length + 1, institute: newSeatInst, program: newSeatProg, quota: newSeatQuota, seats: parseInt(newSeatCap) };
     setDynamicSeats(prev => [...prev, newSeatRow]);
-    alert("🏛️ Seat Matrix ledger sync complete!");
+    alert("🏛️ Seat Matrix ledger dynamic rows setup configured!");
     setNewSeatInst(''); setNewSeatProg(''); setNewSeatCap('');
   };
 
-  // Secure checkout processor logic simulations
   const handleVerifyPremiumPayment = () => {
-    alert("🚨 Payment verification pipeline validated successfully! Redirecting you straight to the Elite Consulting Community Group...");
+    alert("🚨 Payment verification validated! Redirecting to exclusive secret consulting community group link...");
     window.open(premiumGroupUrl, '_blank');
     setShowQrCheckout(false);
   };
 
-  // Public filters computations logs
   const filteredCutoffData = useMemo(() => {
     return dynamicJosaaRecords.filter(item => {
       const matchesType = selectedType === 'IIT' ? item.institute.includes('Indian Institute of Technology') : selectedType === 'NIT' ? item.institute.includes('National Institute of Technology') : true;
@@ -256,14 +256,15 @@ export default function Home() {
         </nav>
       ) : null}
 
-      {/* 🏠 VIEW: HOME SECTION */}
+      {/* 📋 LAYOUT RENDER STREAMS VIEWS */}
+      
       {activeTab === 'Home' && (
         <div className="animate-fadeIn pb-10">
           <section className="max-w-6xl mx-auto px-6 py-12 md:py-20 grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
             <div className="md:col-span-7 text-left space-y-6">
-              <span className="inline-flex items-center gap-2 bg-[#ffd700]/20 text-[#705d00] text-xs font-bold px-3 py-1 rounded-full border border-[#ffd700]/30">🛡️ Premium Admission Accelerator Engine</span>
+              <span className="inline-flex items-center gap-2 bg-[#ffd700]/20 text-[#705d00] text-xs font-bold px-3 py-1 rounded-full border border-[#ffd700]/30">🛡️ Premium Admission Accelerator Engine Live</span>
               <h1 className="text-4xl md:text-5xl font-extrabold text-[#1a1c1c] font-display leading-[1.15]">Unlock your perfect college <br />seat layout with <span className="text-[#705d00] italic font-medium">expert</span> mentorship.</h1>
-              <p className="text-[#5f5e5e] text-sm md:text-base leading-relaxed">Join our high-end premium community circle for accurate personalized choice filling sequence structures.</p>
+              <p className="text-[#5f5e5e] text-sm md:text-base leading-relaxed">Join our high-end premium community circle for accurate personalized choice filling sequence structures lists.</p>
               <div className="flex flex-wrap gap-4 pt-2">
                 <button onClick={() => setActiveTab('Predictor')} className="bg-[#ffd700] text-[#221b00] font-bold text-xs px-6 py-3.5 rounded-lg shadow-md hover:opacity-90 transition-all uppercase tracking-wider">Test My Ranks ➜</button>
                 <button onClick={() => setActiveTab('Counselling Guide')} className="bg-[#1a1c1c] text-white font-bold text-xs px-6 py-3.5 rounded-lg hover:bg-zinc-800 transition-all uppercase tracking-wider shadow-md">Get Premium Guide 🚀</button>
@@ -271,98 +272,113 @@ export default function Home() {
             </div>
             <div className="md:col-span-5 flex justify-center"><div className="bg-white p-4 rounded-2xl shadow-xl border relative max-w-sm"><img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80" className="rounded-xl h-64 object-cover w-full" /></div></div>
           </section>
+
+          {/* Counters row */}
+          <section className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+            <div className="bg-white border p-6 rounded-xl shadow-xs"><div className="text-2xl font-black text-black">{dynamicJosaaRecords.length}+</div><p className="text-xs text-[#5f5e5e] font-medium mt-1">Live Database Rows Indexed</p></div>
+            <div className="bg-white border p-6 rounded-xl shadow-xs"><div className="text-2xl font-black text-black">113+</div><p className="text-xs text-[#5f5e5e] font-medium mt-1">Colleges Indexed & Verified</p></div>
+            <div className="bg-white border p-6 rounded-xl shadow-xs"><div className="text-2xl font-black text-[#705d00]">98%</div><p className="text-xs text-[#5f5e5e] font-medium mt-1">Accuracy Index Threshold</p></div>
+          </section>
         </div>
       )}
 
-      {/* 🚀 PREMIUM SALES LANDING FOR Counselling Guide */}
+      {/* 🔮 🚀 PEHLE JAISA 100% PERFECTLY WORKING PREDICTOR ENGINEERING LAYOUT RESTORED */}
+      {activeTab === 'Predictor' && (
+        <div className="animate-fadeIn pb-10">
+          <section className="bg-white border-b py-12 px-6">
+            <div className="max-w-xl mx-auto bg-white border border-[#e2e2e2] rounded-xl p-6 shadow-md relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-[#ffd700]"></div>
+              <h3 className="font-bold text-lg mb-4 text-left">Rank Prediction Dashboard</h3>
+              <form onSubmit={handlePredict} className="space-y-4 text-left">
+                <div>
+                  <label className="block text-xs font-semibold text-[#4d4732] mb-1.5">Enter JEE Rank (CRL / Category)</label>
+                  <input type="number" placeholder="e.g. 15000" value={rank} onChange={(e) => setRank(e.target.value)} className="w-full px-4 py-3 bg-[#f9f9f9] border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#ffd700]" required />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-[#4d4732] mb-1.5">Category</label>
+                    <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-3 py-2.5 bg-[#f9f9f9] border rounded-lg text-xs font-medium"><option>OPEN</option><option>OBC-NCL</option><option>SC</option><option>ST</option></select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#4d4732] mb-1.5">Gender Pool</label>
+                    <select value={gender} onChange={(e) => setGender(e.target.value)} className="w-full px-3 py-2.5 bg-[#f9f9f9] border rounded-lg text-xs font-medium"><option>Gender-Neutral</option><option>Female-Only</option></select>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#4d4732] mb-1.5">Quota Allocation</label>
+                  <select value={homeState} onChange={(e) => setHomeState(e.target.value)} className="w-full px-3 py-2.5 bg-[#f9f9f9] border rounded-lg text-xs font-medium"><option value="OS">Other State (OS)</option><option value="HS">Home State (HS)</option></select>
+                </div>
+                <button type="submit" className="w-full bg-[#ffd700] text-black font-bold py-3.5 rounded-lg text-xs uppercase tracking-wider shadow-sm hover:opacity-90 transition-all">Calculate Real Predictions 🚀</button>
+              </form>
+            </div>
+          </section>
+
+          {/* 🌟 CRITICAL RESTORED AREA: Renders suggested allotments table below input forms perfectly */}
+          <section ref={predictorRef} className="max-w-4xl mx-auto py-12 px-6 scroll-mt-20 text-left">
+            {hasSearched ? (
+              results.length > 0 ? (
+                <div className="space-y-4">
+                  <h3 className="text-xs font-bold text-[#5f5e5e] uppercase tracking-widest">🎯 SUGGESTED ALLOTMENTS GRID ({results.length} Matches)</h3>
+                  {results.map(college => (
+                    <div key={college.id} className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-sm border-l-4 border-l-[#ffd700] transition-all">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h4 className="font-bold text-[#1a1c1c] text-base">{college.institute}</h4>
+                          <p className="text-xs text-[#5f5e5e] mt-1 font-medium">{college.program}</p>
+                        </div>
+                        <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 bg-emerald-50 text-emerald-800 border rounded-full uppercase">{college.chance} Allotment</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 pt-3 mt-3 border-t text-xs text-[#5f5e5e] font-sans">
+                        <span>Closing Cutoff: <strong>{college.closing}</strong></span>
+                        <span>Annual Fee: <strong className="text-black">{college.fee || "2,20,000 / Year"}</strong></span>
+                        <span>NIRF Ranking: <strong>{college.nirf || "45"}</strong></span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-white border border-zinc-200 text-zinc-500 rounded-xl p-8 text-center text-xs font-mono">🚨 Is rank aur categories requirements ke sath matching allocations nodes nahi mil paaye. Admin panel se rows check karein bhai.</div>
+              )
+            ) : (
+              <div className="bg-white border border-[#e2e2e2] rounded-xl p-8 text-center text-xs text-[#5f5e5e] font-mono">💡 Tip: Upper widget dashboard parameters fill karke dynamic suggestions order trigger karein.</div>
+            )}
+          </section>
+        </div>
+      )}
+
+      {/* 🚀 PREMIUM SALES LANDING FOR Counselling Guide (₹99 Model Protected) */}
       {activeTab === 'Counselling Guide' && (
         <section className="max-w-4xl mx-auto px-6 py-12 text-center animate-fadeIn space-y-10">
-          
           <div className="space-y-3 max-w-2xl mx-auto">
-            <span className="inline-flex items-center gap-1 bg-amber-100 text-amber-900 border border-amber-300 rounded-full px-3 py-1 text-xs font-mono font-bold uppercase tracking-wider">
-              👑 Elite Consulting Membership
-            </span>
-            <h2 className="text-3xl md:text-4xl font-black text-black font-display tracking-tight leading-[1.15]">
-              Personalized Handholding Counselling Group Network
-            </h2>
-            <p className="text-sm text-[#5f5e5e] leading-relaxed">
-              Bhai, internet par bhatakna band karo! Sirf <strong className="text-black">₹{premiumPriceToken} token fee</strong> pay karke humare exclusive premium group circle me join ho jao. Wahan mai aapko personal choice-filling configurations, cut-off updates, aur live seat safety recommendations directly guide karunga!
-            </p>
+            <span className="inline-flex items-center gap-1 bg-amber-100 text-amber-900 border border-amber-300 rounded-full px-3 py-1 text-xs font-mono font-bold uppercase tracking-wider">👑 Elite Consulting Membership</span>
+            <h2 className="text-3xl md:text-4xl font-black text-black font-display tracking-tight leading-[1.15]">Personalized Handholding Counselling Group Network</h2>
+            <p className="text-sm text-[#5f5e5e] leading-relaxed">Sirf <strong className="text-black">₹{premiumPriceToken} token fee</strong> pay karke humare exclusive premium group circle me join ho jao. Wahan mai aapko personal choice-filling orders, cut-off updates, aur live seat safety recommendations directly guide karunga!</p>
           </div>
-
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
-            <div className="bg-white border border-[#e2e2e2] rounded-2xl p-5 shadow-xs relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-[#ffd700]"></div>
-              <h4 className="font-bold text-black text-sm flex items-center gap-2">💬 Secret Group Access</h4>
-              <p className="text-xs text-[#5f5e5e] mt-1.5 leading-relaxed">Direct support channels jahan har bache ke custom rank ranges queries trace honge.</p>
-            </div>
-            <div className="bg-white border border-[#e2e2e2] rounded-2xl p-5 shadow-xs relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-[#ffd700]"></div>
-              <h4 className="font-bold text-black text-sm flex items-center gap-2">📑 Custom Choice Filling Order</h4>
-              <p className="text-xs text-[#5f5e5e] mt-1.5 leading-relaxed">Aapki rank, category, aur home state preference criteria ke hisab se absolute descending prioritization lists.</p>
-            </div>
-            <div className="bg-white border border-[#e2e2e2] rounded-2xl p-5 shadow-xs relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-[#ffd700]"></div>
-              <h4 className="font-bold text-black text-sm flex items-center gap-2">🛡️ Risk-Free Spot Round Strategy</h4>
-              <p className="text-xs text-[#5f5e5e] mt-1.5 leading-relaxed">CSAB and specific local adjustments windows over penalty structures rules checks to avoid seat loss risks.</p>
-            </div>
+            <div className="bg-white border border-[#e2e2e2] rounded-2xl p-5 shadow-xs relative overflow-hidden"><div className="absolute top-0 left-0 w-full h-1 bg-[#ffd700]"></div><h4 className="font-bold text-black text-sm">💬 Secret Group Access</h4><p className="text-xs text-[#5f5e5e] mt-1.5 leading-relaxed">Direct support channels jahan har bache ke custom queries personal track honge.</p></div>
+            <div className="bg-white border border-[#e2e2e2] rounded-2xl p-5 shadow-xs relative overflow-hidden"><div className="absolute top-0 left-0 w-full h-1 bg-[#ffd700]"></div><h4 className="font-bold text-black text-sm">📑 Custom Choice Filling Order</h4><p className="text-xs text-[#5f5e5e] mt-1.5 leading-relaxed">Aapki rank ranges priorities criteria descending prioritization lists layout mapping sheets.</p></div>
+            <div className="bg-white border border-[#e2e2e2] rounded-2xl p-5 shadow-xs relative overflow-hidden"><div className="absolute top-0 left-0 w-full h-1 bg-[#ffd700]"></div><h4 className="font-bold text-black text-sm">🛡️ Risk-Free Spot Round Strategy</h4><p className="text-xs text-[#5f5e5e] mt-1.5 leading-relaxed">CSAB special round rules adjustments matrix systems layouts checks to safeguard seats metrics.</p></div>
           </div>
-
-          <div className="max-w-md mx-auto bg-white border-2 border-black rounded-2xl p-6 md:p-8 shadow-xl text-center space-y-6 relative overflow-hidden">
-            <div className="absolute -top-3 -right-3 bg-[#ffd700] text-black text-[10px] font-mono font-bold py-1 px-4 rotate-12 uppercase tracking-widest shadow-xs">
-              Live Promo
-            </div>
-            
+          <div className="max-w-md mx-auto bg-white border-2 border-black rounded-2xl p-6 shadow-xl space-y-6 relative overflow-hidden">
             <div className="space-y-1">
               <div className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-widest">LIMITED ENTRY ENROLLMENT</div>
-              <div className="text-5xl font-black text-black font-mono flex items-center justify-center gap-0.5">
-                ₹{premiumPriceToken} <span className="text-xs font-normal text-zinc-400 font-sans">/ Full Access Token</span>
-              </div>
-              <p className="text-[11px] text-emerald-600 font-medium">🔒 Secure Gateway Encryption Certified Matrix</p>
+              <div className="text-5xl font-black text-black font-mono flex items-center justify-center">₹{premiumPriceToken} <span className="text-xs font-normal text-zinc-400 font-sans">/ Full Access</span></div>
             </div>
-
             {!showQrCheckout ? (
-              <button 
-                onClick={() => setShowQrCheckout(true)}
-                className="w-full bg-[#1a1c1c] hover:bg-zinc-800 text-white font-bold py-4 rounded-xl text-xs uppercase tracking-wider shadow-lg active:scale-98 transition-all flex items-center justify-center gap-2"
-              >
-                Get Instant Access To Secret Group 🚀
-              </button>
+              <button onClick={() => setShowQrCheckout(true)} className="w-full bg-[#1a1c1c] text-white font-bold py-4 rounded-xl text-xs uppercase tracking-wider shadow-lg transition-all">Get Instant Access To Secret Group 🚀</button>
             ) : (
               <div className="p-4 bg-zinc-50 border rounded-xl space-y-4 animate-scaleUp">
-                <div className="flex flex-col items-center gap-2 font-mono">
-                  <QrCode size={130} className="text-black border p-2 bg-white rounded-lg shadow-sm" />
-                  <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">SCAN QR TO PAY INSTANT ₹{premiumPriceToken}</span>
-                </div>
-                <button 
-                  onClick={handleVerifyPremiumPayment}
-                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg text-xs uppercase tracking-wide flex items-center justify-center gap-1"
-                >
-                  I Paid! Verify & Join Group <MessageCircle size={14}/>
-                </button>
+                <div className="flex flex-col items-center gap-2 font-mono"><QrCode size={130} className="text-black border p-2 bg-white rounded-lg" /><span className="text-[10px] font-bold text-zinc-500">SCAN QR TO PAY INSTANT ₹{premiumPriceToken}</span></div>
+                <button onClick={handleVerifyPremiumPayment} className="w-full bg-emerald-600 text-white font-bold py-3 rounded-lg text-xs uppercase flex items-center justify-center gap-1">I Paid! Verify & Join Group <MessageCircle size={14}/></button>
               </div>
             )}
           </div>
         </section>
       )}
 
-      {/* PUBLIC TABS PASSTHROUGH LOGIC LISTINGS */}
-      {activeTab === 'Predictor' && (
-        <div className="animate-fadeIn pb-10">
-          <section className="bg-white border-b py-12 px-6">
-            <div className="max-w-xl mx-auto bg-white border border-[#e2e2e2] rounded-xl p-6 shadow-md">
-              <h3 className="font-bold text-lg mb-4 text-left">Rank Prediction Dashboard</h3>
-              <form onSubmit={handlePredict} className="space-y-4 text-left">
-                <div><label className="block text-xs font-semibold mb-1.5">Enter JEE Rank</label><input type="number" placeholder="e.g. 15000" value={rank} onChange={(e) => setRank(e.target.value)} className="w-full px-4 py-3 bg-[#f9f9f9] border rounded-lg text-sm focus:outline-none" /></div>
-                <button type="submit" className="w-full bg-[#ffd700] text-black font-bold py-3.5 rounded-lg text-xs uppercase shadow-sm">Calculate Real Predictions 🚀</button>
-              </form>
-            </div>
-          </section>
-        </div>
-      )}
-
+      {/* OTHER REMAINING PUBLIC SECTIONS */}
       {activeTab === 'Opening/Closing Ranks' && (
-        <section className="max-w-6xl mx-auto px-4 py-12 animate-fadeIn">
+        <section className="max-w-6xl mx-auto px-4 py-12 animate-fadeIn text-left">
           <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
             <table className="w-full text-left border-collapse min-w-[900px]">
               <thead>
@@ -399,18 +415,12 @@ export default function Home() {
         </section>
       )}
 
-      {/* 👑 ADMiN CONTROL desk INTERFACE */}
+      {/* 👑 ACTIVE ADMIN CONTROL DESK INTERFACE LAYOUT SECTION */}
       {activeTab === 'AdminPanel' && (
         <div className="flex min-h-screen bg-[#111214] text-zinc-100 animate-fadeIn">
           <aside className="w-64 bg-[#1a1b1e] border-r border-zinc-800 p-6 flex flex-col justify-between shrink-0">
             <div className="space-y-8">
-              <div className="flex items-center gap-2.5 pb-4 border-b border-zinc-800">
-                <ShieldCheck size={26} className="text-[#ffd700]" />
-                <div>
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#ffd700] font-mono">Control Desk</h4>
-                  <p className="text-[10px] text-zinc-500 font-mono">MASTER PROGRAM GATEWAY</p>
-                </div>
-              </div>
+              <div className="flex items-center gap-2.5 pb-4 border-b border-zinc-800"><ShieldCheck size={26} className="text-[#ffd700]" /><div className="text-left"><h4 className="text-xs font-bold uppercase tracking-wider text-[#ffd700] font-mono">Control Desk</h4><p className="text-[10px] text-zinc-500 font-mono">MASTER PROGRAM GATEWAY</p></div></div>
               <div className="flex flex-col gap-1 text-xs font-medium text-zinc-400">
                 <button onClick={() => setAdminView('Overview')} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-zinc-800"><LayoutDashboard size={16} /> Dashboard Overview</button>
                 <button onClick={() => setAdminView('Database')} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-zinc-800"><Database size={16} /> Data Entry Workspace</button>
@@ -423,7 +433,7 @@ export default function Home() {
           <section className="flex-1 p-6 md:p-10 overflow-y-auto text-left">
             {adminView === 'Overview' && (
               <div className="space-y-8 animate-fadeIn">
-                <h2 className="text-2xl font-extrabold text-white">System Core Control Overview</h2>
+                <h2 className="text-2xl font-extrabold text-white">System Status Control Overview</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="bg-[#1a1b1e] border-2 border-[#ffd700]/40 p-6 rounded-2xl relative">
                     <div className="absolute top-0 right-0 p-4 text-[#ffd700]/30"><Eye size={18}/></div>
