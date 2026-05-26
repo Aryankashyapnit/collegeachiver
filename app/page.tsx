@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef, useMemo, useEffect } from 'react';
-import { School, Award, TrendingUp, Search, MapPin, Download, CheckSquare, Layers, BarChart3, ChevronLeft, ChevronRight, Mail, Share2, Globe, CheckCircle, Star, BookOpen, ShieldAlert, FileText, Activity, Percent, Clock, AlertCircle, Calendar, RefreshCw, MessageSquare, X, Send, Lock, User, UserPlus, LayoutDashboard, Database, UserCog, ShieldCheck, PlusCircle, Eye, ShieldCheck as Guarantee, MessageCircle, QrCode } from 'lucide-react';
+import { School, Award, TrendingUp, Search, MapPin, Download, CheckSquare, Layers, BarChart3, ChevronLeft, ChevronRight, Mail, Share2, Globe, CheckCircle, Star, BookOpen, ShieldAlert, FileText, Activity, Percent, Clock, AlertCircle, Calendar, RefreshCw, MessageSquare, X, Send, Lock, User, UserPlus, LayoutDashboard, Database, UserCog, ShieldCheck, PlusCircle, Eye, MessageCircle, QrCode } from 'lucide-react';
 import { massiveJosaaData, CollegeData } from './josaaData';
 
 interface ExtendedCollegeData extends CollegeData {
@@ -63,9 +63,9 @@ export default function Home() {
     { id: 2, round: 'After Round 5 Allotment', josaaRule: 'Strictly No Refund Allowed', csabRule: 'Allowed only if seat upgrades', penalty: 'Full SAF Forfeited' }
   ]);
 
-  // 📈 PREMIUM SALES CONTROL STRATEGIC STATES (Editable Group Gateway URLs)
+  // 📈 PREMIUM SALES CONTROL STRATEGIC STATES (₹99 Psychological Pricing Locked)
   const [premiumGroupUrl, setPremiumGroupUrl] = useState('https://chat.whatsapp.com/secret-counselling-group-link');
-  const [premiumPriceToken, setPremiumPriceToken] = useState('1'); // Base ₹1 structure config
+  const [premiumPriceToken, setPremiumPriceToken] = useState('99'); // 🌟 Set to ₹99 perfectly!
   const [showQrCheckout, setShowQrCheckout] = useState(false);
 
   // Live traffic analytical stats meters
@@ -157,7 +157,7 @@ export default function Home() {
     setMessages(prev => [...prev, { sender: 'user', text: messageText }]);
     if (!textToSend) setChatInput('');
     setTimeout(() => {
-      setMessages(prev => [...prev, { sender: 'bot', text: "Bhai, ye bohot badhiya sawal hai! Premium consulting membership le lo, direct group me handholding support de dunga! 🚀" }]);
+      setMessages(prev => [...prev, { sender: 'bot', text: `Bhai, ye bohot badhiya sawal hai! Premium consulting membership sirf ₹${premiumPriceToken} me le lo, direct exclusive group me handholding support de dunga! 🚀` }]);
     }, 800);
   };
 
@@ -214,7 +214,6 @@ export default function Home() {
     setShowQrCheckout(false);
   };
 
-
   // Public filters computations logs
   const filteredCutoffData = useMemo(() => {
     return dynamicJosaaRecords.filter(item => {
@@ -252,13 +251,12 @@ export default function Home() {
                 <button key={tab} onClick={() => { setActiveTab(tab); setCurrentPage(1); }} className={`px-3 py-2 transition-all rounded-lg text-[13px] font-medium ${activeTab === tab ? 'text-[#221b00] bg-[#ffd700] font-bold shadow-xs' : 'hover:text-[#705d00] hover:bg-[#eeeeee]'}`}>{tab}</button>
               ))}
             </div>
-            <button onClick={() => { setIsSignUpMode(false); setIsSignInOpen(true); }} className="bg-[#ffd700] text-[#221b00] font-bold px-5 py-2 rounded-lg text-xs shadow-xs shrink-0 animate-fadeIn">Sign In</button>
+            <button onClick={() => { setIsSignUpMode(false); setIsSignInOpen(true); }} className="bg-[#ffd700] text-[#221b00] font-bold px-5 py-2 rounded-lg text-xs shadow-xs shrink-0">Sign In</button>
           </div>
         </nav>
       ) : null}
 
-      {/* 📋 USER EXPERIENCE CHUNKS ROUTINGS VIEWS */}
-      
+      {/* 🏠 VIEW: HOME SECTION */}
       {activeTab === 'Home' && (
         <div className="animate-fadeIn pb-10">
           <section className="max-w-6xl mx-auto px-6 py-12 md:py-20 grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
@@ -276,11 +274,10 @@ export default function Home() {
         </div>
       )}
 
-      {/* ⛵ 🌟 BRAND NEW DESIGN REVOLUTION: THE PREMIUM CONVERSION SALES Counselling Guide TAB LAYOUT */}
+      {/* 🚀 PREMIUM SALES LANDING FOR Counselling Guide */}
       {activeTab === 'Counselling Guide' && (
         <section className="max-w-4xl mx-auto px-6 py-12 text-center animate-fadeIn space-y-10">
           
-          {/* Main Visual Sales Pitch Copywriting Header */}
           <div className="space-y-3 max-w-2xl mx-auto">
             <span className="inline-flex items-center gap-1 bg-amber-100 text-amber-900 border border-amber-300 rounded-full px-3 py-1 text-xs font-mono font-bold uppercase tracking-wider">
               👑 Elite Consulting Membership
@@ -293,17 +290,16 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Benefits Value Props Multi Grid Cards row */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
             <div className="bg-white border border-[#e2e2e2] rounded-2xl p-5 shadow-xs relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-[#ffd700]"></div>
               <h4 className="font-bold text-black text-sm flex items-center gap-2">💬 Secret Group Access</h4>
-              <p className="text-xs text-[#5f5e5e] mt-1.5 leading-relaxed">Direct WhatsApp / Telegram premium support channels jahan har bache ke custom rank ranges queries trace honge.</p>
+              <p className="text-xs text-[#5f5e5e] mt-1.5 leading-relaxed">Direct support channels jahan har bache ke custom rank ranges queries trace honge.</p>
             </div>
             <div className="bg-white border border-[#e2e2e2] rounded-2xl p-5 shadow-xs relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-[#ffd700]"></div>
               <h4 className="font-bold text-black text-sm flex items-center gap-2">📑 Custom Choice Filling Order</h4>
-              <p className="text-xs text-[#5f5e5e] mt-1.5 leading-relaxed">Aapki rank, category, aur home state preference criteria ke hisab se absolute descending prioritization lists matching guidelines.</p>
+              <p className="text-xs text-[#5f5e5e] mt-1.5 leading-relaxed">Aapki rank, category, aur home state preference criteria ke hisab se absolute descending prioritization lists.</p>
             </div>
             <div className="bg-white border border-[#e2e2e2] rounded-2xl p-5 shadow-xs relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-[#ffd700]"></div>
@@ -312,7 +308,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Core Interactive Checkout Transaction Processing Trigger Card */}
           <div className="max-w-md mx-auto bg-white border-2 border-black rounded-2xl p-6 md:p-8 shadow-xl text-center space-y-6 relative overflow-hidden">
             <div className="absolute -top-3 -right-3 bg-[#ffd700] text-black text-[10px] font-mono font-bold py-1 px-4 rotate-12 uppercase tracking-widest shadow-xs">
               Live Promo
@@ -321,12 +316,11 @@ export default function Home() {
             <div className="space-y-1">
               <div className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-widest">LIMITED ENTRY ENROLLMENT</div>
               <div className="text-5xl font-black text-black font-mono flex items-center justify-center gap-0.5">
-                ₹{premiumPriceToken} <span className="text-xs font-normal text-zinc-400 font-sans">/ Only Base Token</span>
+                ₹{premiumPriceToken} <span className="text-xs font-normal text-zinc-400 font-sans">/ Full Access Token</span>
               </div>
               <p className="text-[11px] text-emerald-600 font-medium">🔒 Secure Gateway Encryption Certified Matrix</p>
             </div>
 
-            {/* Default CTA View vs QR Dropdown Toggle view rendering */}
             {!showQrCheckout ? (
               <button 
                 onClick={() => setShowQrCheckout(true)}
@@ -348,16 +342,11 @@ export default function Home() {
                 </button>
               </div>
             )}
-
-            <div className="text-[10px] text-zinc-400 font-mono tracking-wide leading-relaxed">
-              *Payment complete hote hi secure integration system browser me access link unlock kar dega bhai. No extra backend database charges required.
-            </div>
           </div>
-
         </section>
       )}
 
-      {/* RENDER PUBLIC TAB MODULES PASSTHROUGH CHUNKS */}
+      {/* PUBLIC TABS PASSTHROUGH LOGIC LISTINGS */}
       {activeTab === 'Predictor' && (
         <div className="animate-fadeIn pb-10">
           <section className="bg-white border-b py-12 px-6">
@@ -410,11 +399,9 @@ export default function Home() {
         </section>
       )}
 
-
-      {/* 👑 ⚙️ 🌟 ACTIVE ADMIN PORTAL COCKPIT WINDOWS MANAGEMENT ACCESSIBLE DESK */}
+      {/* 👑 ADMiN CONTROL desk INTERFACE */}
       {activeTab === 'AdminPanel' && (
         <div className="flex min-h-screen bg-[#111214] text-zinc-100 animate-fadeIn">
-          
           <aside className="w-64 bg-[#1a1b1e] border-r border-zinc-800 p-6 flex flex-col justify-between shrink-0">
             <div className="space-y-8">
               <div className="flex items-center gap-2.5 pb-4 border-b border-zinc-800">
@@ -425,131 +412,63 @@ export default function Home() {
                 </div>
               </div>
               <div className="flex flex-col gap-1 text-xs font-medium text-zinc-400">
-                <button onClick={() => setAdminView('Overview')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${adminView === 'Overview' ? 'bg-[#ffd700] text-black font-bold' : 'hover:bg-zinc-800'}`}><LayoutDashboard size={16} /> Dashboard Overview</button>
-                <button onClick={() => setAdminView('Database')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${adminView === 'Database' ? 'bg-[#ffd700] text-black font-bold' : 'hover:bg-zinc-800'}`}><Database size={16} /> Data Entry Workspace</button>
-                <button onClick={() => setAdminView('Users')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${adminView === 'Users' ? 'bg-[#ffd700] text-black font-bold' : 'hover:bg-zinc-800'}`}><UserCog size={16} /> Premium Gate Setup</button>
+                <button onClick={() => setAdminView('Overview')} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-zinc-800"><LayoutDashboard size={16} /> Dashboard Overview</button>
+                <button onClick={() => setAdminView('Database')} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-zinc-800"><Database size={16} /> Data Entry Workspace</button>
+                <button onClick={() => setAdminView('Users')} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-zinc-800"><UserCog size={16} /> Premium Gate Setup</button>
               </div>
             </div>
-            <button onClick={() => setActiveTab('Home')} className="w-full bg-zinc-800 hover:bg-red-950 text-zinc-300 font-bold py-2.5 rounded-xl text-xs uppercase font-mono text-center shadow-md">🚪 Exit Control Desk</button>
+            <button onClick={() => setActiveTab('Home')} className="w-full bg-zinc-800 hover:bg-red-950 text-zinc-300 font-bold py-2.5 rounded-xl text-xs uppercase font-mono text-center"> Exit Control Desk</button>
           </aside>
 
           <section className="flex-1 p-6 md:p-10 overflow-y-auto text-left">
-            
-            {/* VIEW A: ANALYTICAL METRICS TELEMETRY COUNTERS ROW */}
             {adminView === 'Overview' && (
               <div className="space-y-8 animate-fadeIn">
-                <div>
-                  <h2 className="text-2xl font-extrabold text-white font-display">System Core Control Overview</h2>
-                  <p className="text-xs text-zinc-400 mt-1">Live background analytics system metrics scanning total visits package.</p>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {/* Visitiors counter */}
-                  <div className="bg-[#1a1b1e] border-2 border-[#ffd700]/40 p-6 rounded-2xl relative shadow-lg">
+                <h2 className="text-2xl font-extrabold text-white">System Core Control Overview</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-[#1a1b1e] border-2 border-[#ffd700]/40 p-6 rounded-2xl relative">
                     <div className="absolute top-0 right-0 p-4 text-[#ffd700]/30"><Eye size={18}/></div>
-                    <div className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">Total Website Live Visits</div>
-                    <div className="text-4xl font-black text-[#ffd700] font-mono mt-1 animate-pulse">{totalVisits} <span className="text-xs font-normal text-zinc-500">Hits</span></div>
-                  </div>
-                  <div className="bg-[#1a1b1e] border border-zinc-800 p-6 rounded-2xl">
-                    <div className="text-[10px] font-mono font-bold text-zinc-500 uppercase">Live Database Total Rows</div>
-                    <div className="text-3xl font-black text-white font-mono mt-1">{dynamicJosaaRecords.length} Nodes</div>
+                    <div className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">Total Website Live Hits</div>
+                    <div className="text-4xl font-black text-[#ffd700] font-mono mt-1 animate-pulse">{totalVisits} Visits</div>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* VIEW B: COMPREHENSIVE CUTOFF AND DATA ENTRY MANAGE WORKSPACES */}
             {adminView === 'Database' && (
               <div className="space-y-8 animate-fadeIn">
-                <div className="bg-[#1a1b1e] border border-zinc-800 p-6 rounded-2xl relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-full h-1 bg-[#ffd700]"></div>
-                  <h3 className="font-bold text-base text-white mb-4 flex items-center gap-2"><PlusCircle size={18} className="text-[#ffd700]"/> Inject New Predictor & Cutoff Record Row</h3>
+                <div className="bg-[#1a1b1e] border border-zinc-800 p-6 rounded-2xl">
+                  <h3 className="font-bold text-base text-white mb-4"><PlusCircle size={18} className="text-[#ffd700] inline-block mr-1.5"/> Inject New Predictor Record</h3>
                   <form onSubmit={handleAddCutoffRecord} className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-zinc-300">
                     <div className="sm:col-span-2"><label className="block text-zinc-400 mb-1">Institute Legal Name</label><input type="text" value={newInst} onChange={(e) => setNewInst(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none" required /></div>
                     <div className="sm:col-span-2"><label className="block text-zinc-400 mb-1">Academic Program specialty</label><input type="text" value={newProg} onChange={(e) => setNewProg(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none" required /></div>
                     <div><label className="block text-zinc-400 mb-1">Opening</label><input type="number" value={newOpenRank} onChange={(e) => setNewOpenRank(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none" required /></div>
                     <div><label className="block text-zinc-400 mb-1">Closing</label><input type="number" value={newCloseRank} onChange={(e) => setNewCloseRank(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none" required /></div>
-                    <div className="sm:col-span-2"><label className="block text-zinc-400 mb-1">Annual Course Fee structure structure</label><input type="text" value={newFee} onChange={(e) => setNewFee(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none" required /></div>
-                    <button type="submit" className="sm:col-span-2 bg-[#ffd700] text-black font-bold py-3 rounded-xl uppercase font-mono text-xs hover:opacity-90 transition-all mt-2">Inject Row Into Predictor Memory Array Grid 🚀</button>
-                  </form>
-                </div>
-
-                {/* Seat Matrix append controls panel Form B inside workspace */}
-                <div className="bg-[#1a1b1e] border border-zinc-800 p-6 rounded-2xl relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-full h-1 bg-[#ffd700]"></div>
-                  <h3 className="font-bold text-base text-white mb-4 flex items-center gap-2"><School size={18} className="text-[#ffd700]"/> Inject New Seat Matrix Capacity Row</h3>
-                  <form onSubmit={handleAddSeatMatrixRow} className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-zinc-300">
-                    <div><label className="block text-zinc-400 mb-1">Institute Node name text</label><input type="text" placeholder="e.g. IIT Delhi" value={newSeatInst} onChange={(e) => setNewSeatInst(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none" required /></div>
-                    <div><label className="block text-zinc-400 mb-1">Specialization Stream specialty branch</label><input type="text" placeholder="e.g. Computer Science" value={newSeatProg} onChange={(e) => setNewSeatProg(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none" required /></div>
-                    <div><label className="block text-zinc-400 mb-1">Quota Pool Pool ID</label><input type="text" placeholder="e.g. OPEN (Neutral)" value={newSeatQuota} onChange={(e) => setNewSeatQuota(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none" required /></div>
-                    <div><label className="block text-zinc-400 mb-1">Absolute Seats capacity</label><input type="number" placeholder="40" value={newSeatCap} onChange={(e) => setNewSeatCap(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none" required /></div>
-                    <button type="submit" className="sm:col-span-2 bg-zinc-100 text-black font-bold py-3 rounded-xl uppercase font-mono text-xs hover:opacity-90 transition-all mt-2">Commit Capacity Row directly to Seat Matrix Ledger 🚀</button>
+                    <button type="submit" className="sm:col-span-2 bg-[#ffd700] text-black font-bold py-3 rounded-xl uppercase font-mono text-xs hover:opacity-90 mt-2">Inject Row Into Predictor Matrix 🚀</button>
                   </form>
                 </div>
               </div>
             )}
 
-            {/* 🚀 ⚙️ PREMIUM VIEW C: CONFIGURING THE ELITE GROUP LINKS AND TOKEN PRICE FOR COUNSELLING ACCELERATOR */}
             {adminView === 'Users' && (
               <div className="space-y-8 animate-fadeIn">
-                <div className="bg-[#1a1b1e] border-2 border-purple-900/60 p-6 rounded-2xl relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-full h-1.5 bg-[#ffd700]"></div>
-                  <h3 className="font-bold text-base text-white mb-4 flex items-center gap-2">
-                    <Guarantee size={18} className="text-[#ffd700]"/> Elite Consulting Group Gateway Configuration Settings
-                  </h3>
-                  
+                <div className="bg-[#1a1b1e] border-2 border-purple-900/60 p-6 rounded-2xl">
+                  <h3 className="font-bold text-base text-white mb-4">Elite Consulting Group Configuration Settings</h3>
                   <div className="grid grid-cols-1 gap-4 text-xs text-zinc-300">
                     <div>
-                      <label className="block text-zinc-400 mb-1">Secret Redirection Group Access Link (WhatsApp/Telegram Private Link)</label>
-                      <input 
-                        type="text" 
-                        value={premiumGroupUrl} 
-                        onChange={(e) => setPremiumGroupUrl(e.target.value)}
-                        className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-emerald-400 font-mono outline-none focus:border-[#ffd700]" 
-                      />
+                      <label className="block text-zinc-400 mb-1">Secret Redirection Group Access Link</label>
+                      <input type="text" value={premiumGroupUrl} onChange={(e) => setPremiumGroupUrl(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-emerald-400 font-mono outline-none" />
                     </div>
                     <div>
                       <label className="block text-zinc-400 mb-1">Introductory Premium Token Price (INR)</label>
-                      <input 
-                        type="number" 
-                        value={premiumPriceToken} 
-                        onChange={(e) => setPremiumPriceToken(e.target.value)}
-                        className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-[#ffd700] font-mono font-bold outline-none" 
-                      />
+                      <input type="number" value={premiumPriceToken} onChange={(e) => setPremiumPriceToken(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-[#ffd700] font-mono font-bold outline-none" />
                     </div>
-                    <p className="text-[11px] text-zinc-500 italic">
-                      *Bhai, is input field me aap jo link daaloge, bacha jab payment complete karke verification trigger karega, system automatic use usi group me land karwa dega.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Form D Timeline pushes input boxes framework restored perfectly */}
-                <div className="bg-[#1a1b1e] border border-zinc-800 p-6 rounded-2xl">
-                  <h3 className="font-bold text-base text-white mb-4 flex items-center gap-2"><Calendar size={18} className="text-[#ffd700]"/> Inject New Timeline Step Deadline</h3>
-                  <form onSubmit={handleAddDeadlineEvent} className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-zinc-300">
-                    <div><label className="block text-zinc-400 mb-1">Date Stamp info</label><input type="text" placeholder="June 28, 2026" value={newDeadDate} onChange={(e) => setNewDeadDate(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none" required /></div>
-                    <div><label className="block text-zinc-400 mb-1">Status chip select</label><select value={newDeadStat} onChange={(e) => setNewDeadStat(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-zinc-300 outline-none"><option>Upcoming</option><option>Live Soon</option><option>Strict Warning</option></select></div>
-                    <div className="sm:col-span-2"><label className="block text-zinc-400 mb-1">Event title header</label><input type="text" placeholder="Round 1 Allotment Result" value={newDeadTitle} onChange={(e) => setNewDeadTitle(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none" required /></div>
-                    <div className="sm:col-span-2"><label className="block text-zinc-400 mb-1">Event descriptions logs</label><textarea rows={2} value={newDeadDesc} onChange={(e) => setNewDeadDesc(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none" required /></div>
-                    <button type="submit" className="sm:col-span-2 bg-zinc-100 text-black font-bold py-3 rounded-xl uppercase font-mono text-xs hover:opacity-90 mt-2 transition-all">Commit Deadline step milestone to public timeline 🚀</button>
-                  </form>
-                </div>
-
-                {/* Auditing records student session lists */}
-                <div className="bg-[#1a1b1e] border border-zinc-800 p-6 rounded-2xl">
-                  <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-zinc-400 mb-4">Student email session audits logs stream</h3>
-                  <div className="border border-zinc-800 rounded-xl overflow-hidden divide-y divide-zinc-800/40 text-[11px] font-mono text-zinc-400">
-                    {studentSessions.map((session, idx) => (
-                      <div key={idx} className="p-3 bg-zinc-900/10 flex justify-between"><span>👤 Logged Account: <strong>{session.email}</strong></span><span className="text-zinc-500">Timestamp: {session.timestamp}</span></div>
-                    ))}
                   </div>
                 </div>
               </div>
             )}
-
           </section>
         </div>
       )}
-
 
       {/* FLOATING AI CHATBOT SYSTEM */}
       <div className="fixed bottom-6 right-6 z-50 font-sans">
@@ -571,28 +490,6 @@ export default function Home() {
           </div>
         )}
       </div>
-
-      {/* DUAL-STATE AUTH MODAL PROFILES COMPONENT */}
-      {isSignInOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fadeIn">
-          <div className="w-[90%] max-w-md bg-white rounded-2xl shadow-2xl border border-[#e2e2e2] overflow-hidden relative animate-scaleUp">
-            <div className="absolute top-0 left-0 w-full h-1.5 bg-[#ffd700]"></div>
-            <button onClick={() => { setIsSignInOpen(false); setIsSignUpMode(false); }} className="absolute top-4 right-4 text-zinc-400 hover:text-black"><X size={20} /></button>
-            <div className="p-6 md:p-8 text-center pb-4">
-              <h3 className="text-xl font-extrabold text-[#1a1c1c] font-display">{isSignUpMode ? 'Create New Account' : 'Welcome Back Student'}</h3>
-              <p className="text-xs text-[#5f5e5e] mt-1">Sign in using credentials security parameter variables mapping tokens.</p>
-            </div>
-            <form onSubmit={handleAuthSubmit} className="px-6 md:px-8 pb-6 space-y-4 text-left">
-              <div><label className="block text-xs font-semibold text-[#4d4732] mb-1.5">Email ID Address</label><div className="relative"><User size={16} className="absolute left-3.5 top-3.5 text-[#5f5e5e]" /><input type="email" placeholder="e.g. admin@achiver.com" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} className="w-full pl-10 pr-4 py-3 bg-[#f9f9f9] border text-xs outline-none" required /></div></div>
-              <div><label className="block text-xs font-semibold text-[#4d4732] mb-1.5">Password Token</label><div className="relative"><Lock size={16} className="absolute left-3.5 top-3.5 text-[#5f5e5e]" /><input type="password" placeholder="e.g. admin123" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} className="w-full pl-10 pr-4 py-3 bg-[#f9f9f9] border text-xs outline-none" required /></div></div>
-              <button type="submit" className="w-full bg-[#1a1c1c] text-white font-bold py-3.5 rounded-xl text-xs uppercase shadow-md flex items-center justify-center gap-2 mt-2 transition-all">Access Dashboard 🚀</button>
-            </form>
-            <div className="bg-[#f3f3f3] px-6 py-4 border-t text-center text-xs text-[#5f5e5e]">
-              {isSignUpMode ? <p>Already have an account? <button onClick={() => setIsSignUpMode(false)} className="text-[#705d00] font-bold hover:underline">Sign In Here</button></p> : <p>Don't have an account? <button onClick={() => setIsSignUpMode(true)} className="text-[#705d00] font-bold hover:underline">Sign Up / Register Here</button></p>}
-            </div>
-          </div>
-        </div>
-      )}
 
     </main>
   );
