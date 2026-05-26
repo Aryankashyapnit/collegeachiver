@@ -61,9 +61,7 @@ export default function Home() {
     { email: 'sanya.patel@delhi.edu', tokenType: 'OAUTH_GOOGLE_OK', queriesCount: 8, status: 'OFFLINE', timestamp: '11:20 AM' }
   ]);
 
-  const [selectedYear, setSelectedYear] = useState('2023');
   const [selectedType, setSelectedType] = useState('IIT'); 
-  const [selectedRound, setSelectedRound] = useState('Round 1');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -74,10 +72,8 @@ export default function Home() {
   ]);
 
   const [isSignInOpen, setIsSignInOpen] = useState(false);
-  const [isSignUpMode, setIsSignUpMode] = useState(false); 
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
-  const [confirmPasswordInput, setConfirmPasswordInput] = useState('');
 
   const [adminView, setAdminView] = useState<'Overview' | 'Database' | 'Users'>('Overview');
   const [adminSearch, setAdminSearch] = useState('');
@@ -104,7 +100,7 @@ export default function Home() {
 
   const predictorRef = useRef<HTMLDivElement>(null);
 
-  // 📡 🚀 READ OPERATION: Fetch all real cutoff records from Supabase Cloud on initialization
+  // 📡 🚀 READ OPERATION
   useEffect(() => {
     setTotalVisits(prev => prev + 1);
     
@@ -121,7 +117,6 @@ export default function Home() {
         if (data && data.length > 0) {
           setDynamicJosaaRecords(data);
         } else {
-          // If cloud table is brand new, seed it with fallback matrix arrays
           setDynamicJosaaRecords(massiveJosaaData);
         }
       } catch (err) {
@@ -134,7 +129,6 @@ export default function Home() {
     loadCloudDatabaseRecords();
   }, []);
 
-  // Public side predictor match operations
   const handlePredict = (e: React.FormEvent) => {
     e.preventDefault();
     if (!rank) return alert("Pehle apni rank enter karo bhai!");
@@ -181,46 +175,45 @@ export default function Home() {
     alert(`✨ Welcome back bhai! Logged in as: ${emailInput}`);
     setIsSignInOpen(false);
   };
-
-  // ⚙️ WRITE OPERATION: Injects record straight to the real Supabase Cloud Table instance node
+// ⚙️ WRITE OPERATION
   const handleAddCutoffRecord = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newInst || !newProg || !newOpenRank || !newCloseRank) return alert("Form k cells ko fill karein!");
 
+    // Sirf wahi columns jo Supabase table me 100% exist karte hain
     const newRowData = {
       institute: newInst,
       program: newProg,
       quota: newQuota,
       category: newCat,
       gender: newGend,
-      opening: parseInt(newOpenRank),
-      closing: parseInt(newCloseRank),
-      placement: "16.4 LPA",
-      nirf: 42,
-      fee: `${newFee} / Year`
+      opening: parseInt(newOpenRank) || 0,
+      closing: parseInt(newCloseRank) || 0
     };
 
     try {
-      // Stream record straight into cloud database row allocation
       const { data, error } = await supabase
         .from('josaa_records')
         .insert([newRowData])
         .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase Error Details:", error);
+        return alert(`Database Reject: ${error.message}`);
+      }
 
-      // Update state live so results reflect immediately
       if (data && data[0]) {
         setDynamicJosaaRecords(prev => [data[0] as CollegeData, ...prev]);
       }
       
       alert("🚀 Mubarak ho! Naya Cutoff Record Real Supabase Cloud Database me permanently save ho gaya h!");
       setNewInst(''); setNewProg(''); setNewOpenRank(''); setNewCloseRank('');
-    } catch (err) {
+    } catch (err: any) {
       console.error("Cloud insert transaction crashed:", err);
-      alert("🚨 Backend transmission error! .env.local keys or setup connection verify karein.");
+      alert(`🚨 Crash Error: ${err?.message || "Unknown Network Crash"}`);
     }
   };
+  
 
   const handleAddDeadlineEvent = (e: React.FormEvent) => {
     e.preventDefault();
@@ -228,7 +221,7 @@ export default function Home() {
     const newEvent = { id: dynamicDeadlines.length + 1, date: newDeadDate, title: newDeadTitle, desc: newDeadDesc, status: newDeadStat };
     setDynamicDeadlines([...dynamicDeadlines, newEvent]);
     alert("⏰ Success! Timeline deadline step updated.");
-    setNewDeadDate(''); setNewDeadTitle('');
+    setNewDeadDate(''); setNewDeadTitle(''); setNewDeadDesc('');
   };
 
   const handleAddSeatMatrixRow = (e: React.FormEvent) => {
@@ -237,7 +230,7 @@ export default function Home() {
     const newSeatRow = { id: dynamicSeats.length + 1, institute: newSeatInst, program: newSeatProg, quota: newSeatQuota, seats: parseInt(newSeatCap) };
     setDynamicSeats([...dynamicSeats, newSeatRow]);
     alert("🏛️ Seat Matrix grid tracking sync done!");
-    setNewSeatInst(''); setNewSeatProg('');
+    setNewSeatInst(''); setNewSeatProg(''); setNewSeatCap('');
   };
 
   const handleVerifyPremiumPayment = () => {
@@ -253,13 +246,10 @@ export default function Home() {
     });
   }, [selectedType, searchQuery, dynamicJosaaRecords]);
 
-  const adminFilteredData = useMemo(() => {
-    return dynamicJosaaRecords.filter(item => item.institute.toLowerCase().includes(adminSearch.toLowerCase())).slice(0, 3);
-  }, [adminSearch, dynamicJosaaRecords]);
-
   const itemsPerPage = 5;
   const paginatedData = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage; return filteredCutoffData.slice(start, start + itemsPerPage);
+    const start = (currentPage - 1) * itemsPerPage; 
+    return filteredCutoffData.slice(start, start + itemsPerPage);
   }, [filteredCutoffData, currentPage]);
 
   return (
@@ -282,7 +272,7 @@ export default function Home() {
                 <button key={tab} onClick={() => { setActiveTab(tab); setCurrentPage(1); }} className={`px-3 py-2 transition-all rounded-lg text-[13px] font-medium ${activeTab === tab ? 'text-[#221b00] bg-[#ffd700] font-bold shadow-xs' : 'hover:text-[#705d00] hover:bg-[#eeeeee]'}`}>{tab}</button>
               ))}
             </div>
-            <button type="button" onClick={() => { setIsSignUpMode(false); setIsSignInOpen(true); }} className="bg-[#ffd700] text-[#221b00] font-bold px-5 py-2 rounded-lg text-xs shadow-xs shrink-0 cursor-pointer hover:opacity-90">Sign In</button>
+            <button type="button" onClick={() => setIsSignInOpen(true)} className="bg-[#ffd700] text-[#221b00] font-bold px-5 py-2 rounded-lg text-xs shadow-xs shrink-0 cursor-pointer hover:opacity-90">Sign In</button>
           </div>
         </nav>
       ) : null}
@@ -308,7 +298,7 @@ export default function Home() {
                 <button onClick={() => setActiveTab('Counselling Guide')} className="bg-[#1a1c1c] text-white font-bold text-xs px-6 py-3.5 rounded-lg hover:bg-zinc-800 transition-all uppercase tracking-wider shadow-md">Get Premium Guide 🚀</button>
               </div>
             </div>
-            <div className="md:col-span-5 flex justify-center"><div className="bg-white p-4 rounded-2xl shadow-xl border relative max-w-sm"><img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80" className="rounded-xl h-64 object-cover w-full" /></div></div>
+            <div className="md:col-span-5 flex justify-center"><div className="bg-white p-4 rounded-2xl shadow-xl border relative max-w-sm"><img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80" className="rounded-xl h-64 object-cover w-full" alt="College Prep" /></div></div>
           </section>
         </div>
       )}
@@ -384,7 +374,7 @@ export default function Home() {
             {!showQrCheckout ? (
               <button onClick={() => setShowQrCheckout(true)} className="w-full bg-[#1a1c1c] text-white font-bold py-4 rounded-xl text-xs uppercase tracking-wider shadow-lg hover:bg-zinc-800 transition-all cursor-pointer">Get Instant Access To Secret Group 🚀</button>
             ) : (
-              <div className="p-4 bg-zinc-50 border rounded-xl space-y-4 animate-scaleUp">
+              <div className="p-4 bg-zinc-50 border rounded-xl space-y-4">
                 <div className="flex flex-col items-center gap-2 font-mono"><QrCode size={130} className="text-black border p-2 bg-white rounded-lg" /><span className="text-[10px] font-bold text-zinc-500">SCAN QR TO PAY INSTANT ₹{premiumPriceToken}</span></div>
                 <button onClick={handleVerifyPremiumPayment} className="w-full bg-emerald-600 text-white font-bold py-3 rounded-lg text-xs uppercase flex items-center justify-center gap-1 cursor-pointer">I Paid! Verify & Join Group <MessageCircle size={14}/></button>
               </div>
@@ -396,6 +386,13 @@ export default function Home() {
       {/* AUX STATIC READ LISTINGS VIEW PORTS */}
       {activeTab === 'Opening/Closing Ranks' && (
         <section className="max-w-6xl mx-auto px-4 py-12 animate-fadeIn text-left">
+          <div className="flex gap-4 mb-4">
+            <select value={selectedType} onChange={(e) => { setSelectedType(e.target.value); setCurrentPage(1); }} className="p-2 border rounded bg-white text-xs font-semibold">
+              <option value="IIT">IITs</option>
+              <option value="NIT">NITs</option>
+            </select>
+            <input type="text" placeholder="Search Campus..." value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }} className="p-2 border rounded text-xs w-64 bg-white" />
+          </div>
           <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
             <table className="w-full text-left border-collapse min-w-[900px]">
               <thead>
@@ -408,8 +405,14 @@ export default function Home() {
               </tbody>
             </table>
           </div>
+          <div className="flex justify-between items-center mt-4">
+            <button disabled={currentPage === 1} onClick={() => setCurrentPage(prev => prev - 1)} className="bg-zinc-800 text-white px-3 py-1 rounded text-xs disabled:opacity-50 flex items-center"><ChevronLeft size={14}/> Prev</button>
+            <span className="text-xs font-mono">Page {currentPage}</span>
+            <button disabled={paginatedData.length < itemsPerPage} onClick={() => setCurrentPage(prev => prev + 1)} className="bg-zinc-800 text-white px-3 py-1 rounded text-xs disabled:opacity-50 flex items-center">Next <ChevronRight size={14}/></button>
+          </div>
         </section>
       )}
+      
       {activeTab === 'Deadlines' && (
         <section className="max-w-4xl mx-auto px-6 py-12 text-left animate-fadeIn">
           <h2 className="text-2xl font-extrabold border-b pb-2 mb-6">JoSAA Deadlines Timeline Calendar</h2>
@@ -418,6 +421,7 @@ export default function Home() {
           </div>
         </section>
       )}
+      
       {activeTab === 'Seat Matrix' && (
         <section className="max-w-5xl mx-auto px-6 py-12 text-left animate-fadeIn">
           <h2 className="text-2xl font-extrabold border-b pb-4 mb-6">Seat Matrix Allocation Ledger</h2>
@@ -461,7 +465,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* 🔒 PROFILE SESSION EMAIL LOGGER FEED INCLUDED */}
+                {/* Live Student Authentication Registry Sessions Monitor */}
                 <div className="bg-[#1a1b1e] border border-zinc-800 rounded-2xl p-6">
                   <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-zinc-400 mb-4">🔒 Live Student Authentication Registry Sessions Monitor</h3>
                   <div className="border border-zinc-800 rounded-xl overflow-hidden text-xs font-mono shadow-md">
@@ -483,12 +487,13 @@ export default function Home() {
               </div>
             )}
 
-            {/* 🚀 FORM A DATA WORKSPACE FULLY INTEGRATED INJECTING STRAIGHT TO SUPABASE CLOUD */}
+            {/* FORM A & B DATA WORKSPACE */}
             {adminView === 'Database' && (
               <div className="space-y-12 animate-fadeIn">
                 <div className="bg-[#1a1b1e] border border-zinc-800 p-6 rounded-2xl relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-full h-1 bg-[#ffd700]"></div>
                   <h3 className="font-bold text-base text-white mb-4 flex items-center gap-2"><PlusCircle size={18} className="text-[#ffd700]"/> Form A: Inject New Predictor & Cutoff Record Node</h3>
+                  
                   <form onSubmit={handleAddCutoffRecord} className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-zinc-300">
                     <div className="sm:col-span-2"><label className="block text-zinc-400 mb-1">Institute Legal Entity Full Name</label><input type="text" placeholder="e.g. National Institute of Technology Agartala" value={newInst} onChange={(e) => setNewInst(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none focus:border-[#ffd700]" required /></div>
                     <div className="sm:col-span-2"><label className="block text-zinc-400 mb-1">Academic Program specialty course stream</label><input type="text" placeholder="e.g. Electronics and Communication Engineering (4 Years, B.Tech)" value={newProg} onChange={(e) => setNewProg(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none focus:border-[#ffd700]" required /></div>
@@ -548,7 +553,7 @@ export default function Home() {
           <button onClick={() => setIsChatOpen(true)} className="bg-[#1a1c1c] text-white p-4 rounded-full shadow-2xl border-2 border-[#ffd700] animate-bounce cursor-pointer"><MessageSquare size={24} className="text-[#ffd700]" /></button>
         )}
         {isChatOpen && (
-          <div className="w-80 md:w-96 h-[400px] bg-white rounded-2xl shadow-2xl border border-[#e2e2e2] flex flex-col overflow-hidden animate-slideUp">
+          <div className="w-80 md:w-96 h-[400px] bg-white rounded-2xl shadow-2xl border border-[#e2e2e2] flex flex-col overflow-hidden">
             <div className="bg-[#1a1c1c] text-white p-4 flex justify-between items-center border-b border-[#ffd700]/30"><span className="text-xs font-bold">CollegeAchiver Bot v2.0</span><button onClick={() => setIsChatOpen(false)} className="cursor-pointer"><X size={18} /></button></div>
             <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-[#f9f9f9]">
               {messages.map((msg, i) => (
@@ -562,6 +567,21 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {/* SIGN IN MODAL */}
+      {isSignInOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white p-8 rounded-2xl w-96 shadow-2xl relative text-black">
+            <button onClick={() => setIsSignInOpen(false)} className="absolute top-4 right-4 cursor-pointer"><X size={20}/></button>
+            <h2 className="text-xl font-bold mb-4">Sign In</h2>
+            <form onSubmit={handleAuthSubmit} className="space-y-4">
+              <input type="email" placeholder="Email (admin@achiver.com)" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} className="w-full border p-2.5 rounded text-sm outline-none" required />
+              <input type="password" placeholder="Password (admin123)" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} className="w-full border p-2.5 rounded text-sm outline-none" required />
+              <button type="submit" className="w-full bg-black text-white py-2.5 rounded font-bold text-sm hover:opacity-90 transition-all cursor-pointer">Access Dashboard</button>
+            </form>
+          </div>
+        </div>
+      )}
 
     </main>
   );
