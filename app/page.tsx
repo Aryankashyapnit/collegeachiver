@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef, useMemo } from 'react';
-import { School, Award, TrendingUp, Search, MapPin, Download, CheckSquare, Layers, BarChart3, Clock, ChevronLeft, ChevronRight, Mail, Share2, Globe } from 'lucide-react';
+import { School, Award, TrendingUp, Search, MapPin, Download, CheckSquare, Layers, BarChart3, Clock, ChevronLeft, ChevronRight, Mail, Share2, Globe, HelpCircle, BookOpen } from 'lucide-react';
 import { massiveJosaaData, CollegeData } from './josaaData';
 
 interface ExtendedCollegeData extends CollegeData {
@@ -87,19 +87,19 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#f9f9f9] text-[#1a1c1c] antialiased font-sans">
       
-      {/* 🗺️ PREMIUM RIGID COCKPIT NAVBAR WITH PERMANENT HOME TAB */}
+      {/* 🗺️ PREMIUM RIGID COCKPIT NAVBAR WITH COUNSELLING GUIDE */}
       <nav className="sticky top-0 z-50 bg-white shadow-sm border-b border-[#e2e2e2] px-6 py-3.5">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="max-w-6xl mx-auto flex flex-col lg:flex-row justify-between items-center gap-4">
           
           {/* Logo Brand */}
-          <div onClick={() => setActiveTab('Home')} className="text-xl font-extrabold tracking-tight text-[#705d00] flex items-center gap-2 cursor-pointer select-none">
+          <div onClick={() => setActiveTab('Home')} className="text-xl font-extrabold tracking-tight text-[#705d00] flex items-center gap-2 cursor-pointer select-none shrink-0">
             <span className="h-4 w-4 bg-[#ffd700] inline-block rounded-[4px]"></span>
             CollegeAchiver
           </div>
           
-          {/* 🎛️ NAVIGATION BUTTONS ARRAY (Home Included) */}
-          <div className="flex flex-wrap items-center justify-center gap-1 md:gap-4 text-xs font-semibold text-[#5f5e5e]">
-            {['Home', 'Predictor', 'Opening/Closing Ranks', 'Analysis', 'Deadlines', 'Seat Matrix'].map((tab) => (
+          {/* 🎛️ FULL NAVIGATION BUTTONS ARRAY (Counselling Guide Added) */}
+          <div className="flex flex-wrap items-center justify-center gap-1 md:gap-3 text-xs font-semibold text-[#5f5e5e]">
+            {['Home', 'Predictor', 'Counselling Guide', 'Opening/Closing Ranks', 'Analysis', 'Deadlines', 'Seat Matrix'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => { setActiveTab(tab); setCurrentPage(1); }}
@@ -114,7 +114,7 @@ export default function Home() {
             ))}
           </div>
 
-          <button className="bg-[#ffd700] text-[#221b00] font-bold px-5 py-2 rounded-lg text-xs hover:opacity-90 transition-all shadow-xs">
+          <button className="bg-[#ffd700] text-[#221b00] font-bold px-5 py-2 rounded-lg text-xs hover:opacity-90 transition-all shadow-xs shrink-0">
             Sign In
           </button>
         </div>
@@ -122,7 +122,7 @@ export default function Home() {
 
       {/* 📋 RENDER CORE COMPONENTS BASED ON HEADER SELECTION */}
       
-      {/* 1️⃣ TAB CONTENT: HOME OR PREDICTOR (Dono Landing Layout render karenge) */}
+      {/* 1️⃣ TAB CONTENT: HOME OR PREDICTOR */}
       {(activeTab === 'Home' || activeTab === 'Predictor') && (
         <>
           <section className="bg-white border-b border-[#e8e8e8] py-12 md:py-16 px-6">
@@ -130,7 +130,7 @@ export default function Home() {
               
               <div className="lg:col-span-7 space-y-5 text-left">
                 <div className="inline-flex items-center gap-2 bg-[#ffd700]/20 text-[#705d00] text-[11px] font-mono font-bold tracking-wider uppercase px-3 py-1 rounded-full border border-[#ffd700]/40">
-                  ✨ AI-Counselling Engine Loaded
+                  ✨ AI-Counselling Engine Live
                 </div>
                 <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-[#1a1c1c] leading-[1.15]">
                   Predict Your Dream <span className="text-[#705d00]">IIT & NIT</span>
@@ -235,7 +235,43 @@ export default function Home() {
         </>
       )}
 
-      {/* 2️⃣ TAB CONTENT: OPENING/CLOSING RANKS */}
+      {/* 2️⃣ TAB CONTENT: COUNSELLING GUIDE (New Tab Component) */}
+      {activeTab === 'Counselling Guide' && (
+        <section className="max-w-4xl mx-auto px-6 py-12 animate-fadeIn text-left">
+          <div className="mb-8 border-b border-[#e2e2e2] pb-4">
+            <span className="text-xs font-bold text-[#705d00] uppercase tracking-wider font-mono">Step-by-Step Advisor</span>
+            <h2 className="text-3xl font-extrabold text-[#1a1c1c] tracking-tight mt-1">JoSAA 2026 Student Counselling Guide</h2>
+            <p className="text-sm text-[#5f5e5e] mt-1">Understand the systematic process to secure and lock your target college allocations smoothly.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 left-0 h-full w-1 bg-[#ffd700]"></div>
+              <div className="text-sm font-bold text-[#705d00] mb-1">Phase 1: Registration</div>
+              <p className="text-xs text-[#5f5e5e] leading-relaxed">Login using JEE credentials, verify profile status variables, and initialize configuration protocols.</p>
+            </div>
+            <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 left-0 h-full w-1 bg-[#ffd700]"></div>
+              <div className="text-sm font-bold text-[#705d00] mb-1">Phase 2: Choice Fill</div>
+              <p className="text-xs text-[#5f5e5e] leading-relaxed">Arrange target specialization branches in strict sequential order based on our Predictor results.</p>
+            </div>
+            <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 left-0 h-full w-1 bg-[#ffd700]"></div>
+              <div className="text-sm font-bold text-[#705d00] mb-1">Phase 3: Seat Lock</div>
+              <p className="text-xs text-[#5f5e5e] leading-relaxed">Accept allocations via Freeze, Float, or Slide options followed by technical document checking.</p>
+            </div>
+          </div>
+
+          <div className="bg-white border border-[#e2e2e2] rounded-xl p-6 shadow-sm">
+            <h3 className="font-bold text-base mb-3 flex items-center gap-2"><BookOpen size={18} className="text-[#705d00]" /> Pro Tip: Float vs Slide System</h3>
+            <p className="text-xs text-[#5f5e5e] leading-relaxed">
+              Agar aapko koi seat milti hai par aap upar ke choices check karna chahte hain toh <strong>Float</strong> select karein. Agar aapko usi college me kisi higher degree branch ko evaluate karna hai toh <strong>Slide</strong> option trigger karein!
+            </p>
+          </div>
+        </section>
+      )}
+
+      {/* 3️⃣ TAB CONTENT: OPENING/CLOSING RANKS */}
       {activeTab === 'Opening/Closing Ranks' && (
         <section className="max-w-6xl mx-auto px-4 md:px-8 py-12">
           <div className="mb-10">
@@ -356,7 +392,7 @@ export default function Home() {
         </section>
       )}
 
-      {/* 3️⃣ TAB CONTENT: ANALYSIS */}
+      {/* 4️⃣ TAB CONTENT: ANALYSIS */}
       {activeTab === 'Analysis' && (
         <section className="max-w-6xl mx-auto px-6 py-12">
           <div className="mb-8 border-b border-[#e2e2e2] pb-4">
@@ -375,7 +411,7 @@ export default function Home() {
         </section>
       )}
 
-      {/* 4️⃣ TAB CONTENT: DEADLINES */}
+      {/* 5️⃣ TAB CONTENT: DEADLINES */}
       {activeTab === 'Deadlines' && (
         <section className="max-w-3xl mx-auto px-6 py-12">
           <h2 className="text-2xl font-black mb-6 tracking-tight">JoSAA Counselling Event Target Sequence</h2>
@@ -388,7 +424,7 @@ export default function Home() {
         </section>
       )}
 
-      {/* 5️⃣ TAB CONTENT: SEAT MATRIX */}
+      {/* 6️⃣ TAB CONTENT: SEAT MATRIX */}
       {activeTab === 'Seat Matrix' && (
         <section className="max-w-4xl mx-auto px-6 py-12">
           <h2 className="text-2xl font-extrabold mb-4 tracking-tight">Seat Matrix Allocation Ledger</h2>
