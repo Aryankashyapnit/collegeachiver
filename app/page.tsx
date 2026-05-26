@@ -31,7 +31,7 @@ export default function Home() {
   const [homeState, setHomeState] = useState('OS'); 
   const [hasSearched, setHasSearched] = useState(false);
 
-  // 🏛️ PERSISTENT CORE DATABASE MANAGEMENT ARRAYS
+  // 🏛️ PERSISTENT ENGINE CORE MEMORY ARRAYS
   const [dynamicJosaaRecords, setDynamicJosaaRecords] = useState<CollegeData[]>(massiveJosaaData);
   const [results, setResults] = useState<ExtendedCollegeData[]>([]);
 
@@ -42,17 +42,17 @@ export default function Home() {
   ]);
 
   const [dynamicDeadlines, setDynamicDeadlines] = useState([
-    { id: 1, date: 'June 10, 2026', title: 'JEE Advanced Result & Cut-off Release', desc: 'Organizing IIT ke dwara final rank card aur official qualifying cut-offs publish honge.', status: 'Upcoming' },
-    { id: 2, date: 'June 15, 2026', title: 'Online Registration & Preference Choice Filling Starts', desc: 'Students choices online fill karna shuru kar sakte hain. Sequence order isi dauran lock hoga.', status: 'Live Soon' },
+    { id: 1, date: 'June 10, 2026', title: 'JEE Advanced Result & Cut-off Release', desc: 'IIT ke dwara final rank card aur official qualifying cut-offs publish honge.', status: 'Upcoming' },
+    { id: 2, date: 'June 15, 2026', title: 'Online Registration & Preference Choice Filling Starts', desc: 'Students choices online fill karna shuru kar sakte hain.', status: 'Live Soon' },
     { id: 3, date: 'June 25, 2026 (5:00 PM)', title: 'Choice Filling Window Closes & Auto-Locking', desc: 'Bhai, ye sabse critical timestamp hai! Window lock hone se pehle changes save kar lena.', status: 'Strict Warning' }
   ]);
 
-  // 💰 PREMIUM GROUP FUNNEL STATE SETTINGS (₹99 Sweets spot locked)
+  // 💰 PREMIUM GROUP FUNNEL STATE SETTINGS (₹99 Psychological Pricing Sweetspot)
   const [premiumGroupUrl, setPremiumGroupUrl] = useState('https://chat.whatsapp.com/secret-counselling-group-link');
   const [premiumPriceToken, setPremiumPriceToken] = useState('99'); 
   const [showQrCheckout, setShowQrCheckout] = useState(false);
 
-  // 📈 SYSTEMS ANALYTICS MONITORING METERS
+  // 📈 SYSTEMS ANALYTICS AND VISIT COUNTER METERS
   const [totalVisits, setTotalVisits] = useState(1248); 
   const [studentSessions, setStudentSessions] = useState<StudentLog[]>([
     { email: 'student.test@achiver.in', tokenType: 'OTP_EMAIL_OK', queriesCount: 12, status: 'ONLINE', timestamp: '12:15 PM' },
@@ -60,32 +60,32 @@ export default function Home() {
     { email: 'aryan.kumar@nitagartala.in', tokenType: 'REGISTERED_NEW_OK', queriesCount: 15, status: 'ONLINE', timestamp: '01:05 PM' }
   ]);
 
-  // Public filtrations table parameters configurations
+  // Public configurations state lookups
   const [selectedYear, setSelectedYear] = useState('2023');
   const [selectedType, setSelectedType] = useState('IIT'); 
   const [selectedRound, setSelectedRound] = useState('Round 1');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
-  // 🤖 FLOATING SYSTEM CHATBOT LOGIC
+  // 🤖 AI CONVERSATIONAL CHATBOT SYSTEM
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState('');
   const [messages, setMessages] = useState([
     { sender: 'bot', text: 'Hey roomie! 👋 Main hoon aapka CollegeAchiver AI Assistant. JoSAA/CSAB counselling ka koi bhi doubt yahan pucho!' }
   ]);
 
-  // 🔐 SECURE SIGN IN/SIGN UP MODALS LAYOUT HANDLERS
+  // 🔐 INTERACTIVE MODALS AUTH ENCRYPTION ENGINE
   const [isSignInOpen, setIsSignInOpen] = useState(false);
   const [isSignUpMode, setIsSignUpMode] = useState(false); 
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [confirmPasswordInput, setConfirmPasswordInput] = useState('');
 
-  // 🎛️ CONTROL DESK COCKPIT SIDEBAR RENDERING TOOGLE STATES
+  // 🎛️ CONTROL DESK VIEW ENGINE (Overview | Database | Users)
   const [adminView, setAdminView] = useState<'Overview' | 'Database' | 'Users'>('Overview');
   const [adminSearch, setAdminSearch] = useState('');
 
-  // Form Inputs Buffer Management variables: Form A
+  // Temporary Inputs State management row elements: Form A
   const [newInst, setNewInst] = useState('');
   const [newProg, setNewProg] = useState('');
   const [newQuota, setNewQuota] = useState('OS');
@@ -95,13 +95,13 @@ export default function Home() {
   const [newCloseRank, setNewCloseRank] = useState('');
   const [newFee, setNewFee] = useState('2,25,000'); 
 
-  // Form Inputs Buffer Management variables: Form B Deadline
+  // Temporary Inputs State management row elements: Form B Deadline
   const [newDeadDate, setNewDeadDate] = useState('');
   const [newDeadTitle, setNewDeadTitle] = useState('');
   const [newDeadDesc, setNewDeadDesc] = useState('');
   const [newDeadStat, setNewDeadStat] = useState('Upcoming');
 
-  // Form Inputs Buffer Management variables: Form C Seat Matrix
+  // Temporary Inputs State management row elements: Form C Seat matrix
   const [newSeatInst, setNewSeatInst] = useState('');
   const [newSeatProg, setNewSeatProg] = useState('');
   const [newSeatQuota, setNewSeatQuota] = useState('OPEN (Neutral)');
@@ -109,12 +109,12 @@ export default function Home() {
 
   const predictorRef = useRef<HTMLDivElement>(null);
 
-  // Rehydration lifecycle protocol
+  // Persistence data recovery hydration lifecycle
   useEffect(() => {
     setTotalVisits(prev => prev + 1);
     if (typeof window !== 'undefined') {
-      const cachedRecords = localStorage.getItem('achiver_colleges');
-      if (cachedRecords) setDynamicJosaaRecords(JSON.parse(cachedRecords));
+      const cachedColleges = localStorage.getItem('achiver_colleges');
+      if (cachedColleges) setDynamicJosaaRecords(JSON.parse(cachedColleges));
       
       const cachedDeadlines = localStorage.getItem('achiver_deadlines');
       if (cachedDeadlines) setDynamicDeadlines(JSON.parse(cachedDeadlines));
@@ -124,7 +124,7 @@ export default function Home() {
     }
   }, []);
 
-  // Public Predictor algorithm compiler run handler logic
+  // Public side predictor matching process engine algorithm
   const handlePredict = (e: React.FormEvent) => {
     e.preventDefault();
     if (!rank) return alert("Pehle apni rank enter karo bhai!");
@@ -155,22 +155,21 @@ export default function Home() {
     setMessages(prev => [...prev, { sender: 'user', text: messageText }]);
     if (!textToSend) setChatInput('');
     setTimeout(() => {
-      setMessages(prev => [...prev, { sender: 'bot', text: `Bhai query register ho gayi hai, Premium group entry lekar direct exclusive supports group me handholding connect karein! 🚀 Token: ₹${premiumPriceToken}` }]);
+      setMessages(prev => [...prev, { sender: 'bot', text: `Inquiry parsed! Premium group options unlock karke safe guidance channel circle join karein. Token fee standard ₹${premiumPriceToken} only.` }]);
     }, 800);
   };
 
-  // Auth Submit handler gatekeeper
+  // Auth gate submit validator handler 
   const handleAuthSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!emailInput || !passwordInput) return alert("Credentials fields bhariye!");
+    if (!emailInput || !passwordInput) return alert("Credentials entries ko fill kijiye!");
     
     if (isSignUpMode) {
-      if (passwordInput !== confirmPasswordInput) return alert("Passwords split mismatch!");
-      alert(`🎉 Account successfully created: ${emailInput}`);
+      alert(`🎉 Account created successfully: ${emailInput}`);
     } else {
-      // 👑 SECURITY BACKDOOR ACTION ENTRY LOCK FOR THE ADMIN CORE PANELS
+      // 👑 SECURITY ROOT ACCESS GATEWAY CONFIGURATION LINKED TO BYPASS USER PANEL LAYOUTS
       if (emailInput.toLowerCase() === 'admin@achiver.com' && passwordInput === 'admin123') {
-        alert("Welcome Master Control Panel Admin Saheb! 👑 Controls synchronizing live.");
+        alert("Welcome Master Control Panel Admin Saheb! 👑 Sync initialization sequence successful.");
         setActiveTab('AdminPanel');
         setIsSignInOpen(false);
         setEmailInput(''); setPasswordInput('');
@@ -192,35 +191,37 @@ export default function Home() {
     setEmailInput(''); setPasswordInput(''); setConfirmPasswordInput('');
   };
 
-  // ⚙️ ADMINE ACTION 1: Append Cut-off Row Form A
+  // ⚙️ ADMINISTRATIVE BACKEND STATE MANAGEMENT OPERATIONS
+  
+  // Action form A injection: Append Cutoff Row
   const handleAddCutoffRecord = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newInst || !newProg || !newOpenRank || !newCloseRank) return alert("Form fill kijiye!");
+    if (!newInst || !newProg || !newOpenRank || !newCloseRank) return alert("Form k cells ko fill karein!");
     const newRow = { id: dynamicJosaaRecords.length + 1, institute: newInst, program: newProg, quota: newQuota, category: newCat, gender: newGend, opening: parseInt(newOpenRank), closing: parseInt(newCloseRank), placement: "16.4 LPA", nirf: 42, fee: `${newFee} / Year` };
     
     const updated = [newRow, ...dynamicJosaaRecords];
     setDynamicJosaaRecords(updated);
     localStorage.setItem('achiver_colleges', JSON.stringify(updated));
     
-    alert("🔥 Success! Record appended straight to predictor local memory storage pipeline.");
+    alert("🔥 Mubarak ho! Naya Predictor Custom Cutoff Row live state layer pipelines me inject ho gaya.");
     setNewInst(''); setNewProg(''); setNewOpenRank(''); setNewCloseRank('');
   };
 
-  // ⚙️ ADMINE ACTION 2: Append Deadline Event Form C (Inside Users/Overrides Tab)
+  // Action form D injection: Append Deadlines Date milestone
   const handleAddDeadlineEvent = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newDeadDate || !newDeadTitle || !newDeadDesc) return alert("Fields fill kijiye!");
+    if (!newDeadDate || !newDeadTitle || !newDeadDesc) return alert("Values fill kijiye!");
     const newEvent = { id: dynamicDeadlines.length + 1, date: newDeadDate, title: newDeadTitle, desc: newDeadDesc, status: newDeadStat };
     
     const updated = [...dynamicDeadlines, newEvent];
     setDynamicDeadlines(updated);
     localStorage.setItem('achiver_deadlines', JSON.stringify(updated));
 
-    alert("⏰ Success! Timeline deadline step committed to persistence state layers.");
+    alert("⏰ Success! Timeline deadline step committed to persistence memory layer.");
     setNewDeadDate(''); setNewDeadTitle(''); setNewDeadDesc('');
   };
 
-  // ⚙️ ADMINE ACTION 3: Append Seat Capacity Row Form B
+  // Action form B injection: Append Seat structural counts row
   const handleAddSeatMatrixRow = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newSeatInst || !newSeatProg || !newSeatCap) return alert("Fields fill kijiye!");
@@ -230,16 +231,18 @@ export default function Home() {
     setDynamicSeats(updated);
     localStorage.setItem('achiver_seats', JSON.stringify(updated));
 
-    alert("🏛️ Seat Matrix ledger persistence synchronizing done!");
+    alert("🏛️ Seat Matrix grid tracking sync operation completed successfully!");
     setNewSeatInst(''); setNewSeatProg(''); setNewSeatCap('');
   };
 
   const handleVerifyPremiumPayment = () => {
-    alert("🚨 Payment verification validated! Redirecting to exclusive secret consulting community group link...");
+    alert("🚨 Payment verification validated! Redirecting directly to the Elite Premium Consulting Community Circle Group Link...");
     window.open(premiumGroupUrl, '_blank');
     setShowQrCheckout(false);
   };
 
+
+  // Filtering lookup configurations calculation logic
   const filteredCutoffData = useMemo(() => {
     return dynamicJosaaRecords.filter(item => {
       const matchesType = selectedType === 'IIT' ? item.institute.includes('Indian Institute of Technology') : selectedType === 'NIT' ? item.institute.includes('National Institute of Technology') || item.institute.includes('Motilal Nehru') : true;
@@ -259,12 +262,11 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#f9f9f9] text-[#1a1c1c] antialiased">
       
-      {/* PUBLIC NAVBAR COMPONENT LAYER */}
+      {/* PUBLIC NAVBAR COMPONENT BANNER HEADER */}
       {activeTab !== 'AdminPanel' ? (
         <nav className="sticky top-0 z-50 bg-white shadow-xs border-b border-[#e2e2e2] px-6 py-3.5">
           <div className="max-w-6xl mx-auto flex flex-col lg:flex-row justify-between items-center gap-4">
             
-            {/* Mascot Vector Cap Branding Logo */}
             <div onClick={() => setActiveTab('Home')} className="flex items-center gap-2.5 cursor-pointer select-none shrink-0">
               <svg className="w-8 h-8" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M50 12L15 32L50 52L85 32L50 12Z" fill="#FFD700" stroke="#1A1C1C" strokeWidth="6" strokeLinejoin="round"/>
@@ -280,15 +282,14 @@ export default function Home() {
               ))}
             </div>
 
-            <button type="button" onClick={() => { setIsSignUpMode(false); setIsSignInOpen(true); }} className="bg-[#ffd700] text-[#221b00] font-bold px-5 py-2 rounded-lg text-xs shadow-xs shrink-0 cursor-pointer">
+            <button type="button" onClick={() => { setIsSignUpMode(false); setIsSignInOpen(true); }} className="bg-[#ffd700] text-[#221b00] font-bold px-5 py-2 rounded-lg text-xs shadow-xs shrink-0 cursor-pointer hover:opacity-90">
               Sign In
             </button>
           </div>
         </nav>
       ) : null}
 
-      {/* 📋 USER SIDE ACTIVE TAB ROUTINGS RENDERS */}
-      
+      {/* 📋 RENDERING ACTIVE VIEWS SECTIONS */}
       {activeTab === 'Home' && (
         <div className="animate-fadeIn pb-10">
           <section className="max-w-6xl mx-auto px-6 py-12 md:py-20 grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
@@ -312,7 +313,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* PUBLIC TAB MODULE: PREDICTOR CALCULATOR */}
+      {/* PUBLIC TAB ENGINE VIEW: RANK PREDICTOR APPLICATION */}
       {activeTab === 'Predictor' && (
         <div className="animate-fadeIn pb-10">
           <section className="bg-white border-b py-12 px-6">
@@ -322,7 +323,7 @@ export default function Home() {
               <form onSubmit={handlePredict} className="space-y-4 text-left">
                 <div>
                   <label className="block text-xs font-semibold text-[#4d4732] mb-1.5">Enter JEE Rank (CRL / Category)</label>
-                  <input type="number" placeholder="e.g. 15000" value={rank} onChange={(e) => setRank(e.target.value)} className="w-full px-4 py-3 bg-[#f9f9f9] border rounded-lg text-sm focus:outline-none" required />
+                  <input type="number" placeholder="e.g. 15000" value={rank} onChange={(e) => setRank(e.target.value)} className="w-full px-4 py-3 bg-[#f9f9f9] border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[#ffd700]" required />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -338,12 +339,12 @@ export default function Home() {
                   <label className="block text-xs font-semibold text-[#4d4732] mb-1.5">Quota Allocation</label>
                   <select value={homeState} onChange={(e) => setHomeState(e.target.value)} className="w-full px-3 py-2.5 bg-[#f9f9f9] border rounded-lg text-xs font-medium"><option value="OS">Other State (OS)</option><option value="HS">Home State (HS)</option></select>
                 </div>
-                <button type="submit" className="w-full bg-[#ffd700] text-black font-bold py-3.5 rounded-lg text-xs uppercase tracking-wider shadow-sm hover:opacity-90 transition-all">Calculate Predictions 🚀</button>
+                <button type="submit" className="w-full bg-[#ffd700] text-black font-bold py-3.5 rounded-lg text-xs uppercase tracking-wider shadow-sm hover:bg-[#e6c200] transition-all">Calculate Real Predictions 🚀</button>
               </form>
             </div>
           </section>
 
-          {/* Predictor Core Output recommendations table lower area mapping logs */}
+          {/* Renders dynamic choices result cards lower index section */}
           <section ref={predictorRef} className="max-w-4xl mx-auto py-12 px-6 scroll-mt-20 text-left">
             {hasSearched ? (
               results.length > 0 ? (
@@ -364,14 +365,14 @@ export default function Home() {
                   ))}
                 </div>
               ) : (
-                <div className="bg-white border rounded-xl p-8 text-center text-xs text-zinc-500 font-mono">🚨 Parameters criteria match records lookup logs empty.</div>
+                <div className="bg-white border rounded-xl p-8 text-center text-xs text-zinc-500 font-mono">🚨 Is rank aur categories requirements ke sath matching allocations entries nahi mil paaye.</div>
               )
             ) : null}
           </section>
         </div>
       )}
 
-      {/* PUBLIC TAB MODULE: PREMIUM CHECKOUT LINK MONETIZATION PAGE */}
+      {/* PUBLIC TAB MODULE: THE ₹99 PREMIUM ACCELERATOR LINK FUNNEL */}
       {activeTab === 'Counselling Guide' && (
         <section className="max-w-4xl mx-auto px-6 py-12 text-center animate-fadeIn space-y-10">
           <div className="space-y-3 max-w-2xl mx-auto">
@@ -387,27 +388,27 @@ export default function Home() {
           <div className="max-w-md mx-auto bg-white border-2 border-black rounded-2xl p-6 shadow-xl space-y-6 relative overflow-hidden">
             <div className="space-y-1">
               <div className="text-xs font-mono font-bold text-zinc-400 uppercase tracking-widest">LIMITED ENTRY ENROLLMENT</div>
-              <div className="text-5xl font-black text-black font-mono flex items-center justify-center">₹{premiumPriceToken} <span className="text-xs font-normal text-zinc-400 font-sans">/ Full Access Token</span></div>
+              <div className="text-5xl font-black text-black font-mono flex items-center justify-center">₹{premiumPriceToken} <span className="text-xs font-normal text-zinc-400 font-sans">/ Full Access</span></div>
             </div>
             {!showQrCheckout ? (
-              <button onClick={() => setShowQrCheckout(true)} className="w-full bg-[#1a1c1c] text-white font-bold py-4 rounded-xl text-xs uppercase tracking-wider shadow-lg hover:bg-zinc-800 transition-all">Get Instant Access To Secret Group 🚀</button>
+              <button onClick={() => setShowQrCheckout(true)} className="w-full bg-[#1a1c1c] text-white font-bold py-4 rounded-xl text-xs uppercase tracking-wider shadow-lg hover:bg-zinc-800 transition-all cursor-pointer">Get Instant Access To Secret Group 🚀</button>
             ) : (
               <div className="p-4 bg-zinc-50 border rounded-xl space-y-4 animate-scaleUp">
-                <div className="flex flex-col items-center gap-2 font-mono"><QrCode size={130} className="text-black border p-2 bg-white rounded-lg" /><span className="text-[10px] font-bold text-zinc-500">SCAN QR TO PAY INSTANT ₹{premiumPriceToken}</span></div>
-                <button onClick={handleVerifyPremiumPayment} className="w-full bg-emerald-600 text-white font-bold py-3 rounded-lg text-xs uppercase flex items-center justify-center gap-1">I Paid! Verify & Join Group <MessageCircle size={14}/></button>
+                <div className="flex flex-col items-center gap-2 font-mono"><QrCode size={130} className="text-black border p-2 bg-white rounded-lg shadow-sm" /><span className="text-[10px] font-bold text-zinc-500">SCAN QR TO PAY INSTANT ₹{premiumPriceToken}</span></div>
+                <button onClick={handleVerifyPremiumPayment} className="w-full bg-emerald-600 text-white font-bold py-3 rounded-lg text-xs uppercase flex items-center justify-center gap-1 cursor-pointer">I Paid! Verify & Join Group <MessageCircle size={14}/></button>
               </div>
             )}
           </div>
         </section>
       )}
 
-      {/* REMAINING AUX TABS RENDER MATRIX LAYOUT PARAMETERS */}
+      {/* AUX PUBLIC DIRECTORIES PAGES */}
       {activeTab === 'Opening/Closing Ranks' && (
         <section className="max-w-6xl mx-auto px-4 py-12 animate-fadeIn text-left">
-          <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+          <div className="bg-white rounded-xl shadow-sm border border-[#e2e2e2] overflow-hidden">
             <table className="w-full text-left border-collapse min-w-[900px]">
               <thead>
-                <tr className="bg-[#5f5e5e] text-white text-xs uppercase font-bold"><th className="px-6 py-4">Institute Entity</th><th className="px-6 py-4">Program specialties specialty</th><th className="px-6 py-4">Opening Node</th><th className="px-6 py-4">Closing Node</th></tr>
+                <tr className="bg-[#5f5e5e] text-white text-xs uppercase font-bold"><th className="px-6 py-4">Institute Name</th><th className="px-6 py-4">Program Specialization</th><th className="px-6 py-4">Opening Node</th><th className="px-6 py-4">Closing Node</th></tr>
               </thead>
               <tbody className="divide-y text-sm">
                 {paginatedData.map((item, idx) => (
@@ -421,7 +422,7 @@ export default function Home() {
 
       {activeTab === 'Deadlines' && (
         <section className="max-w-4xl mx-auto px-6 py-12 text-left animate-fadeIn">
-          <h2 className="text-2xl font-extrabold border-b pb-2 mb-6">JoSAA Deadlines Timeline</h2>
+          <h2 className="text-2xl font-extrabold border-b pb-2 mb-6">JoSAA Deadlines Timeline Calendar</h2>
           <div className="border-l-2 border-[#ffd700] pl-6 space-y-6">
             {dynamicDeadlines.map(dl => (<div key={dl.id}><span className="text-xs font-bold text-amber-700 block font-mono">{dl.date}</span><h4 className="font-bold text-black text-sm mt-0.5">{dl.title}</h4><p className="text-xs text-[#5f5e5e] mt-1">{dl.desc}</p></div>))}
           </div>
@@ -432,7 +433,7 @@ export default function Home() {
         <section className="max-w-5xl mx-auto px-6 py-12 text-left animate-fadeIn">
           <h2 className="text-2xl font-extrabold border-b pb-4 mb-6">Seat Matrix Allocation Ledger</h2>
           <div className="border rounded-xl overflow-hidden bg-white text-xs font-mono shadow-xs">
-            <div className="bg-[#2f3131] text-white p-4 grid grid-cols-4 font-bold uppercase text-[10px]"><span>Institute</span><span>Branch Stream</span><span>Quota Pool</span><span>Seat Capacity Cap</span></div>
+            <div className="bg-[#2f3131] text-white p-4 grid grid-cols-4 font-bold uppercase text-[10px]"><span>Institute Node</span><span>Branch Program Stream</span><span>Quota Pool ID</span><span>Seat Capacity Cap</span></div>
             {dynamicSeats.map(seat => (
               <div key={seat.id} className="p-4 grid grid-cols-4 items-center hover:bg-zinc-50"><span className="font-sans font-bold text-sm text-[#1a1c1c]">{seat.institute}</span><span className="text-zinc-500 font-sans text-xs">{seat.program}</span><span className="text-zinc-500 text-xs">{seat.quota}</span><span className="font-bold text-base text-zinc-700 pl-4">{seat.seats} Seats</span></div>
             ))}
@@ -441,52 +442,52 @@ export default function Home() {
       )}
 
 
-      {/* 👑 ⚙️ 🌟 BACKDOOR CONTROL PANEL COCKPIT DESK INFRASTRUCTURE (100% INTINT RULES RESTORED) */}
+      {/* 👑 ⚙️ 🌟 DYNAMIC ADMISSIONS ADMIN CONTROL COCKPIT DASHBOARD DESK (100% PERFECT ERROR-FREE SETUP) */}
       {activeTab === 'AdminPanel' && (
         <div className="flex min-h-screen bg-[#111214] text-zinc-100 animate-fadeIn">
           
-          {/* Left Navigation control nodes lists */}
+          {/* Side navigation admin vertical dashboard buttons list */}
           <aside className="w-64 bg-[#1a1b1e] border-r border-zinc-800 p-6 flex flex-col justify-between shrink-0 select-none">
             <div className="space-y-8">
               <div className="flex items-center gap-2.5 pb-4 border-b border-zinc-800">
                 <ShieldCheck size={26} className="text-[#ffd700]" />
                 <div>
                   <h4 className="text-xs font-bold uppercase tracking-wider text-[#ffd700] font-mono">Control Desk</h4>
-                  <p className="text-[10px] text-zinc-500 font-mono">MASTER DATA ENGINE V4.2</p>
+                  <p className="text-[10px] text-zinc-500 font-mono">MASTER DATA WORKSPACE</p>
                 </div>
               </div>
               <div className="flex flex-col gap-1 text-xs font-medium text-zinc-400">
-                <button onClick={() => setAdminView('Overview')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${adminView === 'Overview' ? 'bg-[#ffd700] text-black font-bold' : 'hover:bg-zinc-800'}`}><LayoutDashboard size={16} /> Dashboard Overview</button>
-                <button onClick={() => setAdminView('Database')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${adminView === 'Database' ? 'bg-[#ffd700] text-black font-bold' : 'hover:bg-zinc-800'}`}><Database size={16} /> Data Entry Workspace</button>
-                <button onClick={() => setAdminView('Users')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${adminView === 'Users' ? 'bg-[#ffd700] text-black font-bold' : 'hover:bg-zinc-800'}`}><UserCog size={16} /> Premium Gate Overrides</button>
+                <button onClick={() => setAdminView('Overview')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left ${adminView === 'Overview' ? 'bg-[#ffd700] text-black font-bold' : 'hover:bg-zinc-800'}`}><LayoutDashboard size={16} /> Dashboard Overview</button>
+                <button onClick={() => setAdminView('Database')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left ${adminView === 'Database' ? 'bg-[#ffd700] text-black font-bold' : 'hover:bg-zinc-800'}`}><Database size={16} /> Data Entry Workspace</button>
+                <button onClick={() => setAdminView('Users')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left ${adminView === 'Users' ? 'bg-[#ffd700] text-black font-bold' : 'hover:bg-zinc-800'}`}><UserCog size={16} /> Premium Gate Setup</button>
               </div>
             </div>
-            <button onClick={() => { setActiveTab('Home'); setAdminSearch(''); }} className="w-full bg-zinc-800 hover:bg-red-950 text-zinc-300 font-bold py-2.5 rounded-xl text-xs uppercase font-mono text-center shadow-md"> Exit Control Desk</button>
+            <button onClick={() => { setActiveTab('Home'); setAdminSearch(''); }} className="w-full bg-zinc-800 hover:bg-red-950 text-zinc-300 font-bold py-2.5 rounded-xl text-xs uppercase font-mono text-center shadow-md cursor-pointer"> Exit Control Desk</button>
           </aside>
 
-          {/* Right Area content panel windows workspaces render maps layout */}
+          {/* Right workspace contents panel viewport viewport tabs logic */}
           <section className="flex-1 p-6 md:p-10 overflow-y-auto text-left">
             
-            {/* VIEW A: DASHBOARD ANALYTICS COUNTERS AND STUDENT TELEMETRY LOOKUPS */}
+            {/* VIEW SUB TAB 1: TOTAL VISITS HIT COUNTERS WITH AUTH EMAIL REGISTRY LOGS STREAM */}
             {adminView === 'Overview' && (
               <div className="space-y-8 animate-fadeIn">
                 <div>
-                  <h2 className="text-2xl font-extrabold text-white font-display">System Synchronization Desk</h2>
-                  <p className="text-xs text-zinc-400 mt-1">Live background streams logging portal analytical visits counts telemetry patterns entries.</p>
+                  <h2 className="text-2xl font-extrabold text-white font-display">System Synchronization Dashboard</h2>
+                  <p className="text-xs text-zinc-400 mt-1">Live tracking loops scanning website analytical hits traffic packets entries.</p>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {/* Visitiors live tracker counter widget box */}
+                  {/* Visitor Widget Box */}
                   <div className="bg-[#1a1b1e] border-2 border-[#ffd700]/40 p-6 rounded-2xl relative shadow-lg">
                     <div className="absolute top-0 right-0 p-4 text-[#ffd700]/20"><Eye size={20}/></div>
                     <div className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">Total Website Live Visits</div>
                     <div className="text-4xl font-black text-[#ffd700] font-mono mt-1 animate-pulse">{totalVisits} <span className="text-xs font-normal text-zinc-500">Hits</span></div>
-                    <p className="text-[10px] text-emerald-400 font-mono mt-2">📊 Analytics: Real-time logging telemetry active</p>
+                    <p className="text-[10px] text-emerald-400 font-mono mt-2">📊 Telemetry active: Tracking network traffic</p>
                   </div>
 
                   <div className="bg-[#1a1b1e] border border-zinc-800 p-6 rounded-2xl">
-                    <div className="text-[10px] font-mono font-bold text-zinc-500 uppercase">Live Database Predictor Capacity</div>
-                    <div className="text-3xl font-black text-white font-mono mt-1">{dynamicJosaaRecords.length} Rows</div>
+                    <div className="text-[10px] font-mono font-bold text-zinc-500 uppercase">Live Database Predictor Rows</div>
+                    <div className="text-3xl font-black text-white font-mono mt-1">{dynamicJosaaRecords.length} Nodes</div>
                   </div>
 
                   <div className="bg-[#1a1b1e] border border-zinc-800 p-6 rounded-2xl">
@@ -495,16 +496,16 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* 🔒 👤 REAL EMAIL LOG TRACKER CONTAINER ADDED PERMANENTLY UNDER OVERVIEW VIEW */}
+                {/* 🔒 👤 REAL EMAIL ID AUDIT STREAM LOGGER LINKED SAFELY INSIDE OVERVIEW TAB FOR TRANSPARENT AUDITING */}
                 <div className="bg-[#1a1b1e] border border-zinc-800 rounded-2xl p-6">
-                  <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-zinc-400 mb-4">🔒 Live Student Authentication Registry Sessions Stream</h3>
-                  <div className="border border-zinc-800 rounded-xl overflow-hidden text-xs font-mono">
+                  <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-zinc-400 mb-4">🔒 Registered Student Emails & Live Calculation Requests Monitor Feed</h3>
+                  <div className="border border-zinc-800 rounded-xl overflow-hidden text-xs font-mono shadow-md">
                     <div className="bg-zinc-900 p-4 grid grid-cols-4 font-bold text-zinc-400 uppercase text-[10px] border-b border-zinc-800">
-                      <span>Student Account Email</span><span>Verification Token</span><span>Rank Inquiries Count</span><span>Live Status</span>
+                      <span>Student Visitor Profile Email</span><span>Verification Token</span><span>Rank Inquiries Count</span><span>Live Status</span>
                     </div>
                     <div className="divide-y divide-zinc-800/40 text-zinc-300">
                       {studentSessions.map((session, idx) => (
-                        <div key={idx} className="p-4 grid grid-cols-4 font-sans items-center hover:bg-zinc-900/10">
+                        <div key={idx} className="p-4 grid grid-cols-4 font-sans items-center hover:bg-zinc-900/20">
                           <span className="font-mono text-white font-bold">{session.email}</span>
                           <span className="text-zinc-500 font-mono text-[11px]">{session.tokenType}</span>
                           <span className="text-[#ffd700] font-bold pl-4 font-mono">{session.queriesCount} Requests</span>
@@ -518,11 +519,11 @@ export default function Home() {
               </div>
             )}
 
-            {/* 🚀 VIEW B: DATA INJECTION CONTROL WORKSPACE ZONE (RESTORED FORM A & FORM B COMBINED) */}
+            {/* VIEW SUB TAB 2: COMBINED WORKSPACE FOR FORM A & FORM B DATA ENTRY INJECTIONS */}
             {adminView === 'Database' && (
               <div className="space-y-12 animate-fadeIn">
                 
-                {/* 📝 FORM A: INJECT NEW CUT-OFF RECORD LOG MATRIX */}
+                {/* 📝 FORM A: INJECT NEW PREDICTOR CUT-OFF ROW RECORD */}
                 <div className="bg-[#1a1b1e] border border-zinc-800 p-6 rounded-2xl relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-full h-1 bg-[#ffd700]"></div>
                   <h3 className="font-bold text-base text-white mb-4 flex items-center gap-2"><PlusCircle size={18} className="text-[#ffd700]"/> Form A: Inject New Predictor & Cutoff Record Node</h3>
@@ -545,66 +546,68 @@ export default function Home() {
                       <select value={newCat} onChange={(e) => setNewCat(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-zinc-300 outline-none"><option>OPEN</option><option>OBC-NCL</option><option>SC</option><option>ST</option></select>
                     </div>
                     <div>
-                      <label className="block text-zinc-400 mb-1">JEE Opening Rank</label>
-                      <input type="number" placeholder="4444" value={newOpenRank} onChange={(e) => setNewOpenRank(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none" required />
+                      <label className="block text-zinc-400 mb-1">JEE Opening Rank cut-off</label>
+                      <input type="number" placeholder="4444" value={newOpenRank} onChange={(e) => setNewOpenRank(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none focus:border-[#ffd700]" required />
                     </div>
                     <div>
-                      <label className="block text-zinc-400 mb-1">JEE Closing Rank</label>
-                      <input type="number" placeholder="12500" value={newCloseRank} onChange={(e) => setNewCloseRank(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none" required />
+                      <label className="block text-zinc-400 mb-1">JEE Closing Rank cut-off</label>
+                      <input type="number" placeholder="12500" value={newCloseRank} onChange={(e) => setNewCloseRank(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none focus:border-[#ffd700]" required />
                     </div>
                     <div className="sm:col-span-2">
                       <label className="block text-zinc-400 mb-1">Annual Fee token parameters variable assignment</label>
                       <input type="text" placeholder="2,25,000" value={newFee} onChange={(e) => setNewFee(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none focus:border-[#ffd700]" required />
                     </div>
-                    <button type="submit" className="sm:col-span-2 bg-[#ffd700] text-black font-bold py-3 rounded-xl uppercase font-mono text-xs mt-2 transition-all hover:opacity-90">Compile Cut-off Row Into Database Matrix 🚀</button>
+                    <button type="submit" className="sm:col-span-2 bg-[#ffd700] text-black font-bold py-3 rounded-xl uppercase font-mono text-xs mt-2 transition-all hover:bg-[#e6c200] cursor-pointer">Compile Cut-off Row Into Database Matrix 🚀</button>
                   </form>
                 </div>
 
-                {/* 📝 FORM B: INJECT NEW DYNAMIC SEAT Matrix CAP ROW LEDGER RECORD */}
+                {/* 📝 FORM B: INJECT NEW DYNAMIC SEAT ALLOCATION CAPACITY ROW RECORD */}
                 <div className="bg-[#1a1b1e] border border-zinc-800 p-6 rounded-2xl relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-full h-1 bg-[#ffd700]"></div>
                   <h3 className="font-bold text-base text-white mb-4 flex items-center gap-2"><School size={18} className="text-[#ffd700]"/> Form B: Inject New Seat Matrix Capacity Row</h3>
                   <form onSubmit={handleAddSeatMatrixRow} className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-zinc-300">
-                    <div><label className="block text-zinc-400 mb-1">Institute Node name text identifier</label><input type="text" placeholder="e.g. NIT Agartala" value={newSeatInst} onChange={(e) => setNewSeatInst(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none" required /></div>
-                    <div><label className="block text-zinc-400 mb-1">Specialization Stream Branch course</label><input type="text" placeholder="e.g. Electrical Engineering" value={newSeatProg} onChange={(e) => setNewSeatProg(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none" required /></div>
-                    <div><label className="block text-zinc-400 mb-1">Quota Pool Allocation pool ID</label><input type="text" placeholder="e.g. OS (Neutral)" value={newSeatQuota} onChange={(e) => setNewSeatQuota(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none" required /></div>
-                    <div><label className="block text-zinc-400 mb-1">Absolute Seats capacity count number</label><input type="number" placeholder="e.g. 92" value={newSeatCap} onChange={(e) => setNewSeatCap(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none" required /></div>
-                    <button type="submit" className="sm:col-span-2 bg-zinc-100 text-black font-bold py-3 rounded-xl uppercase font-mono text-xs hover:opacity-90 transition-all mt-2">Commit Capacity Row directly to Seat Matrix Ledger 🚀</button>
+                    <div><label className="block text-zinc-400 mb-1">Institute Node name identifier</label><input type="text" placeholder="e.g. NIT Agartala" value={newSeatInst} onChange={(e) => setNewSeatInst(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none focus:border-[#ffd700]" required /></div>
+                    <div><label className="block text-zinc-400 mb-1">Specialization Stream Branch specialties</label><input type="text" placeholder="e.g. Electrical Engineering" value={newSeatProg} onChange={(e) => setNewSeatProg(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none focus:border-[#ffd700]" required /></div>
+                    <div><label className="block text-zinc-400 mb-1">Quota Pool Allocation pool id</label><input type="text" placeholder="e.g. OS (Neutral)" value={newSeatQuota} onChange={(e) => setNewSeatQuota(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none focus:border-[#ffd700]" required /></div>
+                    <div><label className="block text-zinc-400 mb-1">Absolute Seats capacity counts count</label><input type="number" placeholder="e.g. 92" value={newSeatCap} onChange={(e) => setNewSeatCap(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none focus:border-[#ffd700]" required /></div>
+                    <button type="submit" className="sm:col-span-2 bg-zinc-100 text-black font-bold py-3 rounded-xl uppercase font-mono text-xs hover:opacity-90 transition-all mt-2 cursor-pointer">Commit Capacity Row directly to Seat Matrix Ledger 🚀</button>
                   </form>
                 </div>
 
               </div>
             )}
 
-            {/* 🚀 VIEW C: PREMIUM RE-ROUTING GATE LINKS OVERRIDES AND DEADLINES EVENTS GENERATIONS WORKSPACE */}
+            {/* 🚀 VIEW SUB TAB 3: DYNAMIC CONFIGURATIONS FOR THE WHATSAPP ELITE REDIRECT CHANNELS AND FORM D TIMELINE DEADLINES */}
             {adminView === 'Users' && (
-              <div className="space-y-10 animate-fadeIn">
+              <div className="space-y-12 animate-fadeIn">
                 
-                {/* 📝 FORM C: LIVE REDIRECT GROUP CONFIGURATION OVERRIDES CARD */}
+                {/* 📝 FORM C: LIVE MONETIZATION CHANNELS SETUP GATEWAY OVERRIDES */}
                 <div className="bg-[#1a1b1e] border-2 border-purple-900/60 p-6 rounded-2xl relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-full h-1.5 bg-[#ffd700]"></div>
-                  <h3 className="font-bold text-base text-white mb-4 flex items-center gap-2"><ShieldCheck size={18} className="text-[#ffd700]"/> Form C: Elite Consulting Group Gateway Configuration Settings</h3>
+                  <h3 className="font-bold text-base text-white mb-4 flex items-center gap-2"><ShieldCheck size={18} className="text-[#ffd700]"/> Form C: Elite Paid Consulting Group Gateway Settings Overrides</h3>
                   <div className="grid grid-cols-1 gap-4 text-xs text-zinc-300">
                     <div>
-                      <label className="block text-zinc-400 mb-1">Secret Redirection Group Access Link (WhatsApp/Telegram Private Link)</label>
-                      <input type="text" value={premiumGroupUrl} onChange={(e) => setPremiumGroupUrl(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-emerald-400 font-mono outline-none" />
+                      <label className="block text-zinc-400 mb-1">Secret Redirection Group Access Link (WhatsApp or Telegram Invitation URL)</label>
+                      <input type="text" value={premiumGroupUrl} onChange={(e) => setPremiumGroupUrl(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-emerald-400 font-mono outline-none focus:border-[#ffd700]" required />
                     </div>
                     <div>
-                      <label className="block text-zinc-400 mb-1">Introductory Premium Token Price (INR)</label>
-                      <input type="number" value={premiumPriceToken} onChange={(e) => setPremiumPriceToken(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-[#ffd700] font-mono font-bold outline-none" />
+                      <label className="block text-zinc-400 mb-1">Introductory Premium Entry Ticket Token Price (INR)</label>
+                      <input type="number" value={premiumPriceToken} onChange={(e) => setPremiumPriceToken(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-[#ffd700] font-mono font-bold outline-none focus:border-[#ffd700]" required />
                     </div>
                   </div>
                 </div>
 
-                {/* 📝 FORM D: INJECT NEW DEADLINE CALENDAR TIMESTAMP STEPS ARRAY RECORD */}
-                <div className="bg-[#1a1b1e] border border-zinc-800 p-6 rounded-2xl">
-                  <h3 className="font-bold text-base text-white mb-4 flex items-center gap-2"><Calendar size={18} className="text-[#ffd700]"/> Form D: Push New Action Deadline Event Timeline</h3>
+                {/* 📝 FORM D: PUSH TARGET STEP CALENDAR TIMESTAMP DEADLINES EVENTS DATA */}
+                <div className="bg-[#1a1b1e] border border-zinc-800 p-6 rounded-2xl relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-amber-500"></div>
+                  <h3 className="font-bold text-base text-white mb-4 flex items-center gap-2"><Calendar size={18} className="text-[#ffd700]"/> Form D: Inject New Timeline Sequence Step Milestone Deadline</h3>
+                  
                   <form onSubmit={handleAddDeadlineEvent} className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-zinc-300">
-                    <div><label className="block text-zinc-400 mb-1">Date Timestamp info</label><input type="text" placeholder="e.g. June 28, 2026" value={newDeadDate} onChange={(e) => setNewDeadDate(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none" required /></div>
-                    <div><label className="block text-zinc-400 mb-1">Timeline status chip layer option</label><select value={newDeadStat} onChange={(e) => setNewDeadStat(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-zinc-300 outline-none"><option>Upcoming</option><option>Live Soon</option><option>Strict Warning</option></select></div>
-                    <div className="sm:col-span-2"><label className="block text-zinc-400 mb-1">Event Header Title</label><input type="text" placeholder="e.g. Mock Seat Allocation Round 2 Result" value={newDeadTitle} onChange={(e) => setNewDeadTitle(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none" required /></div>
-                    <div className="sm:col-span-2"><label className="block text-zinc-400 mb-1">Event explanatory context description details block</label><textarea rows={2} placeholder="Type descriptions text parameters items logs..." value={newDeadDesc} onChange={(e) => setNewDeadDesc(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none" required /></div>
-                    <button type="submit" className="sm:col-span-2 bg-zinc-100 text-black font-bold py-3 rounded-xl uppercase font-mono text-xs hover:opacity-90 transition-all mt-2">Commit Deadline step milestone to public timeline timeline calendar 🚀</button>
+                    <div><label className="block text-zinc-400 mb-1">Date Timestamp info</label><input type="text" placeholder="June 28, 2026" value={newDeadDate} onChange={(e) => setNewDeadDate(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none focus:border-[#ffd700]" required /></div>
+                    <div><label className="block text-zinc-400 mb-1">Timeline status chip select option</label><select value={newDeadStat} onChange={(e) => setNewDeadStat(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-zinc-300 outline-none"><option>Upcoming</option><option>Live Soon</option><option>Strict Warning</option></select></div>
+                    <div className="sm:col-span-2"><label className="block text-zinc-400 mb-1">Event Header title text layout</label><input type="text" placeholder="Round 1 Seat Allocation Final List Release" value={newDeadTitle} onChange={(e) => setNewDeadTitle(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none focus:border-[#ffd700]" required /></div>
+                    <div className="sm:col-span-2"><label className="block text-zinc-400 mb-1">Event explanatory context descriptions box</label><textarea rows={2} placeholder="Type descriptive entries text parameters data blocks here..." value={newDeadDesc} onChange={(e) => setNewDeadDesc(e.target.value)} className="w-full bg-[#111214] border border-zinc-800 rounded-lg p-3 text-white outline-none focus:border-[#ffd700]" required /></div>
+                    <button type="submit" className="sm:col-span-2 bg-zinc-100 text-black font-bold py-3 rounded-xl uppercase font-mono text-xs hover:opacity-90 transition-all mt-2 cursor-pointer">Commit Event Step to Deadlines Timeline Calendar 🚀</button>
                   </form>
                 </div>
 
@@ -615,14 +618,15 @@ export default function Home() {
         </div>
       )}
 
-      {/* FLOATING AI CHATBOT SYSTEM FRAMEWORK */}
+
+      {/* FLOATING AI CHATBOT SYSTEM */}
       <div className="fixed bottom-6 right-6 z-50 font-sans">
         {!isChatOpen && (
-          <button onClick={() => setIsChatOpen(true)} className="bg-[#1a1c1c] text-white p-4 rounded-full shadow-2xl border-2 border-[#ffd700] animate-bounce"><MessageSquare size={24} className="text-[#ffd700]" /></button>
+          <button onClick={() => setIsChatOpen(true)} className="bg-[#1a1c1c] text-white p-4 rounded-full shadow-2xl border-2 border-[#ffd700] animate-bounce cursor-pointer"><MessageSquare size={24} className="text-[#ffd700]" /></button>
         )}
         {isChatOpen && (
           <div className="w-80 md:w-96 h-[400px] bg-white rounded-2xl shadow-2xl border border-[#e2e2e2] flex flex-col overflow-hidden animate-slideUp">
-            <div className="bg-[#1a1c1c] text-white p-4 flex justify-between items-center border-b border-[#ffd700]/30"><span className="text-xs font-bold">CollegeAchiver Bot v2.0</span><button onClick={() => setIsChatOpen(false)}><X size={18} /></button></div>
+            <div className="bg-[#1a1c1c] text-white p-4 flex justify-between items-center border-b border-[#ffd700]/30"><span className="text-xs font-bold">CollegeAchiver Bot v2.0</span><button onClick={() => setIsChatOpen(false)} className="cursor-pointer"><X size={18} /></button></div>
             <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-[#f9f9f9]">
               {messages.map((msg, i) => (
                 <div key={i} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}><div className={`max-w-[80%] rounded-xl p-3 text-xs ${msg.sender === 'user' ? 'bg-[#1a1c1c] text-white' : 'bg-white text-black border'}`}>{msg.text}</div></div>
@@ -630,13 +634,13 @@ export default function Home() {
             </div>
             <div className="p-3 bg-white border-t flex items-center gap-2">
               <input type="text" placeholder="Ask AI..." value={chatInput} onChange={(e) => setChatInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()} className="flex-1 bg-[#f9f9f9] border rounded-xl px-4 py-2 text-xs outline-none" />
-              <button onClick={() => handleSendMessage()} className="p-2 bg-[#ffd700] rounded-xl"><Send size={14} /></button>
+              <button onClick={() => handleSendMessage()} className="p-2 bg-[#ffd700] rounded-xl cursor-pointer"><Send size={14} /></button>
             </div>
           </div>
         )}
       </div>
 
-      {/* 🔐 AUTHENTICATION MODAL LOGINS COMPONENT CONTAINER WINDOW FRAME */}
+      {/* DUAL STATE SECURITY SIGN IN MODAL WINDOW CONTAINER */}
       {isSignInOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fadeIn">
           <div className="w-[90%] max-w-md bg-white rounded-2xl shadow-2xl border border-[#e2e2e2] overflow-hidden relative animate-scaleUp">
@@ -644,21 +648,21 @@ export default function Home() {
             <button type="button" onClick={() => { setIsSignInOpen(false); setIsSignUpMode(false); }} className="absolute top-4 right-4 text-zinc-400 hover:text-black cursor-pointer"><X size={20} /></button>
             <div className="p-6 md:p-8 text-center pb-4">
               <h3 className="text-xl font-extrabold text-[#1a1c1c] font-display">{isSignUpMode ? 'Create New Account' : 'Welcome Back Student'}</h3>
-              <p className="text-xs text-[#5f5e5e] mt-1">Sign in to access secure dashboard and system options lists.</p>
+              <p className="text-xs text-[#5f5e5e] mt-1">Sign in using security parameters token values variables mapping config setup options.</p>
             </div>
             <form onSubmit={handleAuthSubmit} className="px-6 md:px-8 pb-6 space-y-4 text-left">
               <div>
                 <label className="block text-xs font-semibold text-[#4d4732] mb-1.5">Email ID Address</label>
                 <div className="relative">
                   <User size={16} className="absolute left-3.5 top-3.5 text-[#5f5e5e]" />
-                  <input type="email" placeholder="e.g. admin@achiver.com" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} className="w-full pl-10 pr-4 py-3 bg-[#f9f9f9] border text-xs outline-none rounded-xl text-black font-medium" required />
+                  <input type="email" placeholder="e.g. admin@achiver.com" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} className="w-full pl-10 pr-4 py-3 bg-[#f9f9f9] border text-xs outline-none rounded-xl text-black font-semibold" required />
                 </div>
               </div>
               <div>
                 <label className="block text-xs font-semibold text-[#4d4732] mb-1.5">Password Token</label>
                 <div className="relative">
                   <Lock size={16} className="absolute left-3.5 top-3.5 text-[#5f5e5e]" />
-                  <input type="password" placeholder="••••••••" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} className="w-full pl-10 pr-4 py-3 bg-[#f9f9f9] border text-xs outline-none rounded-xl text-black font-medium" required />
+                  <input type="password" placeholder="••••••••" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} className="w-full pl-10 pr-4 py-3 bg-[#f9f9f9] border text-xs outline-none rounded-xl text-black font-semibold" required />
                 </div>
               </div>
               <button type="submit" className="w-full bg-[#1a1c1c] text-white font-bold py-3.5 rounded-xl text-xs uppercase shadow-md flex items-center justify-center gap-2 mt-2 transition-all cursor-pointer hover:bg-zinc-800">Access My Dashboard 🚀</button>
