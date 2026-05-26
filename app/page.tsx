@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef, useMemo } from 'react';
-import { School, Award, TrendingUp, Search, MapPin, Download, CheckSquare, Layers, BarChart3, ChevronLeft, ChevronRight, Mail, Share2, Globe, CheckCircle, Star, BookOpen, ShieldAlert, FileText, Activity, Percent, Clock, AlertCircle, Calendar, RefreshCw, MessageSquare, X, Send, Lock, User } from 'lucide-react';
+import { School, Award, TrendingUp, Search, MapPin, Download, CheckSquare, Layers, BarChart3, ChevronLeft, ChevronRight, Mail, Share2, Globe, CheckCircle, Star, BookOpen, ShieldAlert, FileText, Activity, Percent, Clock, AlertCircle, Calendar, RefreshCw, MessageSquare, X, Send, Lock, User, UserPlus } from 'lucide-react';
 import { massiveJosaaData, CollegeData } from './josaaData';
 
 interface ExtendedCollegeData extends CollegeData {
@@ -33,10 +33,12 @@ export default function Home() {
     { sender: 'bot', text: 'Hey roomie! 👋 Main hoon aapka CollegeAchiver AI Assistant. JoSAA/CSAB counselling ka koi bhi doubt yahan pucho!' }
   ]);
 
-  // 🔐 SIGN IN MODAL STATE
+  // 🔐 INTERACTIVE AUTH MODAL STATES
   const [isSignInOpen, setIsSignInOpen] = useState(false);
+  const [isSignUpMode, setIsSignUpMode] = useState(false); // false = Sign In view, true = Sign Up view
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
+  const [confirmPasswordInput, setConfirmPasswordInput] = useState('');
 
   const predictorRef = useRef<HTMLDivElement>(null);
 
@@ -96,15 +98,24 @@ export default function Home() {
     }, 800);
   };
 
-  // Sign In Handle Submit
-  const handleSignInSubmit = (e: React.FormEvent) => {
+  // Auth Form Handler (Sign In / Sign Up Combined Protocol)
+  const handleAuthSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!emailInput || !passwordInput) return alert("Bhai, Email aur Password dono bharo pehle!");
+    if (!emailInput || !passwordInput) return alert("Bhai, saare inputs dhyan se bharo pehle!");
     
-    alert(`Mubarak ho bhai! Successfully logged in as: ${emailInput}`);
+    if (isSignUpMode) {
+      if (passwordInput !== confirmPasswordInput) return alert("Bhai, dono passwords aapas me match nahi kar rahe hain!");
+      alert(`🎉 Badhai ho bhai! Naya account successfully create ho gaya: ${emailInput}`);
+    } else {
+      alert(`✨ Welcome back bhai! Successfully logged in as: ${emailInput}`);
+    }
+
+    // Reset workflow states
     setIsSignInOpen(false);
+    setIsSignUpMode(false);
     setEmailInput('');
     setPasswordInput('');
+    setConfirmPasswordInput('');
   };
 
   // Dynamic Live Filtering Logic for Cut-off Data Table
@@ -135,7 +146,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#f9f9f9] text-[#1a1c1c] antialiased pb-10">
       
-      {/* 🗺_ PREMIUM COCKPIT NAVBAR */}
+      {/* 🗺️ PREMIUM COCKPIT NAVBAR */}
       <nav className="sticky top-0 z-50 bg-white shadow-xs border-b border-[#e2e2e2] px-6 py-3.5">
         <div className="max-w-6xl mx-auto flex flex-col lg:flex-row justify-between items-center gap-4">
           
@@ -169,21 +180,22 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Trigger Open Sign In Modal Trigger */}
+          {/* Trigger Sign In Popup */}
           <button 
-            onClick={() => setIsSignInOpen(true)}
-            className="bg-[#ffd700] text-[#221b00] font-bold px-5 py-2 rounded-lg text-xs hover:opacity-90 active:scale-95 transition-all shrink-0 shadow-xs"
+            onClick={() => { setIsSignUpMode(false); setIsSignInOpen(true); }}
+            className="bg-[#ffd700] text-[#221b00] font-bold px-5 py-2 rounded-lg text-xs hover:opacity-90 active:scale-95 transition-all shrink-0 shadow-xs animate-fadeIn"
           >
             Sign In
           </button>
         </div>
       </nav>
 
-      {/* 📋 RENDER MODULE DATA */}
+      {/* 📋 RENDER MODULE DATA CHUNKS */}
       
       {/* 1️⃣ TAB CONTENT: HOME */}
       {activeTab === 'Home' && (
         <div className="animate-fadeIn">
+          {/* Hero Banner Area */}
           <section className="max-w-6xl mx-auto px-6 py-12 md:py-20 grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
             <div className="md:col-span-7 space-y-6 text-left">
               <span className="inline-flex items-center gap-2 bg-[#ffd700]/20 text-[#705d00] text-xs font-bold px-3 py-1 rounded-full border border-[#ffd700]/30">
@@ -255,7 +267,7 @@ export default function Home() {
                   <label className="block text-xs font-semibold text-[#4d4732] mb-1.5">Quota Type</label>
                   <select value={homeState} onChange={(e) => setHomeState(e.target.value)} className="w-full px-3 py-2.5 bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg text-xs font-medium"><option value="OS">Other State (OS)</option><option value="HS">Home State (HS)</option></select>
                 </div>
-                <button type="submit" className="w-full bg-[#ffd700] text-[#221b00] font-bold py-3.5 rounded-lg text-xs uppercase hover:opacity-90 transition-all shadow-sm">Calculate Predictions 🚀</button>
+                <button type="submit" className="w-full bg-[#ffd700] text-[#221b00] font-bold py-3.5 rounded-lg text-xs uppercase hover:opacity-90 transition-all">Calculate Predictions 🚀</button>
               </form>
             </div>
           </section>
@@ -287,28 +299,28 @@ export default function Home() {
               <h2 className="text-3xl font-extrabold text-[#1a1c1c] font-display mt-2 tracking-tight">Counselling Architecture Guide</h2>
             </div>
             <div className="flex gap-2 bg-[#eeeeee] p-1.5 rounded-xl shadow-inner">
-              <button onClick={() => setGuideMode('JoSAA')} className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${guideMode === 'JoSAA' ? 'bg-black text-white' : 'text-[#5f5e5e]'}`}>JoSAA Roadmap</button>
-              <button onClick={() => setGuideMode('CSAB')} className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${guideMode === 'CSAB' ? 'bg-[#ffd700] text-black' : 'text-[#5f5e5e]'}`}>CSAB Spot Round</button>
+              <button onClick={() => setGuideMode('JoSAA')} className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${guideMode === 'JoSAA' ? 'bg-black text-white shadow-xs' : 'text-[#5f5e5e]'}`}>JoSAA Roadmap</button>
+              <button onClick={() => setGuideMode('CSAB')} className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${guideMode === 'CSAB' ? 'bg-[#ffd700] text-black shadow-xs' : 'text-[#5f5e5e]'}`}>CSAB Spot Round</button>
             </div>
           </div>
 
           {guideMode === 'JoSAA' ? (
             <div className="space-y-6 animate-fadeIn">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs"><div className="text-sm font-bold mb-2">1. Choice Filling</div><p className="text-xs text-[#5f5e5e]">Ranks parameters priority instructions mapping complete.</p></div>
+                <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs"><div className="text-sm font-bold mb-2">1. Choice Filling</div><p className="text-xs text-[#5f5e5e]">Predictor hierarchy logic sorting active.</p></div>
               </div>
             </div>
           ) : (
             <div className="space-y-6 animate-fadeIn">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs"><div className="text-sm font-bold mb-2">1. Vacant Seats</div><p className="text-xs text-[#5f5e5e]">Special spot round capacity allocations index ledger view logs.</p></div>
+                <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs"><div className="text-sm font-bold mb-2">1. Vacant Seats</div><p className="text-xs text-[#5f5e5e]">Display parameters matrix initialized perfectly.</p></div>
               </div>
             </div>
           )}
         </section>
       )}
 
-      {/* Baaki saare tabs previous logic constraints mapping constants remain */}
+      {/* 4️⃣ TAB CONTENT: OPENING/CLOSING RANKS */}
       {activeTab === 'Opening/Closing Ranks' && (
         <section className="max-w-6xl mx-auto px-4 md:px-8 py-12 animate-fadeIn">
           <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-[#e2e2e2]">
@@ -318,7 +330,7 @@ export default function Home() {
               </thead>
               <tbody className="divide-y divide-[#e2e2e2] text-sm">
                 {paginatedData.map((item, idx) => (
-                  <tr key={idx} className="group hover:bg-[#ffd700]/5"><td className="px-6 py-4 font-semibold">{item.institute}</td><td className="px-6 py-4 text-xs">{item.program}</td><td className="px-6 py-4 font-mono">{item.quota}</td><td className="px-6 py-4">{item.category}</td><td className="px-6 py-4 font-mono">{item.opening}</td><td className="px-6 py-4 text-[#705d00] font-mono">{item.closing}</td></tr>
+                  <tr key={idx} className="group hover:bg-[#ffd700]/5"><td className="px-6 py-4 font-semibold text-[#1a1c1c]">{item.institute}</td><td className="px-6 py-4 text-xs">{item.program}</td><td className="px-6 py-4 text-[#5f5e5e] font-mono">{item.quota}</td><td className="px-6 py-4">{item.category}</td><td className="px-6 py-4 font-mono font-bold text-zinc-700">{item.opening}</td><td className="px-6 py-4 font-mono font-bold text-[#705d00]">{item.closing}</td></tr>
                 ))}
               </tbody>
             </table>
@@ -362,34 +374,36 @@ export default function Home() {
       </div>
 
 
-      {/* 🔐 PREMIUM BLUR STATE: INTERACTIVE SIGN IN MODAL WINDOW */}
+      {/* 🔐 DUAL-STATE AUTH MODAL COMPONENT (Sign In & Sign Up Integrated) */}
       {isSignInOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fadeIn">
-          
-          {/* Main Form Container Frame */}
           <div className="w-[90%] max-w-md bg-white rounded-2xl shadow-2xl border border-[#e2e2e2] overflow-hidden relative animate-scaleUp">
             
-            {/* Upper Top Accent Border Grid line */}
+            {/* Upper Top Accent Line */}
             <div className="absolute top-0 left-0 w-full h-1.5 bg-[#ffd700]"></div>
             
-            {/* Close Cross Trigger Button */}
+            {/* Close Trigger */}
             <button 
-              onClick={() => { setIsSignInOpen(false); setEmailInput(''); setPasswordInput(''); }}
+              onClick={() => { setIsSignInOpen(false); setIsSignUpMode(false); setEmailInput(''); setPasswordInput(''); setConfirmPasswordInput(''); }}
               className="absolute top-4 right-4 text-zinc-400 hover:text-black transition-colors"
             >
               <X size={20} />
             </button>
 
-            {/* Header branding info titles */}
+            {/* Title Area Switching based on state */}
             <div className="p-6 md:p-8 text-center pb-4">
-              <h3 className="text-xl font-extrabold text-[#1a1c1c] font-display">Welcome Back Student</h3>
-              <p className="text-xs text-[#5f5e5e] mt-1">Sign in to your CollegeAchiver account to access locked rank predictions history lists.</p>
+              <h3 className="text-xl font-extrabold text-[#1a1c1c] font-display">
+                {isSignUpMode ? 'Create New Account' : 'Welcome Back Student'}
+              </h3>
+              <p className="text-xs text-[#5f5e5e] mt-1">
+                {isSignUpMode ? 'Sign up to lock your personalized choice filling order and counselling matrices.' : 'Sign in to your CollegeAchiver account to access locked rank predictions history lists.'}
+              </p>
             </div>
 
-            {/* Input Form Fields Box Console */}
-            <form onSubmit={handleSignInSubmit} className="px-6 md:px-8 pb-8 space-y-4 text-left">
+            {/* Input form submission mapping */}
+            <form onSubmit={handleAuthSubmit} className="px-6 md:px-8 pb-6 space-y-4 text-left">
               
-              {/* Field 1: Email Box */}
+              {/* Field 1: Email Address */}
               <div>
                 <label className="block text-xs font-semibold text-[#4d4732] mb-1.5">Registered Email ID</label>
                 <div className="relative">
@@ -400,11 +414,12 @@ export default function Home() {
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
                     className="w-full pl-10 pr-4 py-3 bg-[#f9f9f9] border border-[#e2e2e2] rounded-xl text-xs focus:ring-1 focus:ring-[#ffd700] focus:outline-none font-medium text-[#1a1c1c]"
+                    required
                   />
                 </div>
               </div>
 
-              {/* Field 2: Password Input */}
+              {/* Field 2: Password Token */}
               <div>
                 <label className="block text-xs font-semibold text-[#4d4732] mb-1.5">Password Token</label>
                 <div className="relative">
@@ -415,28 +430,77 @@ export default function Home() {
                     value={passwordInput}
                     onChange={(e) => setPasswordInput(e.target.value)}
                     className="w-full pl-10 pr-4 py-3 bg-[#f9f9f9] border border-[#e2e2e2] rounded-xl text-xs focus:ring-1 focus:ring-[#ffd700] focus:outline-none"
+                    required
                   />
                 </div>
               </div>
 
-              {/* Remember Pass matrix options */}
-              <div className="flex justify-between items-center text-[11px] font-medium text-[#5f5e5e] pt-1">
-                <label className="flex items-center gap-1.5 cursor-pointer">
-                  <input type="checkbox" className="rounded text-[#ffd700] focus:ring-[#ffd700] h-3.5 w-3.5 bg-zinc-50 border-[#e2e2e2]" />
-                  Remember Me
-                </label>
-                <span className="text-[#705d00] hover:underline cursor-pointer">Forgot Password?</span>
-              </div>
+              {/* 🌟 Field 3 DYNAMIC CONDITIONAL: Confirm Password (Only displays on Sign Up view state) */}
+              {isSignUpMode && (
+                <div className="animate-slideDown">
+                  <label className="block text-xs font-semibold text-[#4d4732] mb-1.5">Confirm Password Token</label>
+                  <div className="relative">
+                    <Lock size={16} className="absolute left-3.5 top-3.5 text-[#5f5e5e]" />
+                    <input 
+                      type="password" 
+                      placeholder="••••••••" 
+                      value={confirmPasswordInput}
+                      onChange={(e) => setConfirmPasswordInput(e.target.value)}
+                      className="w-full pl-10 pr-4 py-3 bg-[#f9f9f9] border border-[#e2e2e2] rounded-xl text-xs focus:ring-1 focus:ring-[#ffd700] focus:outline-none"
+                      required={isSignUpMode}
+                    />
+                  </div>
+                </div>
+              )}
 
-              {/* Main Submit CTA Action */}
+              {/* Remember me row (Only visible during default Sign In view state) */}
+              {!isSignUpMode && (
+                <div className="flex justify-between items-center text-[11px] font-medium text-[#5f5e5e] pt-1">
+                  <label className="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" className="rounded text-[#ffd700] focus:ring-[#ffd700] h-3.5 w-3.5 bg-zinc-50 border-[#e2e2e2]" />
+                    Remember Me
+                  </label>
+                  <span className="text-[#705d00] hover:underline cursor-pointer">Forgot Password?</span>
+                </div>
+              )}
+
+              {/* Submit Action CTA Button */}
               <button 
                 type="submit" 
-                className="w-full bg-[#1a1c1c] text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider shadow-md hover:bg-zinc-800 transition-all active:scale-98 mt-2"
+                className="w-full bg-[#1a1c1c] text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider shadow-md hover:bg-zinc-800 transition-all flex items-center justify-center gap-2 mt-2"
               >
-                Access My Dashboard 🚀
+                {isSignUpMode ? (
+                  <>Create My Account <UserPlus size={14}/></>
+                ) : (
+                  <>Access My Dashboard 🚀</>
+                )}
               </button>
-
             </form>
+
+            {/* 🌟 BOTTOM INTERACTIVE TOGGLE SUB-TAB SECTION (Sign In / Sign Up Selector Link) */}
+            <div className="bg-[#f3f3f3] px-6 py-4 border-t border-[#e2e2e2] text-center text-xs text-[#5f5e5e]">
+              {isSignUpMode ? (
+                <p>
+                  Already have an account?{' '}
+                  <button 
+                    onClick={() => { setIsSignUpMode(false); setPasswordInput(''); setConfirmPasswordInput(''); }}
+                    className="text-[#705d00] font-bold hover:underline"
+                  >
+                    Sign In Here
+                  </button>
+                </p>
+              ) : (
+                <p>
+                  Don't have an account?{' '}
+                  <button 
+                    onClick={() => { setIsSignUpMode(true); setPasswordInput(''); }}
+                    className="text-[#705d00] font-bold hover:underline"
+                  >
+                    Sign Up / Register Here
+                  </button>
+                </p>
+              )}
+            </div>
 
           </div>
         </div>
