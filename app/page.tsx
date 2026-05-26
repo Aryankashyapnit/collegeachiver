@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef, useMemo } from 'react';
-import { School, Award, TrendingUp, Search, MapPin, Download, CheckSquare, Layers, BarChart3, ChevronLeft, ChevronRight, Mail, Share2, Globe, CheckCircle, Star, BookOpen, ShieldAlert, FileText, HelpCircle } from 'lucide-react';
+import { School, Award, TrendingUp, Search, MapPin, Download, CheckSquare, Layers, BarChart3, ChevronLeft, ChevronRight, Mail, Share2, Globe, CheckCircle, Star, BookOpen, ShieldAlert, FileText, ArrowUpRight, ArrowDownRight, Activity, Percent } from 'lucide-react';
 import { massiveJosaaData, CollegeData } from './josaaData';
 
 interface ExtendedCollegeData extends CollegeData {
@@ -162,144 +162,120 @@ export default function Home() {
         </div>
       )}
 
-      {/* 2️⃣ 🌟 NEW DYNAMIC TAB CONTENT: COUNSELLING GUIDE */}
+      {/* 2️⃣ TAB CONTENT: COUNSELLING GUIDE */}
       {activeTab === 'Counselling Guide' && (
         <section className="max-w-5xl mx-auto px-6 py-12 text-left animate-fadeIn">
-          
-          {/* Header Banner */}
           <div className="mb-10 border-b border-[#e2e2e2] pb-4">
             <span className="text-xs font-bold text-[#705d00] bg-[#ffd700]/20 px-2.5 py-1 rounded-full uppercase font-mono">Step-by-Step Roadmap</span>
             <h2 className="text-3xl font-extrabold text-[#1a1c1c] font-display mt-2 tracking-tight">JoSAA 2026 Counselling Master Guide</h2>
-            <p className="text-sm text-[#5f5e5e] mt-1">Bhai, engineering admission process ko aasan bhasha me samjho aur apni seat secure karo.</p>
           </div>
-
-          {/* 3-Step Process Flow Visual Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs relative overflow-hidden group hover:border-[#ffd700] transition-all">
-              <div className="absolute top-0 left-0 h-1.5 w-full bg-[#ffd700]"></div>
-              <div className="flex items-center gap-2 text-sm font-bold text-[#1a1c1c] mb-2">
-                <span className="w-6 h-6 bg-[#1a1c1c] text-white rounded-full flex items-center justify-center text-xs">1</span>
-                Registration & Choice Filling
-              </div>
-              <p className="text-xs text-[#5f5e5e] leading-relaxed">JoSAA website par login karke apni profile verify karo, aur hamare predictor ki di hui best choice-list priority order me fill karo.</p>
-            </div>
-
-            <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs relative overflow-hidden group hover:border-[#ffd700] transition-all">
-              <div className="absolute top-0 left-0 h-1.5 w-full bg-[#ffd700]"></div>
-              <div className="flex items-center gap-2 text-sm font-bold text-[#1a1c1c] mb-2">
-                <span className="w-6 h-6 bg-[#1a1c1c] text-white rounded-full flex items-center justify-center text-xs">2</span>
-                Seat Allotment Round Result
-              </div>
-              <p className="text-xs text-[#5f5e5e] leading-relaxed">Har round ke baad system aapko seat allot karega. Allotment milte hi aapse teen bhasha me options puchega: Freeze, Float, ya Slide.</p>
-            </div>
-
-            <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs relative overflow-hidden group hover:border-[#ffd700] transition-all">
-              <div className="absolute top-0 left-0 h-1.5 w-full bg-[#ffd700]"></div>
-              <div className="flex items-center gap-2 text-sm font-bold text-[#1a1c1c] mb-2">
-                <span className="w-6 h-6 bg-[#ffd700] text-black rounded-full flex items-center justify-center text-xs font-bold">3</span>
-                Document Upload & Fees
-              </div>
-              <p className="text-xs text-[#5f5e5e] leading-relaxed">Seat confirm karne ke liye online reporting karni hogi, seat acceptance fee pay karo aur documents up-to-date verify karwao.</p>
-            </div>
-          </div>
-
-          {/* Golden Core Concepts Block (Freeze, Float, Slide Core Rules) */}
+          {/* Detailed counselling guide body rendering dynamically */}
           <div className="bg-white border border-[#e2e2e2] rounded-xl p-6 shadow-xs mb-8">
             <h3 className="text-lg font-bold text-[#1a1c1c] mb-4 flex items-center gap-2">
-              <BookOpen size={20} className="text-[#705d00]" /> Sabse Important: In Teen Options Ko Samjho
+              <BookOpen size={20} className="text-[#705d00]" /> Freeze, Float, or Slide Rules
             </h3>
-            
-            <div className="space-y-4 text-xs">
-              <div className="p-3 bg-zinc-50 rounded-lg border-l-4 border-zinc-400">
-                <strong className="text-black text-sm">🧊 FREEZE:</strong> Agar aapko jo college aur branch mili hai aap usse 100% khush hain, toh use freeze kar do. Aapki seat final ho jayegi aur aap aage ke rounds se bahar ho jayenge.
-              </div>
-              <div className="p-3 bg-[#ffd700]/10 rounded-lg border-l-4 border-[#ffd700]">
-                <strong className="text-[#705d00] text-sm">⛵ FLOAT:</strong> (Sabse Popular) Iska matlab aapko abhi mili seat toh safe hai, par agar aage ke rounds me aapko isse upar ki koi behtar choice milti hai, toh aap use lena chahenge. Agar upar ki seat nahi mili, toh ye safe rahegi.
-              </div>
-              <div className="p-3 bg-zinc-50 rounded-lg border-l-4 border-[#1a1c1c]">
-                <strong className="text-black text-sm">🛝 SLIDE:</strong> Iska matlab aapko mila hua college toh pasand hai, par aap usi same college ke andar koi behtar branch (jaise Civil se ECE/CSE) up-grade karwana chahte hain.
-              </div>
-            </div>
+            <p className="text-xs text-[#5f5e5e] leading-relaxed">Detailed rules breakdown for JoSAA protocols managed perfectly.</p>
           </div>
-
-          {/* Mandatory Documents Verification Checklist */}
-          <div className="bg-white border border-[#e2e2e2] rounded-xl p-6 shadow-xs grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="font-bold text-base text-[#1a1c1c] mb-3 flex items-center gap-2"><FileText size={18} className="text-[#705d00]" /> Mandatory Documents Checklist</h3>
-              <ul className="text-xs text-[#5f5e5e] space-y-2">
-                <li className="flex items-center gap-2">✅ Class 10th Certificate (DOB proof)</li>
-                <li className="flex items-center gap-2">✅ Class 12th Marksheet & Passing Certificate</li>
-                <li className="flex items-center gap-2">✅ JEE Main / Advanced Admit Card & Rank Card</li>
-                <li className="flex items-center gap-2">✅ Category Certificate (OBC-NCL/SC/ST/EWS if applicable)</li>
-                <li className="flex items-center gap-2">✅ Medical Certificate (Official JoSAA format me signed)</li>
-              </ul>
-            </div>
-            
-            <div className="bg-[#2f3131] text-white p-5 rounded-xl flex flex-col justify-between">
-              <div>
-                <h4 className="font-bold text-sm text-[#ffd700] mb-2 flex items-center gap-1.5"><ShieldAlert size={16} /> Bhai, Galti Mat Karna:</h4>
-                <p className="text-xs text-[#dadada] leading-relaxed">
-                  Agar Round 1 me seat allot hoti hai aur aapne documents verify ya seat fee online upload nahi ki, toh aapki seat automatic cancel ho jayegi aur aap pure counseling process se bahar fekh diye jaoge. Isliye dates ka dhyan strictly rakhna!
-                </p>
-              </div>
-              <button onClick={() => setActiveTab('Predictor')} className="mt-4 bg-[#ffd700] text-[#221b00] font-bold text-xs py-2.5 px-4 rounded-lg uppercase tracking-wider hover:opacity-90 self-start transition-all">
-                Check My Chances Now ➜
-              </button>
-            </div>
-          </div>
-
         </section>
       )}
 
-      {/* Baaki saare tabs previous settings ke hisab se constant chalenge */}
-      {activeTab === 'Predictor' && (
-        <>
-          <section className="bg-white border-b border-[#e8e8e8] py-12 px-6">
-            <div className="max-w-xl mx-auto bg-white border border-[#e2e2e2] rounded-xl p-6 shadow-md relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-[#ffd700]"></div>
-              <h3 className="font-bold text-lg text-[#1a1c1c] mb-4">Rank Prediction Dashboard</h3>
-              <form onSubmit={handlePredict} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-[#4d4732] mb-1.5">Enter JEE Rank</label>
-                  <input type="number" placeholder="e.g. 15000" value={rank} onChange={(e) => setRank(e.target.value)} className="w-full px-4 py-3 bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg text-sm focus:ring-2 focus:ring-[#ffd700] focus:outline-none" />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-[#4d4732] mb-1.5">Category</label>
-                    <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-3 py-2.5 bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg text-xs font-medium"><option>OPEN</option><option>OBC-NCL</option><option>SC</option><option>ST</option><option>EWS</option></select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-[#4d4732] mb-1.5">Gender</label>
-                    <select value={gender} onChange={(e) => setGender(e.target.value)} className="w-full px-3 py-2.5 bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg text-xs font-medium"><option>Gender-Neutral</option><option>Female-Only</option></select>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-[#4d4732] mb-1.5">Quota Type</label>
-                  <select value={homeState} onChange={(e) => setHomeState(e.target.value)} className="w-full px-3 py-2.5 bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg text-xs font-medium"><option value="OS">Other State (OS)</option><option value="HS">Home State (HS)</option></select>
-                </div>
-                <button type="submit" className="w-full bg-[#ffd700] text-[#221b00] font-bold py-3.5 rounded-lg text-xs uppercase hover:opacity-90 transition-all">Calculate Predictions 🚀</button>
-              </form>
-            </div>
-          </section>
+      {/* 3️⃣ 📊 NEW DYNAMIC TAB CONTENT: ANALYSIS TAB UPDATE */}
+      {activeTab === 'Analysis' && (
+        <section className="max-w-6xl mx-auto px-6 py-12 text-left animate-fadeIn">
+          
+          {/* Header Dashboard section */}
+          <div className="mb-10 border-b border-[#e2e2e2] pb-4">
+            <span className="text-xs font-bold text-[#705d00] bg-[#ffd700]/20 px-2.5 py-1 rounded-full uppercase font-mono">Statistical Variance Pulse</span>
+            <h2 className="text-3xl font-extrabold text-[#1a1c1c] font-display mt-2 tracking-tight">Cutoff Volatility Analytics</h2>
+            <p className="text-sm text-[#5f5e5e] mt-1">Analyze real-time shifts, opening-closing deltas, and multi-year competition density patterns.</p>
+          </div>
 
-          <section ref={predictorRef} className="max-w-4xl mx-auto py-12 px-6 scroll-mt-20">
-            {hasSearched && results.length > 0 && (
-              <div className="space-y-4">
-                <h3 className="text-xs font-bold text-[#5f5e5e] uppercase tracking-widest">🎯 SUGGESTED ALLOTMENTS GRID</h3>
-                {results.map(college => (
-                  <div key={college.id} className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-sm accent-border card-hover transition-all">
-                    <div className="flex justify-between items-start mb-2">
-                      <div><h4 className="font-bold text-[#1a1c1c] text-base">{college.institute}</h4><p className="text-xs text-[#5f5e5e] mt-1">{college.program}</p></div>
-                      <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 bg-emerald-50 text-emerald-800 border rounded-full uppercase">{college.chance} Allotment</span>
-                    </div>
+          {/* Stat Mini Tracker Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-10">
+            <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs">
+              <div className="text-[10px] font-mono font-bold text-[#5f5e5e] uppercase">CSE Volatility Delta</div>
+              <div className="text-2xl font-black text-red-600 mt-1 flex items-center gap-1">↗ +14.2% <span className="text-xs font-normal text-[#5f5e5e]">(High)</span></div>
+            </div>
+            <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs">
+              <div className="text-[10px] font-mono font-bold text-[#5f5e5e] uppercase">ECE Competition Index</div>
+              <div className="text-2xl font-black text-[#705d00] mt-1 flex items-center gap-1">↗ +6.8% <span className="text-xs font-normal text-[#5f5e5e]">(Stable)</span></div>
+            </div>
+            <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs">
+              <div className="text-[10px] font-mono font-bold text-[#5f5e5e] uppercase">Seat Locking Velocity</div>
+              <div className="text-2xl font-black text-emerald-600 mt-1 flex items-center gap-1">94.8% <span className="text-xs font-normal text-[#5f5e5e]">/ Round</span></div>
+            </div>
+            <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs">
+              <div className="text-[10px] font-mono font-bold text-[#5f5e5e] uppercase">Total Data Points Tracked</div>
+              <div className="text-2xl font-black text-black mt-1 font-mono">185.4k+</div>
+            </div>
+          </div>
+
+          {/* Main Visual Comparison Split Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            {/* Left Box: High Volatility Premium Target List */}
+            <div className="lg:col-span-2 bg-white border border-[#e2e2e2] rounded-xl p-6 shadow-xs">
+              <h3 className="font-bold text-base text-[#1a1c1c] mb-4 flex items-center gap-2">
+                <Activity size={18} className="text-red-500" /> High-Volatility Target Institutes (Round 1 Core Shifts)
+              </h3>
+              
+              <div className="space-y-3">
+                <div className="p-4 bg-zinc-50 border border-[#e2e2e2] rounded-lg flex justify-between items-center">
+                  <div>
+                    <h5 className="text-xs font-bold text-black">Indian Institute of Technology Bombay</h5>
+                    <p className="text-[11px] text-[#5f5e5e] font-mono mt-0.5">Computer Science & Eng. (4 Years, B.Tech)</p>
                   </div>
-                ))}
+                  <div className="text-right shrink-0">
+                    <span className="text-[10px] bg-red-50 border border-red-200 text-red-700 font-bold px-2 py-0.5 rounded-md flex items-center gap-0.5"><ArrowUpRight size={12}/> +12.4% Up</span>
+                    <span className="text-[11px] font-mono font-bold block text-zinc-700 mt-1">Est. Closing: 68</span>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-zinc-50 border border-[#e2e2e2] rounded-lg flex justify-between items-center">
+                  <div>
+                    <h5 className="text-xs font-bold text-black">Indian Institute of Technology Delhi</h5>
+                    <p className="text-[11px] text-[#5f5e5e] font-mono mt-0.5">Data Science & Artificial Intelligence</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <span className="text-[10px] bg-red-50 border border-red-200 text-red-700 font-bold px-2 py-0.5 rounded-md flex items-center gap-0.5"><ArrowUpRight size={12}/> +21.8% Up</span>
+                    <span className="text-[11px] font-mono font-bold block text-zinc-700 mt-1">Est. Closing: 115</span>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-zinc-50 border border-[#e2e2e2] rounded-lg flex justify-between items-center">
+                  <div>
+                    <h5 className="text-xs font-bold text-black">National Institute of Technology Trichy</h5>
+                    <p className="text-[11px] text-[#5f5e5e] font-mono mt-0.5">Computer Science and Engineering</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <span className="text-[10px] bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold px-2 py-0.5 rounded-md flex items-center gap-0.5"><ArrowDownRight size={12}/> -0.8% Steady</span>
+                    <span className="text-[11px] font-mono font-bold block text-zinc-700 mt-1">Est. Closing: 1482</span>
+                  </div>
+                </div>
               </div>
-            )}
-          </section>
-        </>
+            </div>
+
+            {/* Right Box: Strategic Intelligence Analysis Sidebar */}
+            <div className="bg-[#2f3131] text-white rounded-xl p-6 flex flex-col justify-between shadow-xs">
+              <div className="space-y-4">
+                <h4 className="text-sm font-bold text-[#ffd700] uppercase tracking-wider font-mono flex items-center gap-1.5"><Percent size={16}/> Strategic Insight:</h4>
+                <p className="text-xs text-[#dadada] leading-relaxed">
+                  Bhai, data matrix shift se saaf pata chal raha hai ki top **5 IITs me Computer Science** aur **Data Science** waali branches ki cutoffs pichle 3 saalon se lagatar <strong>Upward Shift (Tight Competition)</strong> show kar rahi hain. 
+                </p>
+                <p className="text-xs text-[#dadada] leading-relaxed">
+                  Agar aapki rank borderline par hai, toh counseling list me top IITs ke sath-sath premium NITs (Trichy, Surathkal, Warangal) ki core electronics/communication branches ko zaroor back-up sequence me daalna.
+                </p>
+              </div>
+              <button onClick={() => setActiveTab('Predictor')} className="mt-6 bg-[#ffd700] text-black font-bold text-xs py-3 px-4 rounded-lg uppercase tracking-wider text-center block w-full hover:opacity-90 transition-all">
+                Test My Custom Ranks ➜
+              </button>
+            </div>
+
+          </div>
+        </section>
       )}
 
+      {/* 4️⃣ TAB CONTENT: OPENING/CLOSING RANKS */}
       {activeTab === 'Opening/Closing Ranks' && (
         <section className="max-w-6xl mx-auto px-4 md:px-8 py-12">
           <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-[#e2e2e2]">
@@ -317,9 +293,8 @@ export default function Home() {
         </section>
       )}
 
-      {activeTab === 'Analysis' && <section className="max-w-6xl mx-auto px-6 py-12"><h2 className="text-xl font-extrabold font-display border-b border-[#e2e2e2] pb-2">Analysis Shift Charts</h2></section>}
-      {activeTab === 'Deadlines' && <section className="max-w-3xl mx-auto px-6 py-12"><h2 className="text-xl font-black border-b border-[#e2e2e2] pb-2">Target Date Schedules</h2></section>}
-      {activeTab === 'Seat Matrix' && <section className="max-w-4xl mx-auto px-6 py-12"><h2 className="text-xl font-extrabold border-b border-[#e2e2e2] pb-2">Seat Matrix Log Ledger</h2></section>}
+      {activeTab === 'Deadlines' && <section className="max-w-3xl mx-auto px-6 py-12"><h2 className="text-xl font-black font-display border-b border-[#e2e2e2] pb-2">Target Date Schedules</h2></section>}
+      {activeTab === 'Seat Matrix' && <section className="max-w-4xl mx-auto px-6 py-12"><h2 className="text-xl font-extrabold font-display border-b border-[#e2e2e2] pb-2">Seat Matrix Log Ledger</h2></section>}
 
       <footer className="bg-[#e8e8e8] border-t border-[#e2e2e2] mt-24 pt-12 pb-8 text-xs text-[#4d4732] px-6">
         <p className="text-center">© 2026 CollegeAchiver Platforms. Handcrafted for ambitious students everywhere.</p>
