@@ -8,8 +8,8 @@ interface ExtendedCollegeData extends CollegeData {
 }
 
 export default function Home() {
-  // 🎛️ Navbar Active Tab Control
-  const [activeTab, setActiveTab] = useState('Predictor');
+  // 🎛️ Navbar Active Tab Control (Default to 'Home')
+  const [activeTab, setActiveTab] = useState('Home');
   
   // Predictor Engine States
   const [rank, setRank] = useState('');
@@ -21,7 +21,7 @@ export default function Home() {
 
   // 🏛️ Opening/Closing Ranks Cut-off Tab States
   const [selectedYear, setSelectedYear] = useState('2023');
-  const [selectedType, setSelectedType] = useState('IIT'); // IIT, NIT, IIIT, GFTI
+  const [selectedType, setSelectedType] = useState('IIT'); 
   const [selectedRound, setSelectedRound] = useState('Round 1');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -59,16 +59,14 @@ export default function Home() {
     }, 100);
   };
 
-  // 🔍 Dynamic Live Filtering Logic for Cut-off Data Table
+  // Dynamic Live Filtering Logic for Cut-off Data Table
   const filteredCutoffData = useMemo(() => {
     return massiveJosaaData.filter(item => {
-      // Filter by Type (IIT matching string pattern, NIT matching NIT pattern, etc.)
       const matchesType = 
         selectedType === 'IIT' ? item.institute.includes('Indian Institute of Technology') :
         selectedType === 'NIT' ? item.institute.includes('National Institute of Technology') || item.institute.includes('Motilal Nehru') :
         selectedType === 'IIIT' ? item.institute.includes('International Institute of Information') : true;
 
-      // Filter by Quick Search Text
       const matchesSearch = 
         item.institute.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.program.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -89,19 +87,19 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#f9f9f9] text-[#1a1c1c] antialiased font-sans">
       
-      {/* 🗺️ PREMIUM RIGID COCKPIT NAVBAR */}
+      {/* 🗺️ PREMIUM RIGID COCKPIT NAVBAR WITH PERMANENT HOME TAB */}
       <nav className="sticky top-0 z-50 bg-white shadow-sm border-b border-[#e2e2e2] px-6 py-3.5">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
           
-          {/* Logo Brand Customization */}
-          <div onClick={() => setActiveTab('Predictor')} className="text-xl font-extrabold tracking-tight text-[#705d00] flex items-center gap-2 cursor-pointer select-none">
+          {/* Logo Brand */}
+          <div onClick={() => setActiveTab('Home')} className="text-xl font-extrabold tracking-tight text-[#705d00] flex items-center gap-2 cursor-pointer select-none">
             <span className="h-4 w-4 bg-[#ffd700] inline-block rounded-[4px]"></span>
             CollegeAchiver
           </div>
           
-          {/* 🎛️ MASTER ACCENT TABS CONTROLLER */}
+          {/* 🎛️ NAVIGATION BUTTONS ARRAY (Home Included) */}
           <div className="flex flex-wrap items-center justify-center gap-1 md:gap-4 text-xs font-semibold text-[#5f5e5e]">
-            {['Predictor', 'Opening/Closing Ranks', 'Analysis', 'Deadlines', 'Seat Matrix'].map((tab) => (
+            {['Home', 'Predictor', 'Opening/Closing Ranks', 'Analysis', 'Deadlines', 'Seat Matrix'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => { setActiveTab(tab); setCurrentPage(1); }}
@@ -122,8 +120,10 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* 1️⃣ CONTENT MATRIX VIEW: PREDICTOR TAB */}
-      {activeTab === 'Predictor' && (
+      {/* 📋 RENDER CORE COMPONENTS BASED ON HEADER SELECTION */}
+      
+      {/* 1️⃣ TAB CONTENT: HOME OR PREDICTOR (Dono Landing Layout render karenge) */}
+      {(activeTab === 'Home' || activeTab === 'Predictor') && (
         <>
           <section className="bg-white border-b border-[#e8e8e8] py-12 md:py-16 px-6">
             <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -194,7 +194,7 @@ export default function Home() {
             {hasSearched ? (
               results.length > 0 ? (
                 <div className="space-y-4">
-                  <h3 className="text-xs font-bold text-[#5f5e5e] uppercase tracking-wider tracking-widest">🎯 SUGGESTED ALLOTMENTS</h3>
+                  <h3 className="text-xs font-bold text-[#5f5e5e] uppercase tracking-widest">🎯 SUGGESTED ALLOTMENTS</h3>
                   {results.map(college => {
                     const statusColors = {
                       High: "bg-emerald-50 text-emerald-800 border-emerald-200",
@@ -235,27 +235,22 @@ export default function Home() {
         </>
       )}
 
-      {/* 2️⃣ CONTENT MATRIX VIEW: OPENING/CLOSING RANKS TAB (New Feature Embedded) */}
+      {/* 2️⃣ TAB CONTENT: OPENING/CLOSING RANKS */}
       {activeTab === 'Opening/Closing Ranks' && (
         <section className="max-w-6xl mx-auto px-4 md:px-8 py-12">
-          
-          {/* Header Area */}
           <div className="mb-10">
             <h1 className="text-3xl md:text-4xl font-extrabold text-[#1a1c1c] mb-2 tracking-tight">Cut-off Analysis Matrix</h1>
-            <p className="text-base text-[#5f5e5e] max-w-2xl">Browse historical opening and closing ranks for all JoSAA participating institutes. Use the multi-filters array to narrow your target branches.</p>
+            <p className="text-base text-[#5f5e5e] max-w-2xl">Browse historical opening and closing ranks for all JoSAA participating institutes.</p>
           </div>
 
-          {/* Interactive Filters Panel */}
           <div className="bg-white rounded-xl p-6 mb-8 shadow-sm border border-[#e2e2e2] grid grid-cols-1 md:grid-cols-4 gap-6">
-            {/* Year Selection Dropdown */}
             <div className="flex flex-col gap-2">
               <label className="text-xs font-bold text-[#4d4732] uppercase tracking-wider">Year Configuration</label>
-              <select value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)} className="bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg p-3 text-sm focus:ring-2 focus:ring-[#ffd700] focus:border-[#ffd700] outline-none transition-all font-medium">
+              <select value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)} className="bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg p-3 text-sm outline-none font-medium">
                 <option>2023</option><option>2022</option><option>2021</option>
               </select>
             </div>
 
-            {/* Institute Type Pill Button Array */}
             <div className="flex flex-col gap-2">
               <label className="text-xs font-bold text-[#4d4732] uppercase tracking-wider">Institute Type</label>
               <div className="flex flex-wrap gap-2">
@@ -264,9 +259,7 @@ export default function Home() {
                     key={type}
                     onClick={() => { setSelectedType(type); setCurrentPage(1); }}
                     className={`px-4 py-2 rounded-full text-xs font-bold border transition-all ${
-                      selectedType === type
-                        ? 'bg-[#ffd700] text-[#221b00] border-[#ffd700]'
-                        : 'bg-white border-[#e2e2e2] text-[#5f5e5e] hover:bg-[#eeeeee]'
+                      selectedType === type ? 'bg-[#ffd700] text-[#221b00] border-[#ffd700]' : 'bg-white border-[#e2e2e2] text-[#5f5e5e] hover:bg-[#eeeeee]'
                     }`}
                   >
                     {type}
@@ -275,31 +268,28 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Round Filter */}
             <div className="flex flex-col gap-2">
               <label className="text-xs font-bold text-[#4d4732] uppercase tracking-wider">Round Sequence</label>
-              <select value={selectedRound} onChange={(e) => setSelectedRound(e.target.value)} className="bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg p-3 text-sm focus:ring-2 focus:ring-[#ffd700] focus:border-[#ffd700] outline-none font-medium">
+              <select value={selectedRound} onChange={(e) => setSelectedRound(e.target.value)} className="bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg p-3 text-sm outline-none font-medium">
                 <option>Round 1</option><option>Round 2</option><option>Round 3</option><option>Round 4</option><option>Round 5</option><option>Round 6 (Final)</option>
               </select>
             </div>
 
-            {/* Search Input Box */}
             <div className="flex flex-col gap-2">
               <label className="text-xs font-bold text-[#4d4732] uppercase tracking-wider">Quick Filter Engine</label>
               <div className="relative">
                 <Search className="absolute left-3 top-3.5 text-[#5f5e5e]" size={16} />
                 <input 
                   type="text" 
-                  placeholder="e.g. Bombay, CSE, OBC..." 
+                  placeholder="e.g. Bombay, CSE..." 
                   value={searchQuery}
                   onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-                  className="w-full bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg pl-9 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-[#ffd700] focus:border-[#ffd700] outline-none font-medium"
+                  className="w-full bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg pl-9 pr-4 py-2.5 text-sm outline-none font-medium"
                 />
               </div>
             </div>
           </div>
 
-          {/* Core Structured Data Ledger */}
           <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-[#e2e2e2]">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse min-w-[900px]">
@@ -317,7 +307,7 @@ export default function Home() {
                   {paginatedData.length > 0 ? (
                     paginatedData.map((item, idx) => (
                       <tr key={idx} className="group transition-colors hover:bg-[#ffd700]/5">
-                        <td className="px-6 py-4.5 font-semibold text-[#1a1c1c] group-hover:text-[#705d00] transition-colors">{item.institute}</td>
+                        <td className="px-6 py-4.5 font-semibold text-[#1a1c1c] transition-colors">{item.institute}</td>
                         <td className="px-6 py-4.5 text-[#5f5e5e] text-xs">{item.program}</td>
                         <td className="px-6 py-4.5 text-[#5f5e5e] font-mono">{item.quota}</td>
                         <td className="px-6 py-4.5">
@@ -332,7 +322,7 @@ export default function Home() {
                   ) : (
                     <tr>
                       <td colSpan={6} className="px-6 py-12 text-center text-xs font-mono text-[#5f5e5e]">
-                        ❌ Filters ke mutabik active chunk me koi records available nahi hain. Search queries change karein.
+                        ❌ No records available. Search queries change karein.
                       </td>
                     </tr>
                   )}
@@ -340,16 +330,15 @@ export default function Home() {
               </table>
             </div>
 
-            {/* Pagination Controls Footer Grid */}
             <div className="px-6 py-4 bg-[#f3f3f3] border-t border-[#e2e2e2] flex items-center justify-between text-xs">
               <span className="font-medium text-[#5f5e5e]">
-                Showing {filteredCutoffData.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredCutoffData.length)} of {filteredCutoffData.length} active instances
+                Showing {filteredCutoffData.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredCutoffData.length)} of {filteredCutoffData.length} instances
               </span>
               <div className="flex gap-2 items-center">
                 <button 
                   onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                   disabled={currentPage === 1}
-                  className="p-2 rounded-lg border border-[#e2e2e2] bg-white hover:bg-[#eeeeee] transition-colors disabled:opacity-40"
+                  className="p-2 rounded-lg border border-[#e2e2e2] bg-white hover:bg-[#eeeeee] disabled:opacity-40"
                 >
                   <ChevronLeft size={16} />
                 </button>
@@ -357,26 +346,13 @@ export default function Home() {
                 <button 
                   onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                   disabled={currentPage === totalPages}
-                  className="p-2 rounded-lg border border-[#e2e2e2] bg-white hover:bg-[#eeeeee] transition-colors disabled:opacity-40"
+                  className="p-2 rounded-lg border border-[#e2e2e2] bg-white hover:bg-[#eeeeee] disabled:opacity-40"
                 >
                   <ChevronRight size={16} />
                 </button>
               </div>
             </div>
           </div>
-
-          {/* Call to Action Module embedded */}
-          <section className="mt-16 bg-[#2f3131] text-white rounded-2xl p-8 md:p-12 relative overflow-hidden group shadow-lg">
-            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-              <div>
-                <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-2 tracking-tight">Want a personalized choice prediction?</h2>
-                <p className="text-[#e3e2e2] max-w-xl text-xs md:text-sm">Enter your ranks configuration parameter to dynamically test high probability allotments via smart algorithm matrices.</p>
-              </div>
-              <button onClick={() => setActiveTab('Predictor')} className="bg-[#ffd700] text-[#1b1c1c] font-bold px-8 py-3.5 rounded-xl text-sm hover:scale-105 active:scale-95 transition-all shadow-md shrink-0">
-                Launch Predictor Dashboard
-              </button>
-            </div>
-          </section>
         </section>
       )}
 
@@ -385,26 +361,15 @@ export default function Home() {
         <section className="max-w-6xl mx-auto px-6 py-12">
           <div className="mb-8 border-b border-[#e2e2e2] pb-4">
             <h2 className="text-2xl font-extrabold tracking-tight text-[#1a1c1c]">Cutoff Shift Volatility Charts</h2>
-            <p className="text-xs text-[#5f5e5e] mt-1">Simulated statistical variance indicator for high priority streams.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-white border border-[#e2e2e2] p-5 rounded-xl shadow-xs">
               <h4 className="font-bold text-sm mb-4">IIT Bombay — Computer Science Trends</h4>
               <div className="h-16 bg-[#f9f9f9] border-b border-[#e2e2e2] mb-3 flex items-end gap-2 p-1">
                 <div className="bg-[#5f5e5e] h-[40%] w-full rounded-t"></div>
-                <div className="bg-[#5f5e5e] h-[60%] w-full rounded-t"></div>
                 <div className="bg-[#ffd700] h-[85%] w-full rounded-t"></div>
               </div>
               <div className="flex justify-between text-xs font-mono"><span>2026 Target Cutoff: 68</span><span className="text-red-600 font-bold">↗ +12.4%</span></div>
-            </div>
-            <div className="bg-white border border-[#e2e2e2] p-5 rounded-xl shadow-xs">
-              <h4 className="font-bold text-sm mb-4">IIT Delhi — Data Science Shift Matrix</h4>
-              <div className="h-16 bg-[#f9f9f9] border-b border-[#e2e2e2] mb-3 flex items-end gap-2 p-1">
-                <div className="bg-[#5f5e5e] h-[30%] w-full rounded-t"></div>
-                <div className="bg-[#5f5e5e] h-[55%] w-full rounded-t"></div>
-                <div className="bg-[#ffd700] h-[92%] w-full rounded-t"></div>
-              </div>
-              <div className="flex justify-between text-xs font-mono"><span>2026 Target Cutoff: 115</span><span className="text-red-600 font-bold">↗ +21.8%</span></div>
             </div>
           </div>
         </section>
@@ -418,17 +383,6 @@ export default function Home() {
             <div>
               <span className="text-xs font-mono text-amber-700 font-bold block">JUNE 10, 2026</span>
               <h4 className="font-bold text-[#1a1c1c] mt-0.5">JEE Advanced Rankings Ledger Audit</h4>
-              <p className="text-xs text-[#5f5e5e] mt-0.5">Official cutoffs and score parameters verified by apex authority.</p>
-            </div>
-            <div>
-              <span className="text-xs font-mono text-amber-700 font-bold block">JUNE 15, 2026</span>
-              <h4 className="font-bold text-[#1a1c1c] mt-0.5">Preference Filling Interface Ignition</h4>
-              <p className="text-xs text-[#5f5e5e] mt-0.5">Students authorized to configure preference list metrics.</p>
-            </div>
-            <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
-              <span className="text-xs font-mono text-red-600 font-bold block">JUNE 25, 2026 (SYSTEM TERMINATION)</span>
-              <h4 className="font-bold text-red-700 mt-0.5">Choice Sequence Architecture Auto-Lock</h4>
-              <p className="text-xs text-[#5f5e5e] mt-0.5">Final structural checkpoint time constraint. Changes freeze at midnight.</p>
             </div>
           </div>
         </section>
@@ -443,44 +397,20 @@ export default function Home() {
               <span>Institute Node</span><span>Specialization Branch</span><span>Quota ID</span><span>Seat Cap</span>
             </div>
             <div className="p-3.5 grid grid-cols-4 border-b border-zinc-100"><span>IIT Bombay</span><span>Computer Science Engineering</span><span>OPEN (Neutral)</span><span className="font-bold">124</span></div>
-            <div className="p-3.5 grid grid-cols-4 border-b border-zinc-100"><span>IIT Delhi</span><span>Electrical Engineering</span><span>OBC-NCL</span><span className="font-bold">40</span></div>
-            <div className="p-3.5 grid grid-cols-4"><span>NIT Agartala</span><span>Electronics & Comm. Engineering</span><span>OS - OPEN</span><span className="font-bold">92</span></div>
           </div>
         </section>
       )}
 
-      {/* 📋 SHARED PLATFORM ARCHITECTURAL FOOTER */}
+      {/* FOOTER */}
       <footer className="bg-[#e8e8e8] border-t border-[#e2e2e2] mt-24 pt-12 pb-8 text-xs text-[#4d4732] px-6">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <div className="text-base font-bold text-[#705d00] mb-3">CollegeAchiver</div>
-            <p className="text-[11px] leading-relaxed">Helping students navigate their academic future with data integrity, strategic momentum, and structural clarity.</p>
-          </div>
-          <div>
-            <h4 className="font-bold text-black uppercase mb-3 tracking-wider text-[11px]">Resources</h4>
-            <div className="flex flex-col gap-2 font-medium">
-              <span className="cursor-pointer hover:underline">Methodology Docs</span>
-              <span className="cursor-pointer hover:underline">Help Center Support</span>
-            </div>
-          </div>
-          <div>
-            <h4 className="font-bold text-black uppercase mb-3 tracking-wider text-[11px]">Quick Legal</h4>
-            <div className="flex flex-col gap-2 font-medium">
-              <span className="cursor-pointer hover:underline">Privacy Policy Protocol</span>
-              <span className="cursor-pointer hover:underline">Terms of Service Node</span>
-            </div>
-          </div>
-          <div>
-            <h4 className="font-bold text-black uppercase mb-3 tracking-wider text-[11px]">Channels</h4>
-            <div className="flex gap-4 pt-1 text-[#5f5e5e]">
-              <Mail size={18} className="cursor-pointer hover:text-[#705d00]" />
-              <Share2 size={18} className="cursor-pointer hover:text-[#705d00]" />
-              <Globe size={18} className="cursor-pointer hover:text-[#705d00]" />
-            </div>
+            <p className="text-[11px] leading-relaxed">Navigating future with data integrity.</p>
           </div>
         </div>
         <div className="max-w-6xl mx-auto border-t border-[#d0c6ab] mt-8 pt-4 text-center text-[11px]">
-          <p>© 2026 CollegeAchiver Systems. All data trends compiled natively from official JoSAA releases.</p>
+          <p>© 2026 CollegeAchiver Systems. All rights reserved.</p>
         </div>
       </footer>
 
