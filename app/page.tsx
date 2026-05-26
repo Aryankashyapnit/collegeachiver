@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef, useMemo } from 'react';
-import { School, Award, TrendingUp, Search, MapPin, Download, CheckSquare, Layers, BarChart3, ChevronLeft, ChevronRight, Mail, Share2, Globe, CheckCircle, Star, BookOpen, ShieldAlert, FileText, ArrowUpRight, ArrowDownRight, Activity, Percent } from 'lucide-react';
+import { School, Award, TrendingUp, Search, MapPin, Download, CheckSquare, Layers, BarChart3, ChevronLeft, ChevronRight, Mail, Share2, Globe, CheckCircle, Star, BookOpen, ShieldAlert, FileText, Activity, Percent, Clock, AlertCircle, Calendar } from 'lucide-react';
 import { massiveJosaaData, CollegeData } from './josaaData';
 
 interface ExtendedCollegeData extends CollegeData {
@@ -169,119 +169,162 @@ export default function Home() {
             <span className="text-xs font-bold text-[#705d00] bg-[#ffd700]/20 px-2.5 py-1 rounded-full uppercase font-mono">Step-by-Step Roadmap</span>
             <h2 className="text-3xl font-extrabold text-[#1a1c1c] font-display mt-2 tracking-tight">JoSAA 2026 Counselling Master Guide</h2>
           </div>
-          {/* Detailed counselling guide body rendering dynamically */}
           <div className="bg-white border border-[#e2e2e2] rounded-xl p-6 shadow-xs mb-8">
-            <h3 className="text-lg font-bold text-[#1a1c1c] mb-4 flex items-center gap-2">
-              <BookOpen size={20} className="text-[#705d00]" /> Freeze, Float, or Slide Rules
-            </h3>
+            <h3 className="text-lg font-bold text-[#1a1c1c] mb-4 flex items-center gap-2"><BookOpen size={20} className="text-[#705d00]" /> Freeze, Float, or Slide Rules</h3>
             <p className="text-xs text-[#5f5e5e] leading-relaxed">Detailed rules breakdown for JoSAA protocols managed perfectly.</p>
           </div>
         </section>
       )}
 
-      {/* 3️⃣ 📊 NEW DYNAMIC TAB CONTENT: ANALYSIS TAB UPDATE */}
+      {/* 3️⃣ TAB CONTENT: ANALYSIS */}
       {activeTab === 'Analysis' && (
         <section className="max-w-6xl mx-auto px-6 py-12 text-left animate-fadeIn">
-          
-          {/* Header Dashboard section */}
           <div className="mb-10 border-b border-[#e2e2e2] pb-4">
             <span className="text-xs font-bold text-[#705d00] bg-[#ffd700]/20 px-2.5 py-1 rounded-full uppercase font-mono">Statistical Variance Pulse</span>
             <h2 className="text-3xl font-extrabold text-[#1a1c1c] font-display mt-2 tracking-tight">Cutoff Volatility Analytics</h2>
-            <p className="text-sm text-[#5f5e5e] mt-1">Analyze real-time shifts, opening-closing deltas, and multi-year competition density patterns.</p>
           </div>
-
-          {/* Stat Mini Tracker Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-10">
-            <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs">
-              <div className="text-[10px] font-mono font-bold text-[#5f5e5e] uppercase">CSE Volatility Delta</div>
-              <div className="text-2xl font-black text-red-600 mt-1 flex items-center gap-1">↗ +14.2% <span className="text-xs font-normal text-[#5f5e5e]">(High)</span></div>
-            </div>
-            <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs">
-              <div className="text-[10px] font-mono font-bold text-[#5f5e5e] uppercase">ECE Competition Index</div>
-              <div className="text-2xl font-black text-[#705d00] mt-1 flex items-center gap-1">↗ +6.8% <span className="text-xs font-normal text-[#5f5e5e]">(Stable)</span></div>
-            </div>
-            <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs">
-              <div className="text-[10px] font-mono font-bold text-[#5f5e5e] uppercase">Seat Locking Velocity</div>
-              <div className="text-2xl font-black text-emerald-600 mt-1 flex items-center gap-1">94.8% <span className="text-xs font-normal text-[#5f5e5e]">/ Round</span></div>
-            </div>
-            <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs">
-              <div className="text-[10px] font-mono font-bold text-[#5f5e5e] uppercase">Total Data Points Tracked</div>
-              <div className="text-2xl font-black text-black mt-1 font-mono">185.4k+</div>
-            </div>
-          </div>
-
-          {/* Main Visual Comparison Split Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            {/* Left Box: High Volatility Premium Target List */}
-            <div className="lg:col-span-2 bg-white border border-[#e2e2e2] rounded-xl p-6 shadow-xs">
-              <h3 className="font-bold text-base text-[#1a1c1c] mb-4 flex items-center gap-2">
-                <Activity size={18} className="text-red-500" /> High-Volatility Target Institutes (Round 1 Core Shifts)
-              </h3>
-              
-              <div className="space-y-3">
-                <div className="p-4 bg-zinc-50 border border-[#e2e2e2] rounded-lg flex justify-between items-center">
-                  <div>
-                    <h5 className="text-xs font-bold text-black">Indian Institute of Technology Bombay</h5>
-                    <p className="text-[11px] text-[#5f5e5e] font-mono mt-0.5">Computer Science & Eng. (4 Years, B.Tech)</p>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <span className="text-[10px] bg-red-50 border border-red-200 text-red-700 font-bold px-2 py-0.5 rounded-md flex items-center gap-0.5"><ArrowUpRight size={12}/> +12.4% Up</span>
-                    <span className="text-[11px] font-mono font-bold block text-zinc-700 mt-1">Est. Closing: 68</span>
-                  </div>
-                </div>
-
-                <div className="p-4 bg-zinc-50 border border-[#e2e2e2] rounded-lg flex justify-between items-center">
-                  <div>
-                    <h5 className="text-xs font-bold text-black">Indian Institute of Technology Delhi</h5>
-                    <p className="text-[11px] text-[#5f5e5e] font-mono mt-0.5">Data Science & Artificial Intelligence</p>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <span className="text-[10px] bg-red-50 border border-red-200 text-red-700 font-bold px-2 py-0.5 rounded-md flex items-center gap-0.5"><ArrowUpRight size={12}/> +21.8% Up</span>
-                    <span className="text-[11px] font-mono font-bold block text-zinc-700 mt-1">Est. Closing: 115</span>
-                  </div>
-                </div>
-
-                <div className="p-4 bg-zinc-50 border border-[#e2e2e2] rounded-lg flex justify-between items-center">
-                  <div>
-                    <h5 className="text-xs font-bold text-black">National Institute of Technology Trichy</h5>
-                    <p className="text-[11px] text-[#5f5e5e] font-mono mt-0.5">Computer Science and Engineering</p>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <span className="text-[10px] bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold px-2 py-0.5 rounded-md flex items-center gap-0.5"><ArrowDownRight size={12}/> -0.8% Steady</span>
-                    <span className="text-[11px] font-mono font-bold block text-zinc-700 mt-1">Est. Closing: 1482</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Box: Strategic Intelligence Analysis Sidebar */}
-            <div className="bg-[#2f3131] text-white rounded-xl p-6 flex flex-col justify-between shadow-xs">
-              <div className="space-y-4">
-                <h4 className="text-sm font-bold text-[#ffd700] uppercase tracking-wider font-mono flex items-center gap-1.5"><Percent size={16}/> Strategic Insight:</h4>
-                <p className="text-xs text-[#dadada] leading-relaxed">
-                  Bhai, data matrix shift se saaf pata chal raha hai ki top **5 IITs me Computer Science** aur **Data Science** waali branches ki cutoffs pichle 3 saalon se lagatar <strong>Upward Shift (Tight Competition)</strong> show kar rahi hain. 
-                </p>
-                <p className="text-xs text-[#dadada] leading-relaxed">
-                  Agar aapki rank borderline par hai, toh counseling list me top IITs ke sath-sath premium NITs (Trichy, Surathkal, Warangal) ki core electronics/communication branches ko zaroor back-up sequence me daalna.
-                </p>
-              </div>
-              <button onClick={() => setActiveTab('Predictor')} className="mt-6 bg-[#ffd700] text-black font-bold text-xs py-3 px-4 rounded-lg uppercase tracking-wider text-center block w-full hover:opacity-90 transition-all">
-                Test My Custom Ranks ➜
-              </button>
-            </div>
-
+            <div className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-xs"><div className="text-[10px] font-mono font-bold text-[#5f5e5e] uppercase">CSE Volatility Delta</div><div className="text-2xl font-black text-red-600 mt-1">↗ +14.2%</div></div>
           </div>
         </section>
       )}
 
-      {/* 4️⃣ TAB CONTENT: OPENING/CLOSING RANKS */}
+      {/* 4️⃣ ⏰ NEW DYNAMIC TAB CONTENT: DEADLINES TIMELINE SCHEDULE */}
+      {activeTab === 'Deadlines' && (
+        <section className="max-w-4xl mx-auto px-6 py-12 text-left animate-fadeIn">
+          
+          {/* Section Header */}
+          <div className="mb-10 border-b border-[#e2e2e2] pb-4">
+            <span className="text-xs font-bold text-[#705d00] bg-[#ffd700]/20 px-2.5 py-1 rounded-full uppercase font-mono">Official Time Matrix</span>
+            <h2 className="text-3xl font-extrabold text-[#1a1c1c] font-display mt-2 tracking-tight">JoSAA 2026 Critical Dates & Schedule</h2>
+            <p className="text-sm text-[#5f5e5e] mt-1">Bhai, ek bhi deadline miss hui toh poori mehnat bekaar ho jayegi. In dates ko dhyan se note kar lo!</p>
+          </div>
+
+          {/* Core Stepper/Timeline Architecture Layout */}
+          <div className="relative border-l-2 border-[#ffd700] ml-4 pl-8 space-y-10">
+            
+            {/* Step 1: Results Announcement */}
+            <div className="relative group">
+              {/* Dot Icon Indicator */}
+              <div className="absolute -left-[41px] top-1 bg-white border-4 border-[#1a1c1c] h-5 w-5 rounded-full group-hover:border-[#ffd700] transition-colors"></div>
+              <div className="space-y-1">
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <span className="text-xs font-mono font-bold text-[#705d00] bg-[#ffd700]/20 px-2 py-0.5 rounded-md flex items-center gap-1"><Calendar size={12}/> June 10, 2026</span>
+                  <span className="text-[10px] bg-zinc-100 text-zinc-600 border border-zinc-300 font-bold px-2 py-0.5 rounded-md uppercase">Upcoming</span>
+                </div>
+                <h4 className="text-base font-bold text-black font-display">JEE Advanced Result & Cut-off Release</h4>
+                <p className="text-xs text-[#5f5e5e] max-w-2xl leading-relaxed">Organizing IIT ke dwara final rank card aur official qualifying cut-offs publish honge. Isi ke baad JoSAA portal active kiya jayega.</p>
+              </div>
+            </div>
+
+            {/* Step 2: Registration Ignited */}
+            <div className="relative group">
+              <div className="absolute -left-[41px] top-1 bg-white border-4 border-[#ffd700] h-5 w-5 rounded-full flex items-center justify-center"><span className="h-1.5 w-1.5 bg-black rounded-full animate-ping"></span></div>
+              <div className="space-y-1">
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <span className="text-xs font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md flex items-center gap-1"><Clock size={12}/> June 15, 2026</span>
+                  <span className="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold px-2 py-0.5 rounded-md uppercase animate-pulse">Live Soon</span>
+                </div>
+                <h4 className="text-base font-bold text-black font-display">Online Registration & Preference Choice Filling Starts</h4>
+                <p className="text-xs text-[#5f5e5e] max-w-2xl leading-relaxed">Students apni choices online fill karna shuru kar sakte hain. Bhai, hamare predictor se generated choice-locking sequence isi dauran fill karna hai.</p>
+              </div>
+            </div>
+
+            {/* Step 3: Mock Seat Allotment */}
+            <div className="relative group">
+              <div className="absolute -left-[41px] top-1 bg-white border-4 border-[#1a1c1c] h-5 w-5 rounded-full group-hover:border-[#ffd700] transition-colors"></div>
+              <div className="space-y-1">
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <span className="text-xs font-mono font-bold text-[#705d00] bg-[#ffd700]/20 px-2 py-0.5 rounded-md"><Calendar size={12}/> June 22, 2026</span>
+                  <span className="text-[10px] bg-zinc-100 text-zinc-600 border border-zinc-300 font-bold px-2 py-0.5 rounded-md uppercase">Simulation</span>
+                </div>
+                <h4 className="text-base font-bold text-black font-display">Mock Seat Allocation Round 1 Result</h4>
+                <p className="text-xs text-[#5f5e5e] max-w-2xl leading-relaxed">Abhi tak filled choices ke basis par system ek tentative prediction data show karega ki aapko kaun sa college mil sakta hai, taaki aap apni choices ko modify kar sako.</p>
+              </div>
+            </div>
+
+            {/* Step 4: CRITICAL AUTO LOCK TERMINATION */}
+            <div className="relative group">
+              <div className="absolute -left-[41px] top-1 bg-white border-4 border-red-600 h-5 w-5 rounded-full"></div>
+              <div className="space-y-1">
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <span className="text-xs font-mono font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-md flex items-center gap-1"><AlertCircle size={12}/> June 25, 2026 (5:00 PM)</span>
+                  <span className="text-[10px] bg-red-100 text-red-800 border border-red-300 font-bold px-2 py-0.5 rounded-md uppercase">Strict Warning</span>
+                </div>
+                <h4 className="text-base font-bold text-red-600 font-display">Choice Filling Window Closes & Auto-Locking</h4>
+                <p className="text-xs text-[#5f5e5e] max-w-2xl leading-relaxed font-medium">Bhai, ye sabse critical timestamp hai! Shaam 5 baje choice filling window lock ho jayegi. Isse pehle apni preferences ko re-arrange aur save zaroor kar lena, iske baad koi change nahi hoga.</p>
+              </div>
+            </div>
+
+            {/* Step 5: Round 1 Seat Allocation */}
+            <div className="relative group">
+              <div className="absolute -left-[41px] top-1 bg-white border-4 border-[#1a1c1c] h-5 w-5 rounded-full group-hover:border-[#ffd700] transition-colors"></div>
+              <div className="space-y-1">
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <span className="text-xs font-mono font-bold text-[#705d00] bg-[#ffd700]/20 px-2 py-0.5 rounded-md"><Calendar size={12}/> June 27, 2026</span>
+                  <span className="text-[10px] bg-zinc-100 text-zinc-600 border border-zinc-300 font-bold px-2 py-0.5 rounded-md uppercase">Allocation</span>
+                </div>
+                <h4 className="text-base font-bold text-black font-display">Official Seat Allotment Round 1 Result publicado</h4>
+                <p className="text-xs text-[#5f5e5e] max-w-2xl leading-relaxed">Actual Round 1 ka seat allocation result declared hoga. Seat milte hi online document checking pipeline active ho jayegi.</p>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Strategic Action Banner */}
+          <div className="mt-12 bg-white border border-[#e2e2e2] p-6 rounded-xl shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="space-y-1">
+              <h5 className="font-bold text-sm text-black">Don't remember all dates?</h5>
+              <p className="text-xs text-[#5f5e5e]">Apne status ko safe rakhne ke liye counseling shuru hote hi alert systems open rakhein.</p>
+            </div>
+            <button onClick={() => setActiveTab('Predictor')} className="bg-[#ffd700] text-black font-bold text-xs px-5 py-3 rounded-lg uppercase tracking-wider font-mono shadow-xs hover:opacity-90 transition-all shrink-0">
+              Prepare Choice Order ➜
+            </button>
+          </div>
+
+        </section>
+      )}
+
+      {/* 5️⃣ TAB CONTENT: PREDICTOR ENGINE */}
+      {activeTab === 'Predictor' && (
+        <>
+          <section className="bg-white border-b border-[#e8e8e8] py-12 px-6">
+            <div className="max-w-xl mx-auto bg-white border border-[#e2e2e2] rounded-xl p-6 shadow-md relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-[#ffd700]"></div>
+              <h3 className="font-bold text-lg text-[#1a1c1c] mb-4">Rank Prediction Dashboard</h3>
+              <form onSubmit={handlePredict} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-[#4d4732] mb-1.5">Enter JEE Rank</label>
+                  <input type="number" placeholder="e.g. 15000" value={rank} onChange={(e) => setRank(e.target.value)} className="w-full px-4 py-3 bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg text-sm focus:ring-2 focus:ring-[#ffd700] focus:outline-none" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-[#4d4732] mb-1.5">Category</label>
+                    <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-3 py-2.5 bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg text-xs font-medium"><option>OPEN</option><option>OBC-NCL</option><option>SC</option><option>ST</option><option>EWS</option></select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#4d4732] mb-1.5">Gender</label>
+                    <select value={gender} onChange={(e) => setGender(e.target.value)} className="w-full px-3 py-2.5 bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg text-xs font-medium"><option>Gender-Neutral</option><option>Female-Only</option></select>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#4d4732] mb-1.5">Quota Type</label>
+                  <select value={homeState} onChange={(e) => setHomeState(e.target.value)} className="w-full px-3 py-2.5 bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg text-xs font-medium"><option value="OS">Other State (OS)</option><option value="HS">Home State (HS)</option></select>
+                </div>
+                <button type="submit" className="w-full bg-[#ffd700] text-[#221b00] font-bold py-3.5 rounded-lg text-xs uppercase hover:opacity-90 transition-all">Calculate Predictions 🚀</button>
+              </form>
+            </div>
+          </section>
+        </>
+      )}
+
+      {/* 6️⃣ TAB CONTENT: OPENING/CLOSING RANKS */}
       {activeTab === 'Opening/Closing Ranks' && (
         <section className="max-w-6xl mx-auto px-4 md:px-8 py-12">
           <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-[#e2e2e2]">
             <table className="w-full text-left border-collapse min-w-[900px]">
               <thead>
-                <tr className="bg-[#5f5e5e] text-white text-xs uppercase tracking-wider font-bold"><th className="px-6 py-4">Institute</th><th className="px-6 py-4">Program</th><th className="px-6 py-4">Quota</th><th className="px-6 py-4">Category</th><th className="px-6 py-4">Opening</th><th className="px-6 py-4">Closing</th></tr>
+                <tr className="bg-[#5f5e5e] text-white text-xs font-bold"><th className="px-6 py-4">Institute</th><th className="px-6 py-4">Program</th><th className="px-6 py-4">Quota</th><th className="px-6 py-4">Category</th><th className="px-6 py-4">Opening</th><th className="px-6 py-4">Closing</th></tr>
               </thead>
               <tbody className="divide-y divide-[#e2e2e2] text-sm">
                 {paginatedData.map((item, idx) => (
@@ -293,8 +336,7 @@ export default function Home() {
         </section>
       )}
 
-      {activeTab === 'Deadlines' && <section className="max-w-3xl mx-auto px-6 py-12"><h2 className="text-xl font-black font-display border-b border-[#e2e2e2] pb-2">Target Date Schedules</h2></section>}
-      {activeTab === 'Seat Matrix' && <section className="max-w-4xl mx-auto px-6 py-12"><h2 className="text-xl font-extrabold font-display border-b border-[#e2e2e2] pb-2">Seat Matrix Log Ledger</h2></section>}
+      {activeTab === 'Seat Matrix' && <section className="max-w-4xl mx-auto px-6 py-12"><h2 className="text-xl font-extrabold border-b pb-2">Seat Matrix Log Ledger</h2></section>}
 
       <footer className="bg-[#e8e8e8] border-t border-[#e2e2e2] mt-24 pt-12 pb-8 text-xs text-[#4d4732] px-6">
         <p className="text-center">© 2026 CollegeAchiver Platforms. Handcrafted for ambitious students everywhere.</p>
