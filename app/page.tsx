@@ -1,6 +1,6 @@
 'use client';
-import { useState, useRef } from 'react';
-import { School, Award, TrendingUp, Search, MapPin, Download, CheckSquare, Layers, BarChart3 } from 'lucide-react';
+import { useState, useRef, useMemo } from 'react';
+import { School, Award, TrendingUp, Search, MapPin, Download, CheckSquare, Layers, BarChart3, Clock, ChevronLeft, ChevronRight, Mail, Share2, Globe } from 'lucide-react';
 import { massiveJosaaData, CollegeData } from './josaaData';
 
 interface ExtendedCollegeData extends CollegeData {
@@ -8,10 +8,10 @@ interface ExtendedCollegeData extends CollegeData {
 }
 
 export default function Home() {
-  // 🎛️ Active Tab State Control
+  // 🎛️ Navbar Active Tab Control
   const [activeTab, setActiveTab] = useState('Predictor');
   
-  // Predictor States
+  // Predictor Engine States
   const [rank, setRank] = useState('');
   const [category, setCategory] = useState('OPEN');
   const [gender, setGender] = useState('Gender-Neutral');
@@ -19,8 +19,16 @@ export default function Home() {
   const [results, setResults] = useState<ExtendedCollegeData[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
 
+  // 🏛️ Opening/Closing Ranks Cut-off Tab States
+  const [selectedYear, setSelectedYear] = useState('2023');
+  const [selectedType, setSelectedType] = useState('IIT'); // IIT, NIT, IIIT, GFTI
+  const [selectedRound, setSelectedRound] = useState('Round 1');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+
   const predictorRef = useRef<HTMLDivElement>(null);
 
+  // Predictor Calculation Trigger
   const handlePredict = (e: React.FormEvent) => {
     e.preventDefault();
     if (!rank) return alert("Pehle apni rank enter karo bhai!");
@@ -51,320 +59,430 @@ export default function Home() {
     }, 100);
   };
 
+  // 🔍 Dynamic Live Filtering Logic for Cut-off Data Table
+  const filteredCutoffData = useMemo(() => {
+    return massiveJosaaData.filter(item => {
+      // Filter by Type (IIT matching string pattern, NIT matching NIT pattern, etc.)
+      const matchesType = 
+        selectedType === 'IIT' ? item.institute.includes('Indian Institute of Technology') :
+        selectedType === 'NIT' ? item.institute.includes('National Institute of Technology') || item.institute.includes('Motilal Nehru') :
+        selectedType === 'IIIT' ? item.institute.includes('International Institute of Information') : true;
+
+      // Filter by Quick Search Text
+      const matchesSearch = 
+        item.institute.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.program.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.category.toLowerCase().includes(searchQuery.toLowerCase());
+
+      return matchesType && matchesSearch;
+    });
+  }, [selectedType, searchQuery]);
+
+  // Pagination metrics
+  const itemsPerPage = 5;
+  const totalPages = Math.ceil(filteredCutoffData.length / itemsPerPage) || 1;
+  const paginatedData = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredCutoffData.slice(start, start + itemsPerPage);
+  }, [filteredCutoffData, currentPage]);
+
   return (
-    <main className="min-h-screen bg-[#f8f9ff] text-[#0b1c30] antialiased">
+    <main className="min-h-screen bg-[#f9f9f9] text-[#1a1c1c] antialiased font-sans">
       
-      {/* 👑 AUTHORITATIVE TOP HERO PLATFORM */}
-      <section className="border-b border-[#c6c6cd] bg-[#f8f9ff] py-12 md:py-20 px-6">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      {/* 🗺️ PREMIUM RIGID COCKPIT NAVBAR */}
+      <nav className="sticky top-0 z-50 bg-white shadow-sm border-b border-[#e2e2e2] px-6 py-3.5">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
           
-          {/* Left Column: Core Copy */}
-          <div className="lg:col-span-7 space-y-6 text-left">
-            <div className="inline-flex items-center gap-2 bg-[#131b2e] text-[#eff4ff] text-[10px] font-mono tracking-wider uppercase px-3 py-1 rounded-[4px] border border-[#76777d]">
-              ⚡ ENGINE V4.2.0 | STABLE STATUS
-            </div>
-            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-[#0b1c30] leading-[1.1]">
-              Precision Intelligence <br />
-              for <span className="text-[#fea619]">JoSAA 2026</span>
-            </h1>
-            <p className="text-[#45464d] text-base md:text-lg max-w-xl leading-relaxed">
-              Strategize your counseling with deterministic choice filling and real-time seat analysis. Precision forecasting for IITs, NITs, and IIITs based on decades of admission history.
-            </p>
-            <div className="flex flex-wrap gap-4 pt-2">
-              <button onClick={() => { setActiveTab('Predictor'); setTimeout(() => predictorRef.current?.scrollIntoView({ behavior: 'smooth' }), 50); }} className="bg-[#000000] text-white font-semibold text-sm px-6 py-3.5 rounded-[4px] transition-all hover:bg-[#213145] shadow-sm flex items-center gap-2">
-                Start Predicting <TrendingUp size={16} className="text-[#fea619]" />
+          {/* Logo Brand Customization */}
+          <div onClick={() => setActiveTab('Predictor')} className="text-xl font-extrabold tracking-tight text-[#705d00] flex items-center gap-2 cursor-pointer select-none">
+            <span className="h-4 w-4 bg-[#ffd700] inline-block rounded-[4px]"></span>
+            CollegeAchiver
+          </div>
+          
+          {/* 🎛️ MASTER ACCENT TABS CONTROLLER */}
+          <div className="flex flex-wrap items-center justify-center gap-1 md:gap-4 text-xs font-semibold text-[#5f5e5e]">
+            {['Predictor', 'Opening/Closing Ranks', 'Analysis', 'Deadlines', 'Seat Matrix'].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => { setActiveTab(tab); setCurrentPage(1); }}
+                className={`px-3 py-2 transition-all rounded-lg text-[13px] font-medium ${
+                  activeTab === tab 
+                    ? 'text-[#221b00] bg-[#ffd700] font-bold shadow-sm' 
+                    : 'hover:text-[#705d00] hover:bg-[#eeeeee]'
+                }`}
+              >
+                {tab}
               </button>
-            </div>
-            
-            {/* Engineering Metrics Badges */}
-            <div className="grid grid-cols-3 gap-4 pt-6 border-t border-[#c6c6cd]/60 max-w-md text-[11px] font-mono text-[#45464d]">
-              <div>🟢 <strong className="text-[#0b1c30]">52,148</strong> SEATS TRACKED</div>
-              <div>🏛️ <strong className="text-[#0b1c30]">113</strong> COLLEGES</div>
-              <div>🤖 <strong className="text-[#0b1c30]">ML v2</strong> STRATEGY MODEL</div>
-            </div>
+            ))}
           </div>
 
-          {/* Right Column: Premium Quick Rank Form */}
-          <div className="lg:col-span-5 bg-white border border-[#c6c6cd] rounded-[8px] p-6 shadow-sm">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="font-bold text-xl tracking-tight text-[#0b1c30]">Quick Rank Check</h3>
-              <span className="bg-[#eff4ff] text-[#0b1c30] font-mono text-[9px] font-bold px-2 py-0.5 rounded-[4px] border border-[#c6c6cd]">READY</span>
-            </div>
-
-            <form onSubmit={handlePredict} className="space-y-4">
-              <div>
-                <label className="block text-[10px] font-mono font-bold uppercase tracking-wider text-[#45464d] mb-1.5">JEE Rank (Main / Advanced)</label>
-                <div className="relative">
-                  <input 
-                    type="number" 
-                    placeholder="e.g. 25000" 
-                    value={rank}
-                    onChange={(e) => setRank(e.target.value)}
-                    className="w-full px-4 py-3 bg-[#f8f9ff] border border-[#c6c6cd] rounded-[4px] focus:outline-none focus:ring-2 focus:ring-[#131b2e] text-sm text-[#0b1c30] font-mono"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[10px] font-mono font-bold uppercase tracking-wider text-[#45464d] mb-1.5">Category</label>
-                  <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-3 py-2.5 bg-[#f8f9ff] border border-[#c6c6cd] rounded-[4px] text-xs font-semibold">
-                    <option>OPEN</option><option>OBC-NCL</option><option>SC</option><option>ST</option><option>EWS</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-mono font-bold uppercase tracking-wider text-[#45464d] mb-1.5">Gender</label>
-                  <select value={gender} onChange={(e) => setGender(e.target.value)} className="w-full px-3 py-2.5 bg-[#f8f9ff] border border-[#c6c6cd] rounded-[4px] text-xs font-semibold">
-                    <option>Gender-Neutral</option><option>Female-Only</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[10px] font-mono font-bold uppercase tracking-wider text-[#45464d] mb-1.5">Home State Quota</label>
-                <select value={homeState} onChange={(e) => setHomeState(e.target.value)} className="w-full px-3 py-2.5 bg-[#f8f9ff] border border-[#c6c6cd] rounded-[4px] text-xs font-semibold">
-                  <option value="OS">Other State (OS)</option><option value="HS">Home State (HS)</option>
-                </select>
-              </div>
-
-              <button type="submit" className="w-full bg-[#131b2e] text-white font-bold py-3.5 rounded-[4px] text-xs uppercase tracking-wider transition-all hover:bg-black">
-                Calculate Results 🚀
-              </button>
-            </form>
-          </div>
+          <button className="bg-[#ffd700] text-[#221b00] font-bold px-5 py-2 rounded-lg text-xs hover:opacity-90 transition-all shadow-xs">
+            Sign In
+          </button>
         </div>
-      </section>
+      </nav>
 
-      {/* 📋 RENDER DYNAMIC CONTENT BASED ON ACTIVE TAB */}
-      
-      {/* 1️⃣ TAB: PREDICTOR */}
+      {/* 1️⃣ CONTENT MATRIX VIEW: PREDICTOR TAB */}
       {activeTab === 'Predictor' && (
-        <section ref={predictorRef} className="max-w-4xl mx-auto py-12 px-6 scroll-mt-6">
-          {hasSearched ? (
-            results.length > 0 ? (
-              <div className="space-y-4">
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="text-xs font-mono font-bold text-[#45464d] uppercase tracking-wider">📊 DETECTED ALLOTMENTS GRID ({results.length})</h3>
-                  <button className="text-xs font-mono font-bold text-[#131b2e] hover:underline flex items-center gap-1">
-                    <Download size={14} /> EXPORT PDF LIST
-                  </button>
+        <>
+          <section className="bg-white border-b border-[#e8e8e8] py-12 md:py-16 px-6">
+            <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+              
+              <div className="lg:col-span-7 space-y-5 text-left">
+                <div className="inline-flex items-center gap-2 bg-[#ffd700]/20 text-[#705d00] text-[11px] font-mono font-bold tracking-wider uppercase px-3 py-1 rounded-full border border-[#ffd700]/40">
+                  ✨ AI-Counselling Engine Loaded
                 </div>
-                {results.map(college => {
-                  const statusColors = {
-                    High: "bg-emerald-50 text-emerald-800 border-emerald-200",
-                    Medium: "bg-amber-50 text-amber-800 border-amber-200",
-                    Low: "bg-red-50 text-red-800 border-red-200"
-                  };
-                  return (
-                    <div key={college.id} className="bg-white border border-[#c6c6cd] p-5 rounded-[4px] shadow-sm hover:border-[#131b2e] transition-all">
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="flex gap-3">
-                          <div className="p-2 bg-[#f8f9ff] border border-[#c6c6cd] rounded-[4px] text-[#0b1c30] h-9 w-9 flex items-center justify-center shrink-0">
-                            <School size={18} />
-                          </div>
-                          <div>
-                            <h4 className="font-bold text-[#0b1c30] text-base leading-tight tracking-tight">{college.institute}</h4>
-                            <p className="text-xs text-[#45464d] font-mono mt-1">{college.program}</p>
-                          </div>
-                        </div>
-                        <span className={`text-[9px] font-mono font-bold px-2 py-0.5 border rounded-[4px] uppercase tracking-wider shrink-0 ${statusColors[college.chance || 'Low']}`}>
-                          {college.chance} Allotment
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-3 gap-4 pt-3.5 mt-3 border-t border-[#f8f9ff] text-[11px] font-mono text-[#45464d]">
-                        <span>NIRF RANK: <strong className="text-[#0b1c30]">{college.nirf}</strong></span>
-                        <span>CLOSING RANK: <strong className="text-[#0b1c30]">{college.closing}</strong></span>
-                        <span>QUOTA ID: <strong className="text-[#0b1c30]">{college.quota}</strong></span>
-                        <div className="col-span-3 bg-[#f8f9ff] border border-[#c6c6cd]/40 p-2.5 rounded-[4px] flex justify-between text-[10px]">
-                          <span>AVERAGE REVENUE COMP: <strong className="text-[#0b1c30]">{college.placement}</strong></span>
-                          <span>MESS & TUITION CAPEX: <strong className="text-[#0b1c30]">{college.fee}</strong></span>
-                        </div>
-                      </div>
+                <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-[#1a1c1c] leading-[1.15]">
+                  Predict Your Dream <span className="text-[#705d00]">IIT & NIT</span>
+                </h1>
+                <p className="text-[#5f5e5e] text-sm md:text-base max-w-xl leading-relaxed">
+                  Enter your ranks below to query our multi-year historical dataset. Get precise, instant allotment analytics built on strict academic logic.
+                </p>
+                <div className="grid grid-cols-3 gap-4 pt-4 border-t border-[#e2e2e2] max-w-md text-xs text-[#5f5e5e]">
+                  <div>🔥 <strong className="text-black">52,148</strong> Seats</div>
+                  <div>🏛️ <strong className="text-black">113</strong> Colleges</div>
+                  <div>⚡ <strong className="text-black">2026 Ready</strong></div>
+                </div>
+              </div>
+
+              {/* Form Input Block */}
+              <div className="lg:col-span-5 bg-white border border-[#e2e2e2] rounded-xl p-6 shadow-md relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1.5 bg-[#ffd700]"></div>
+                <h3 className="font-bold text-lg text-[#1a1c1c] mb-4">Rank Prediction Dashboard</h3>
+                <form onSubmit={handlePredict} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-[#4d4732] mb-1.5">Enter JEE Rank (CRL / Category)</label>
+                    <input 
+                      type="number" 
+                      placeholder="e.g. 15000" 
+                      value={rank} 
+                      onChange={(e) => setRank(e.target.value)} 
+                      className="w-full px-4 py-3 bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg text-sm focus:ring-2 focus:ring-[#ffd700] focus:border-[#ffd700] focus:outline-none transition-all" 
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-[#4d4732] mb-1.5">Category</label>
+                      <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-3 py-2.5 bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg text-xs font-medium">
+                        <option>OPEN</option><option>OBC-NCL</option><option>SC</option><option>ST</option><option>EWS</option>
+                      </select>
                     </div>
-                  );
-                })}
+                    <div>
+                      <label className="block text-xs font-semibold text-[#4d4732] mb-1.5">Gender</label>
+                      <select value={gender} onChange={(e) => setGender(e.target.value)} className="w-full px-3 py-2.5 bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg text-xs font-medium">
+                        <option>Gender-Neutral</option><option>Female-Only</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#4d4732] mb-1.5">Quota Allocation Filter</label>
+                    <select value={homeState} onChange={(e) => setHomeState(e.target.value)} className="w-full px-3 py-2.5 bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg text-xs font-medium">
+                      <option value="OS">Other State (OS)</option><option value="HS">Home State (HS)</option>
+                    </select>
+                  </div>
+                  <button type="submit" className="w-full bg-[#ffd700] text-[#221b00] font-bold py-3.5 rounded-lg text-xs uppercase tracking-wider hover:opacity-90 shadow-md active:scale-95 transition-all">
+                    Launch Real Predictions 🚀
+                  </button>
+                </form>
               </div>
+
+            </div>
+          </section>
+
+          {/* Results Render Target */}
+          <section ref={predictorRef} className="max-w-4xl mx-auto py-12 px-6 scroll-mt-20">
+            {hasSearched ? (
+              results.length > 0 ? (
+                <div className="space-y-4">
+                  <h3 className="text-xs font-bold text-[#5f5e5e] uppercase tracking-wider tracking-widest">🎯 SUGGESTED ALLOTMENTS</h3>
+                  {results.map(college => {
+                    const statusColors = {
+                      High: "bg-emerald-50 text-emerald-800 border-emerald-200",
+                      Medium: "bg-amber-50 text-amber-800 border-amber-200",
+                      Low: "bg-red-50 text-red-800 border-red-200"
+                    };
+                    return (
+                      <div key={college.id} className="bg-white border border-[#e2e2e2] rounded-xl p-5 shadow-sm accent-border card-hover transition-all duration-200">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <h4 className="font-bold text-[#1a1c1c] text-base leading-tight">{college.institute}</h4>
+                            <p className="text-xs text-[#5f5e5e] mt-1">{college.program}</p>
+                          </div>
+                          <span className={`text-[10px] font-bold px-3 py-0.5 rounded-full border shrink-0 ${statusColors[college.chance || 'Low']}`}>
+                            {college.chance} CHANCE
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 pt-3 mt-3 border-t border-[#eeeeee] text-xs text-[#5f5e5e]">
+                          <span>Closing Cutoff: <strong className="text-black">{college.closing}</strong></span>
+                          <span>Average Placement: <strong className="text-black">{college.placement}</strong></span>
+                          <span>NIRF Rank: <strong className="text-black">{college.nirf}</strong></span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="bg-white border border-red-200 text-[#ba1a1a] rounded-xl p-6 text-center text-sm font-medium shadow-sm">
+                  🚨 NO ALLOTMENT INSTANCE: Is specified parameter settings par record block nahi mila.
+                </div>
+              )
             ) : (
-              <div className="bg-white border border-red-200 text-[#ba1a1a] rounded-[4px] p-6 text-center text-sm font-mono shadow-sm">
-                🚨 NO INSTANCE FOUND: Is specified rank matrix range ke andar koi matching records save nahi hain.
+              <div className="bg-white border border-[#e2e2e2] rounded-xl p-8 text-center text-xs text-[#5f5e5e] font-mono">
+                💡 Tip: Upper widget me data enter karke system parameters compile karein.
               </div>
-            )
-          ) : (
-            <div className="bg-white border border-[#c6c6cd] rounded-[4px] p-8 text-center text-xs text-[#45464d] font-mono">
-              💡 Upaye: Rank enter karke "Calculate Results" button par click karein dashboard active karne ke liye.
-            </div>
-          )}
-        </section>
+            )}
+          </section>
+        </>
       )}
 
-      {/* 2️⃣ TAB: ANALYSIS */}
-      {activeTab === 'Analysis' && (
-        <section className="max-w-6xl mx-auto px-6 py-16">
+      {/* 2️⃣ CONTENT MATRIX VIEW: OPENING/CLOSING RANKS TAB (New Feature Embedded) */}
+      {activeTab === 'Opening/Closing Ranks' && (
+        <section className="max-w-6xl mx-auto px-4 md:px-8 py-12">
+          
+          {/* Header Area */}
           <div className="mb-10">
-            <span className="text-[10px] font-mono font-bold text-[#76777d] uppercase tracking-wider block mb-1">REAL-TIME METRICS</span>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-[#0b1c30]">Cutoff Volatility Analysis</h2>
-            <p className="text-xs text-[#45464d] mt-1">Interactive visualization of cutoff volatility for high-demand branches across premiere institutes.</p>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-[#1a1c1c] mb-2 tracking-tight">Cut-off Analysis Matrix</h1>
+            <p className="text-base text-[#5f5e5e] max-w-2xl">Browse historical opening and closing ranks for all JoSAA participating institutes. Use the multi-filters array to narrow your target branches.</p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="border border-[#c6c6cd] p-5 rounded-[4px] bg-white">
-              <div className="flex justify-between items-start mb-3">
-                <div>
-                  <h5 className="font-bold text-sm text-[#0b1c30]">IIT Bombay</h5>
-                  <span className="text-[10px] text-[#45464d] font-mono">CS (Computer Science)</span>
-                </div>
-                <span className="text-[9px] font-mono font-bold px-2 py-0.5 bg-red-100 text-red-700 rounded-[2px]">CRITICAL</span>
-              </div>
-              <div className="h-24 flex items-end gap-3 px-2 border-b border-[#c6c6cd] mb-4 pt-4 bg-[#f8f9ff]">
-                <div className="w-full bg-slate-300 h-[40%] rounded-t-[2px]"></div>
-                <div className="w-full bg-slate-300 h-[55%] rounded-t-[2px]"></div>
-                <div className="w-full bg-slate-300 h-[70%] rounded-t-[2px]"></div>
-                <div className="w-full bg-[#fea619] h-[85%] rounded-t-[2px]"></div>
-              </div>
-              <div className="flex justify-between items-center text-[11px] font-mono text-[#45464d]">
-                <span>CURRENT CUTOFF: <strong className="text-[#0b1c30]">68 (AIR)</strong></span>
-                <span className="text-red-600 font-bold">↗ +12.4%</span>
+
+          {/* Interactive Filters Panel */}
+          <div className="bg-white rounded-xl p-6 mb-8 shadow-sm border border-[#e2e2e2] grid grid-cols-1 md:grid-cols-4 gap-6">
+            {/* Year Selection Dropdown */}
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-[#4d4732] uppercase tracking-wider">Year Configuration</label>
+              <select value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)} className="bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg p-3 text-sm focus:ring-2 focus:ring-[#ffd700] focus:border-[#ffd700] outline-none transition-all font-medium">
+                <option>2023</option><option>2022</option><option>2021</option>
+              </select>
+            </div>
+
+            {/* Institute Type Pill Button Array */}
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-[#4d4732] uppercase tracking-wider">Institute Type</label>
+              <div className="flex flex-wrap gap-2">
+                {['IIT', 'NIT', 'IIIT'].map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => { setSelectedType(type); setCurrentPage(1); }}
+                    className={`px-4 py-2 rounded-full text-xs font-bold border transition-all ${
+                      selectedType === type
+                        ? 'bg-[#ffd700] text-[#221b00] border-[#ffd700]'
+                        : 'bg-white border-[#e2e2e2] text-[#5f5e5e] hover:bg-[#eeeeee]'
+                    }`}
+                  >
+                    {type}
+                  </button>
+                ))}
               </div>
             </div>
 
-            <div className="border border-[#c6c6cd] p-5 rounded-[4px] bg-white">
-              <div className="flex justify-between items-start mb-3">
-                <div>
-                  <h5 className="font-bold text-sm text-[#0b1c30]">IIT Delhi</h5>
-                  <span className="text-[10px] text-[#45464d] font-mono">Data Science & AI</span>
-                </div>
-                <span className="text-[9px] font-mono font-bold px-2 py-0.5 bg-[#ffddb8] text-[#653e00] rounded-[2px]">HOT TIER</span>
-              </div>
-              <div className="h-24 flex items-end gap-3 px-2 border-b border-[#c6c6cd] mb-4 pt-4 bg-[#f8f9ff]">
-                <div className="w-full bg-slate-300 h-[30%] rounded-t-[2px]"></div>
-                <div className="w-full bg-slate-300 h-[50%] rounded-t-[2px]"></div>
-                <div className="w-full bg-slate-300 h-[68%] rounded-t-[2px]"></div>
-                <div className="w-full bg-[#fea619] h-[92%] rounded-t-[2px]"></div>
-              </div>
-              <div className="flex justify-between items-center text-[11px] font-mono text-[#45464d]">
-                <span>CURRENT CUTOFF: <strong className="text-[#0b1c30]">115 (AIR)</strong></span>
-                <span className="text-red-600 font-bold">↗ +21.8%</span>
-              </div>
+            {/* Round Filter */}
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-[#4d4732] uppercase tracking-wider">Round Sequence</label>
+              <select value={selectedRound} onChange={(e) => setSelectedRound(e.target.value)} className="bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg p-3 text-sm focus:ring-2 focus:ring-[#ffd700] focus:border-[#ffd700] outline-none font-medium">
+                <option>Round 1</option><option>Round 2</option><option>Round 3</option><option>Round 4</option><option>Round 5</option><option>Round 6 (Final)</option>
+              </select>
             </div>
 
-            <div className="border border-[#c6c6cd] p-5 rounded-[4px] bg-white">
-              <div className="flex justify-between items-start mb-3">
-                <div>
-                  <h5 className="font-bold text-sm text-[#0b1c30]">NIT Trichy</h5>
-                  <span className="text-[10px] text-[#45464d] font-mono">CS (Computer Science)</span>
-                </div>
-                <span className="text-[9px] font-mono font-bold px-2 py-0.5 bg-blue-100 text-blue-700 rounded-[2px]">STABLE</span>
+            {/* Search Input Box */}
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-bold text-[#4d4732] uppercase tracking-wider">Quick Filter Engine</label>
+              <div className="relative">
+                <Search className="absolute left-3 top-3.5 text-[#5f5e5e]" size={16} />
+                <input 
+                  type="text" 
+                  placeholder="e.g. Bombay, CSE, OBC..." 
+                  value={searchQuery}
+                  onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+                  className="w-full bg-[#f9f9f9] border border-[#e2e2e2] rounded-lg pl-9 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-[#ffd700] focus:border-[#ffd700] outline-none font-medium"
+                />
               </div>
-              <div className="h-24 flex items-end gap-3 px-2 border-b border-[#c6c6cd] mb-4 pt-4 bg-[#f8f9ff]">
-                <div className="w-full bg-slate-300 h-[80%] rounded-t-[2px]"></div>
-                <div className="w-full bg-slate-300 h-[82%] rounded-t-[2px]"></div>
-                <div className="w-full bg-slate-300 h-[79%] rounded-t-[2px]"></div>
-                <div className="w-full bg-[#fea619] h-[81%] rounded-t-[2px]"></div>
+            </div>
+          </div>
+
+          {/* Core Structured Data Ledger */}
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-[#e2e2e2]">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse min-w-[900px]">
+                <thead>
+                  <tr className="bg-[#5f5e5e] text-white text-xs uppercase tracking-wider font-bold">
+                    <th className="px-6 py-4">Institute Entity</th>
+                    <th className="px-6 py-4">Academic Program Specialization</th>
+                    <th className="px-6 py-4">Quota</th>
+                    <th className="px-6 py-4">Category</th>
+                    <th className="px-6 py-4">Opening Rank</th>
+                    <th className="px-6 py-4">Closing Rank</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#e2e2e2] text-sm">
+                  {paginatedData.length > 0 ? (
+                    paginatedData.map((item, idx) => (
+                      <tr key={idx} className="group transition-colors hover:bg-[#ffd700]/5">
+                        <td className="px-6 py-4.5 font-semibold text-[#1a1c1c] group-hover:text-[#705d00] transition-colors">{item.institute}</td>
+                        <td className="px-6 py-4.5 text-[#5f5e5e] text-xs">{item.program}</td>
+                        <td className="px-6 py-4.5 text-[#5f5e5e] font-mono">{item.quota}</td>
+                        <td className="px-6 py-4.5">
+                          <span className="bg-[#eeeeee] text-[#4d4732] px-2.5 py-0.5 rounded-full text-[11px] font-medium border border-[#e2e2e2]">
+                            {item.category}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4.5 font-bold text-zinc-700 font-mono">{item.opening}</td>
+                        <td className="px-6 py-4.5 font-bold text-[#705d00] font-mono">{item.closing}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={6} className="px-6 py-12 text-center text-xs font-mono text-[#5f5e5e]">
+                        ❌ Filters ke mutabik active chunk me koi records available nahi hain. Search queries change karein.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination Controls Footer Grid */}
+            <div className="px-6 py-4 bg-[#f3f3f3] border-t border-[#e2e2e2] flex items-center justify-between text-xs">
+              <span className="font-medium text-[#5f5e5e]">
+                Showing {filteredCutoffData.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredCutoffData.length)} of {filteredCutoffData.length} active instances
+              </span>
+              <div className="flex gap-2 items-center">
+                <button 
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="p-2 rounded-lg border border-[#e2e2e2] bg-white hover:bg-[#eeeeee] transition-colors disabled:opacity-40"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                <span className="font-bold px-3 font-mono">Page {currentPage} of {totalPages}</span>
+                <button 
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="p-2 rounded-lg border border-[#e2e2e2] bg-white hover:bg-[#eeeeee] transition-colors disabled:opacity-40"
+                >
+                  <ChevronRight size={16} />
+                </button>
               </div>
-              <div className="flex justify-between items-center text-[11px] font-mono text-[#45464d]">
-                <span>CURRENT CUTOFF: <strong className="text-[#0b1c30]">1482 (AIR)</strong></span>
-                <span className="text-emerald-600 font-bold">↘ -0.8%</span>
+            </div>
+          </div>
+
+          {/* Call to Action Module embedded */}
+          <section className="mt-16 bg-[#2f3131] text-white rounded-2xl p-8 md:p-12 relative overflow-hidden group shadow-lg">
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+              <div>
+                <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-2 tracking-tight">Want a personalized choice prediction?</h2>
+                <p className="text-[#e3e2e2] max-w-xl text-xs md:text-sm">Enter your ranks configuration parameter to dynamically test high probability allotments via smart algorithm matrices.</p>
               </div>
+              <button onClick={() => setActiveTab('Predictor')} className="bg-[#ffd700] text-[#1b1c1c] font-bold px-8 py-3.5 rounded-xl text-sm hover:scale-105 active:scale-95 transition-all shadow-md shrink-0">
+                Launch Predictor Dashboard
+              </button>
+            </div>
+          </section>
+        </section>
+      )}
+
+      {/* 3️⃣ TAB CONTENT: ANALYSIS */}
+      {activeTab === 'Analysis' && (
+        <section className="max-w-6xl mx-auto px-6 py-12">
+          <div className="mb-8 border-b border-[#e2e2e2] pb-4">
+            <h2 className="text-2xl font-extrabold tracking-tight text-[#1a1c1c]">Cutoff Shift Volatility Charts</h2>
+            <p className="text-xs text-[#5f5e5e] mt-1">Simulated statistical variance indicator for high priority streams.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white border border-[#e2e2e2] p-5 rounded-xl shadow-xs">
+              <h4 className="font-bold text-sm mb-4">IIT Bombay — Computer Science Trends</h4>
+              <div className="h-16 bg-[#f9f9f9] border-b border-[#e2e2e2] mb-3 flex items-end gap-2 p-1">
+                <div className="bg-[#5f5e5e] h-[40%] w-full rounded-t"></div>
+                <div className="bg-[#5f5e5e] h-[60%] w-full rounded-t"></div>
+                <div className="bg-[#ffd700] h-[85%] w-full rounded-t"></div>
+              </div>
+              <div className="flex justify-between text-xs font-mono"><span>2026 Target Cutoff: 68</span><span className="text-red-600 font-bold">↗ +12.4%</span></div>
+            </div>
+            <div className="bg-white border border-[#e2e2e2] p-5 rounded-xl shadow-xs">
+              <h4 className="font-bold text-sm mb-4">IIT Delhi — Data Science Shift Matrix</h4>
+              <div className="h-16 bg-[#f9f9f9] border-b border-[#e2e2e2] mb-3 flex items-end gap-2 p-1">
+                <div className="bg-[#5f5e5e] h-[30%] w-full rounded-t"></div>
+                <div className="bg-[#5f5e5e] h-[55%] w-full rounded-t"></div>
+                <div className="bg-[#ffd700] h-[92%] w-full rounded-t"></div>
+              </div>
+              <div className="flex justify-between text-xs font-mono"><span>2026 Target Cutoff: 115</span><span className="text-red-600 font-bold">↗ +21.8%</span></div>
             </div>
           </div>
         </section>
       )}
 
-      {/* 3️⃣ TAB: DEADLINES */}
+      {/* 4️⃣ TAB CONTENT: DEADLINES */}
       {activeTab === 'Deadlines' && (
-        <section className="max-w-4xl mx-auto px-6 py-16">
-          <h2 className="text-2xl font-black mb-6">JoSAA 2026 Critical Schedule Timeline</h2>
-          <div className="space-y-4 border-l-2 border-[#131b2e] pl-6 ml-2">
-            <div className="relative mb-6">
-              <div className="absolute -left-[31px] top-1.5 bg-[#131b2e] h-3 w-3 rounded-full"></div>
-              <span className="text-xs font-mono text-amber-600 font-bold">JUNE 10, 2026</span>
-              <h4 className="font-bold text-base text-[#0b1c30]">JEE Advanced Results Announcement</h4>
-              <p className="text-xs text-[#45464d]">Official cutoffs and rank lists published by organizing IIT.</p>
+        <section className="max-w-3xl mx-auto px-6 py-12">
+          <h2 className="text-2xl font-black mb-6 tracking-tight">JoSAA Counselling Event Target Sequence</h2>
+          <div className="space-y-6 border-l-2 border-[#705d00] pl-6 ml-2 text-sm">
+            <div>
+              <span className="text-xs font-mono text-amber-700 font-bold block">JUNE 10, 2026</span>
+              <h4 className="font-bold text-[#1a1c1c] mt-0.5">JEE Advanced Rankings Ledger Audit</h4>
+              <p className="text-xs text-[#5f5e5e] mt-0.5">Official cutoffs and score parameters verified by apex authority.</p>
             </div>
-            <div className="relative mb-6">
-              <div className="absolute -left-[31px] top-1.5 bg-[#131b2e] h-3 w-3 rounded-full"></div>
-              <span className="text-xs font-mono text-amber-600 font-bold">JUNE 15, 2026</span>
-              <h4 className="font-bold text-base text-[#0b1c30]">Online Registration & Choice Filling Begins</h4>
-              <p className="text-xs text-[#45464d]">Candidates can start entering preferences on official JoSAA portal.</p>
+            <div>
+              <span className="text-xs font-mono text-amber-700 font-bold block">JUNE 15, 2026</span>
+              <h4 className="font-bold text-[#1a1c1c] mt-0.5">Preference Filling Interface Ignition</h4>
+              <p className="text-xs text-[#5f5e5e] mt-0.5">Students authorized to configure preference list metrics.</p>
             </div>
-            <div className="relative">
-              <div className="absolute -left-[31px] top-1.5 bg-red-500 h-3 w-3 rounded-full animate-pulse"></div>
-              <span className="text-xs font-mono text-red-600 font-bold">JUNE 25, 2026 (CRITICAL)</span>
-              <h4 className="font-bold text-base text-red-600">Choice Filling System Auto-Locking</h4>
-              <p className="text-xs text-[#45464d]">Final timestamp to organize and save choices before allocation algorithms trigger.</p>
+            <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+              <span className="text-xs font-mono text-red-600 font-bold block">JUNE 25, 2026 (SYSTEM TERMINATION)</span>
+              <h4 className="font-bold text-red-700 mt-0.5">Choice Sequence Architecture Auto-Lock</h4>
+              <p className="text-xs text-[#5f5e5e] mt-0.5">Final structural checkpoint time constraint. Changes freeze at midnight.</p>
             </div>
           </div>
         </section>
       )}
 
-      {/* 4️⃣ TAB: SEAT MATRIX */}
+      {/* 5️⃣ TAB CONTENT: SEAT MATRIX */}
       {activeTab === 'Seat Matrix' && (
-        <section className="max-w-5xl mx-auto px-6 py-16">
-          <h2 className="text-2xl font-black mb-2">Institutional Capacity Seat Matrix</h2>
-          <p className="text-xs text-[#45464d] mb-6 font-mono">Total Verified Allocation Points: 52,148 Seats Across Nation</p>
-          <div className="border border-[#c6c6cd] rounded-[4px] overflow-hidden bg-white text-xs font-mono shadow-sm">
-            <div className="bg-[#131b2e] text-white p-3 grid grid-cols-4 font-bold uppercase tracking-wider text-[10px]">
-              <span>Institute Name</span><span>Program / Branch</span><span>Category Break</span><span>Seats Count</span>
+        <section className="max-w-4xl mx-auto px-6 py-12">
+          <h2 className="text-2xl font-extrabold mb-4 tracking-tight">Seat Matrix Allocation Ledger</h2>
+          <div className="border border-[#e2e2e2] rounded-xl overflow-hidden bg-white text-xs font-mono shadow-sm">
+            <div className="bg-[#2f3131] text-white p-3.5 grid grid-cols-4 font-bold uppercase tracking-wider text-[10px]">
+              <span>Institute Node</span><span>Specialization Branch</span><span>Quota ID</span><span>Seat Cap</span>
             </div>
-            <div className="p-3 grid grid-cols-4 border-b border-zinc-100"><span>IIT Bombay</span><span>Computer Science</span><span>OPEN (Gender-Neutral)</span><span className="font-bold">124</span></div>
-            <div className="p-3 grid grid-cols-4 border-b border-zinc-100"><span>IIT Delhi</span><span>Data Science & AI</span><span>OPEN (Gender-Neutral)</span><span className="font-bold">40</span></div>
-            <div className="p-3 grid grid-cols-4 border-b border-zinc-100"><span>NIT Agartala</span><span>Electronics & Comm. Engineering</span><span>OS - OPEN</span><span className="font-bold">92</span></div>
-            <div className="p-3 grid grid-cols-4"><span>NIT Trichy</span><span>Computer Science</span><span>OS - OBC-NCL</span><span className="font-bold">38</span></div>
+            <div className="p-3.5 grid grid-cols-4 border-b border-zinc-100"><span>IIT Bombay</span><span>Computer Science Engineering</span><span>OPEN (Neutral)</span><span className="font-bold">124</span></div>
+            <div className="p-3.5 grid grid-cols-4 border-b border-zinc-100"><span>IIT Delhi</span><span>Electrical Engineering</span><span>OBC-NCL</span><span className="font-bold">40</span></div>
+            <div className="p-3.5 grid grid-cols-4"><span>NIT Agartala</span><span>Electronics & Comm. Engineering</span><span>OS - OPEN</span><span className="font-bold">92</span></div>
           </div>
         </section>
       )}
 
-      {/* 5️⃣ TAB: CHOICE FILLING */}
-      {activeTab === 'Choice Filling' && (
-        <section className="max-w-3xl mx-auto px-6 py-16 text-center space-y-6">
-          <div className="bg-[#131b2e] text-white p-8 rounded-[8px] border border-black text-left">
-            <span className="text-[10px] font-mono text-amber-500 font-bold block mb-1">ALGORITHMIC HELPER</span>
-            <h3 className="text-xl font-bold mb-2">Choice Optimizer Preference Sequence</h3>
-            <p className="text-xs text-slate-300 leading-relaxed mb-6">Apne upar generate kiye gaye results me se best preference sequence set karo. Aur direct sequence draft export karke use counseling panel par fill karo.</p>
-            <div className="space-y-2 font-mono text-xs text-slate-200">
-              <div className="p-3 bg-[#0d1c2f] border border-slate-700 rounded-[4px]">Choice #1: IIT Bombay — Computer Science (AIR Cutoff: 68)</div>
-              <div className="p-3 bg-[#0d1c2f] border border-slate-700 rounded-[4px]">Choice #2: IIT Delhi — Data Science & Artificial Intelligence (AIR Cutoff: 115)</div>
-              <div className="p-3 bg-[#0d1c2f] border border-slate-700 rounded-[4px]">Choice #3: NIT Trichy — Computer Science (AIR Cutoff: 1482)</div>
-            </div>
-            <button className="mt-6 bg-[#fea619] text-black font-bold text-xs px-4 py-2.5 rounded-[4px] font-mono tracking-wider hover:bg-amber-500 transition-all flex items-center gap-2">
-              <Download size={14} /> EXPORT PREFERENCE SPREADSHEET
-            </button>
-          </div>
-        </section>
-      )}
-
-      {/* 📊 THE RANK MATRIX ADVANTAGE (Dark Stats Section) */}
-      <section className="bg-[#131b2e] text-white py-16 px-6 border-t border-[#000000]">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+      {/* 📋 SHARED PLATFORM ARCHITECTURAL FOOTER */}
+      <footer className="bg-[#e8e8e8] border-t border-[#e2e2e2] mt-24 pt-12 pb-8 text-xs text-[#4d4732] px-6">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <span className="text-[10px] font-mono font-bold text-[#7c839b] uppercase tracking-wider block mb-2">🛡️ PROPRIETARY DATA PROTOCOL</span>
-            <h3 className="text-3xl font-bold tracking-tight mb-4">The Rank Matrix Advantage</h3>
-            <p className="text-[#7c839b] text-sm leading-relaxed mb-6">
-              CollegeAchiver Portal ensures every prediction is backed by verifiable historical data from JoSAA and CSAB rounds processed with high technical precision.
-            </p>
-            <div className="space-y-3 font-mono text-xs text-[#7c839b]">
-              <div className="flex justify-between border-b border-[#7c839b]/20 pb-2"><span>PREDICTION RELIABILITY</span> <span className="text-[#fea619] font-bold">98.42%</span></div>
-              <div className="flex justify-between border-b border-[#7c839b]/20 pb-2"><span>VERIFIED DATA POINTS</span> <span className="text-[#fea619] font-bold">185,420+</span></div>
+            <div className="text-base font-bold text-[#705d00] mb-3">CollegeAchiver</div>
+            <p className="text-[11px] leading-relaxed">Helping students navigate their academic future with data integrity, strategic momentum, and structural clarity.</p>
+          </div>
+          <div>
+            <h4 className="font-bold text-black uppercase mb-3 tracking-wider text-[11px]">Resources</h4>
+            <div className="flex flex-col gap-2 font-medium">
+              <span className="cursor-pointer hover:underline">Methodology Docs</span>
+              <span className="cursor-pointer hover:underline">Help Center Support</span>
             </div>
           </div>
-          
-          <div className="bg-[#0d1c2f] border border-[#76859b]/30 p-8 rounded-[8px] space-y-6">
-            <h4 className="font-bold text-sm tracking-wide text-white font-mono uppercase">Unrivaled Infrastructure</h4>
-            <p className="text-xs text-[#7c839b] leading-relaxed">As the leading platform for rank analysis, CollegeAchiver ensures technical alignment with actual seating results trends.</p>
-            <div className="grid grid-cols-2 gap-4 pt-4">
-              <div className="border-l-2 border-[#fea619] pl-3">
-                <div className="text-2xl font-black tracking-tight text-white">500k+</div>
-                <div className="text-[10px] font-mono text-[#7c839b]">STUDENT USERS</div>
-              </div>
-              <div className="border-l-2 border-[#fea619] pl-3">
-                <div className="text-2xl font-black tracking-tight text-white">12Y</div>
-                <div className="text-[10px] font-mono text-[#7c839b]">DATA HISTORY</div>
-              </div>
+          <div>
+            <h4 className="font-bold text-black uppercase mb-3 tracking-wider text-[11px]">Quick Legal</h4>
+            <div className="flex flex-col gap-2 font-medium">
+              <span className="cursor-pointer hover:underline">Privacy Policy Protocol</span>
+              <span className="cursor-pointer hover:underline">Terms of Service Node</span>
+            </div>
+          </div>
+          <div>
+            <h4 className="font-bold text-black uppercase mb-3 tracking-wider text-[11px]">Channels</h4>
+            <div className="flex gap-4 pt-1 text-[#5f5e5e]">
+              <Mail size={18} className="cursor-pointer hover:text-[#705d00]" />
+              <Share2 size={18} className="cursor-pointer hover:text-[#705d00]" />
+              <Globe size={18} className="cursor-pointer hover:text-[#705d00]" />
             </div>
           </div>
         </div>
-      </section>
+        <div className="max-w-6xl mx-auto border-t border-[#d0c6ab] mt-8 pt-4 text-center text-[11px]">
+          <p>© 2026 CollegeAchiver Systems. All data trends compiled natively from official JoSAA releases.</p>
+        </div>
+      </footer>
 
     </main>
   );
