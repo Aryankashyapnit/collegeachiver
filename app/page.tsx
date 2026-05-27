@@ -6,7 +6,7 @@ import { createClient } from '@supabase/supabase-js';
 
 // 🔥 DIRECT SUPABASE PRODUCTION CONNECTION PIPELINE
 const supabaseUrl = "https://ygyosdmzubwswnhuhere.supabase.co";
-const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlneW9zZG16dWJ3c3duaHVoZXJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3ODAzMDUsImV4cCI6MjA5NTM1NjMwNX0.1jSqaJKatV4lx9JCEi_dAHP6qJFBrPQl8XJ7bqDJeVY"; // Apni key check kar lena bhai
+const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlneW9zZG16dWJ3c3duaHVoZXJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3ODAzMDUsImV4cCI6MjA5NTM1NjMwNX0.1jSqaJKatV4lx9JCEi_dAHP6qJFBrPQl8XJ7bqDJeVY"; 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 interface ExtendedCollegeData extends CollegeData {
@@ -30,11 +30,11 @@ interface SeatMatrixRecord {
 }
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState('Home'); 
+  const [activeTab, setActiveTab] = useState('Home');
   const [rank, setRank] = useState('');
   const [category, setCategory] = useState('OPEN');
   const [gender, setGender] = useState('Gender-Neutral');
-  const [homeState, setHomeState] = useState('OS'); 
+  const [homeState, setHomeState] = useState('OS');
   const [hasSearched, setHasSearched] = useState(false);
 
   // 🏛️ DATA MATRICES STATE LAYERS
@@ -54,19 +54,19 @@ export default function Home() {
   ]);
 
   // 💰 AUTOMATED PAYMENT GATEWAY STATE SETTINGS
-  const [myUpiId, setMyUpiId] = useState("yourbankupi@oksbi"); // 👈 Yahan apni real UPI ID change kar lena bhai
+  const [myUpiId, setMyUpiId] = useState("9296276633@axl");
   const [myMerchantName, setMyMerchantName] = useState("CollegeAchiever");
   const [premiumGroupUrl, setPremiumGroupUrl] = useState('https://chat.whatsapp.com/secret-counselling-group-link');
-  const [premiumPriceToken, setPremiumPriceToken] = useState('99'); 
+  const [premiumPriceToken, setPremiumPriceToken] = useState('99');
   const [showQrCheckout, setShowQrCheckout] = useState(false);
-  
+
   // 🔒 PAYMENT VERIFICATION BUFFERS
   const [utrInput, setUtrInput] = useState('');
   const [payerEmail, setPayerEmail] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
 
   // Analytics Systems Meters
-  const [totalVisits, setTotalVisits] = useState(1248); 
+  const [totalVisits, setTotalVisits] = useState(1248);
   const [studentSessions, setStudentSessions] = useState<StudentLog[]>([
     { email: 'student.test@achiver.in', tokenType: 'OTP_EMAIL_OK', queriesCount: 12, status: 'ONLINE', timestamp: '12:15 PM' },
     { email: 'sanya.patel@delhi.edu', tokenType: 'OAUTH_GOOGLE_OK', queriesCount: 8, status: 'OFFLINE', timestamp: '11:20 AM' },
@@ -75,7 +75,7 @@ export default function Home() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedType, setSelectedType] = useState('IIT'); 
+  const [selectedType, setSelectedType] = useState('IIT');
 
   // Chatbot framework logic
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -86,7 +86,7 @@ export default function Home() {
 
   // 🔐 CONTROLS AUTHS SECURITY DIALOG MODALS
   const [isSignInOpen, setIsSignInOpen] = useState(false);
-  const [isSignUpMode, setIsSignUpMode] = useState(false); 
+  const [isSignUpMode, setIsSignUpMode] = useState(false);
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
 
@@ -102,7 +102,7 @@ export default function Home() {
   const [newGend, setNewGend] = useState('Gender-Neutral');
   const [newOpenRank, setNewOpenRank] = useState('');
   const [newCloseRank, setNewCloseRank] = useState('');
-  const [newFee, setNewFee] = useState('2,25,000'); 
+  const [newFee, setNewFee] = useState('2,25,000');
 
   const [newDeadDate, setNewDeadDate] = useState('');
   const [newDeadTitle, setNewDeadTitle] = useState('');
@@ -116,9 +116,26 @@ export default function Home() {
 
   const predictorRef = useRef<HTMLDivElement>(null);
 
+  // ==========================================
+  // ✅ DATA FETCH ENGINE
+  // ==========================================
+  const fetchJosaaData = async () => {
+    const { data, error } = await supabase
+      .from('josaadata_record')
+      .select('*');
+
+    if (error) {
+      console.error("Supabase Error:", error.message);
+    } else if (data) {
+      setDynamicJosaaRecords(data);
+    }
+  };
+
   useEffect(() => {
+    fetchJosaaData();
     setTotalVisits(prev => prev + 1);
   }, []);
+  // ==========================================
 
   const handlePredict = (e: React.FormEvent) => {
     e.preventDefault();
@@ -133,8 +150,8 @@ export default function Home() {
     }).map(col => {
       let chance: 'High' | 'Medium' | 'Low' = 'Low';
       const safetyMargin = col.closing - userRank;
-      if (safetyMargin > 8000) chance = 'High';       
-      else if (safetyMargin >= 0) chance = 'Medium';   
+      if (safetyMargin > 8000) chance = 'High';
+      else if (safetyMargin >= 0) chance = 'Medium';
       return { ...col, chance };
     });
 
@@ -169,7 +186,7 @@ export default function Home() {
     };
 
     const { error } = await supabase
-      .from('premium_payments') 
+      .from('premium_payments')
       .insert([paymentLog]);
 
     setTimeout(() => {
@@ -203,7 +220,7 @@ export default function Home() {
   const handleAddCutoffRecord = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newInst || !newProg || !newOpenRank || !newCloseRank) return alert("Form fill kijiye!");
-    
+
     const formData = {
       institute: newInst,
       program: newProg,
@@ -224,12 +241,14 @@ export default function Home() {
     if (error) {
       alert("Database Error: " + error.message);
     } else {
-      const newLocalRow = { id: dynamicJosaaRecords.length + 1, ...formData };
-      setDynamicJosaaRecords([newLocalRow, ...dynamicJosaaRecords]);
-      alert("🎉 Success! Record directly appended to Supabase production table.");
+      alert("🎉 Success! Record added.");
+      
+      // ✅ Fetch the new data from database immediately
+      fetchJosaaData();
+      
       setNewInst(''); setNewProg(''); setNewOpenRank(''); setNewCloseRank('');
     }
-  };
+  }; // <-- ✅ FIXED SYNTAX ERROR HERE
 
   const handleAddDeadlineEvent = (e: React.FormEvent) => {
     e.preventDefault();
@@ -259,7 +278,7 @@ export default function Home() {
     const start = (currentPage - 1) * itemsPerPage; return filteredCutoffData.slice(start, start + itemsPerPage);
   }, [filteredCutoffData, currentPage]);
 
-  // 🛠️ SIMPLE BULLETPROOF UPI PAYLOAD LINK 
+  // 🛠️ SIMPLE BULLETPROOF UPI PAYLOAD LINK
   const upiStringUrl = useMemo(() => {
     return `upi://pay?pa=${myUpiId}&pn=${myMerchantName}&am=${premiumPriceToken}&cu=INR`;
   }, [myUpiId, myMerchantName, premiumPriceToken]);
@@ -288,9 +307,9 @@ export default function Home() {
                 { id: 'Deadlines', label: 'Key Deadlines' },
                 { id: 'Seat Matrix', label: 'Seat Matrix' }
               ].map((item) => (
-                <button 
-                  key={item.id} 
-                  onClick={() => { setActiveTab(item.id); setCurrentPage(1); }} 
+                <button
+                  key={item.id}
+                  onClick={() => { setActiveTab(item.id); setCurrentPage(1); }}
                   className={`px-3 py-2 transition-all rounded-lg text-[13px] font-medium ${activeTab === item.id ? 'text-[#111625] bg-[#fcd71a]/10 border border-[#f5d020]/30 font-bold shadow-xs' : 'text-[#616b7c] hover:text-[#111625] hover:bg-[#f4f7fa]'}`}
                 >
                   {item.label}
@@ -447,7 +466,14 @@ export default function Home() {
               </div>
               <div>
                 <label className="block mb-2 font-bold tracking-wide uppercase text-[10px] text-[#8492a6]">Reservation Category</label>
-                <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-4 py-3.5 bg-[#f8fafc] border border-[#e2e8f0] focus:border-[#fcd71a] focus:bg-white rounded-xl font-bold text-black outline-none"><option>OPEN</option><option>OBC-NCL</option><option>SC</option><option>ST</option></select>
+                <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-4 py-3.5 bg-[#f8fafc] border border-[#e2e8f0] focus:border-[#fcd71a] focus:bg-white rounded-xl font-bold text-black outline-none">
+                  <option>OPEN</option>
+                  <option>OBC-NCL</option>
+                  <option>SC</option>
+                  <option>ST</option>
+                  <option>EWS</option>
+                  <option>PwD</option>
+                </select>
               </div>
               <div>
                 <label className="block mb-2 font-bold tracking-wide uppercase text-[10px] text-[#8492a6]">Gender Pool</label>
@@ -538,7 +564,6 @@ export default function Home() {
             ) : (
               <div className="space-y-5 animate-scaleUp text-center">
                 <div className="flex flex-col items-center gap-2.5 font-mono">
-                  {/* Dynamic API link compilation for the formatted QR generator */}
                   <img 
                     src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiStringUrl)}`}
                     alt="Automated UPI QR Code" 
