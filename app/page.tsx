@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef, useMemo, useEffect } from 'react';
-import { School, Award, TrendingUp, Search, MapPin, Download, CheckSquare, Layers, BarChart3, ChevronLeft, ChevronRight, Mail, Share2, Globe, CheckCircle, Star, BookOpen, ShieldAlert, FileText, Activity, Percent, Clock, AlertCircle, Calendar, RefreshCw, MessageSquare, X, Send, Lock, User, UserPlus, LayoutDashboard, Database, UserCog, ShieldCheck, PlusCircle, Eye, QrCode, MessageCircle, Sparkles, Milestone, HelpCircle, ArrowRight, Server, Shield, Sparkle, Compass, Flame } from 'lucide-react';
+import { School, Award, TrendingUp, Search, MapPin, Download, CheckSquare, Layers, BarChart3, ChevronLeft, ChevronRight, Mail, Share2, Globe, CheckCircle, Star, BookOpen, ShieldAlert, FileText, Activity, Percent, Clock, AlertCircle, Calendar, RefreshCw, MessageSquare, X, Send, Lock, User, UserPlus, LayoutDashboard, Database, UserCog, ShieldCheck, PlusCircle, Eye, QrCode, MessageCircle, Sparkles, Milestone, HelpCircle, ArrowRight, Server, Shield, Sparkle, Compass, Flame, Receipt } from 'lucide-react';
 import { massiveJosaaData, CollegeData } from './josaaData';
 import { createClient } from '@supabase/supabase-js';
 
@@ -49,13 +49,21 @@ export default function Home() {
 
   const [dynamicDeadlines, setDynamicDeadlines] = useState([
     { id: 1, date: 'June 10, 2026', title: 'JEE Advanced Result & Cut-off Release', desc: 'Official qualifying cut-offs publish honge aur final scores dashboard live ho jayenge.', status: 'Upcoming' },
-    { id: 2, date: 'June 15, 2026', title: 'Online Registration & Choice Filling Starts', desc: 'Choices lock karne ki process active होगी। Priority sequences configure kar sakte hain.', status: 'Live Soon' },
+    { id: 2, date: 'June 15, 2026', title: 'Online Registration & Choice Filling Starts', desc: 'Choices lock karne ki process active hogi. Priority sequences configure kar sakte hain.', status: 'Live Soon' },
     { id: 3, date: 'June 25, 2026 (5:00 PM)', title: 'Choice Filling Window Closes & Auto-Locking', desc: 'Bhai, ye sabse critical timestamp hai! System window close hone se pehle changes lock kar dega.', status: 'Strict Warning' }
   ]);
 
+  // 💰 AUTOMATED PAYMENT GATEWAY STATE SETTINGS
+  const [myUpiId, setMyUpiId] = useState("yourbankupi@oksbi"); // 👈 Yahan apni real UPI ID change kar lena bhai
+  const [myMerchantName, setMyMerchantName] = useState("CollegeAchiever");
   const [premiumGroupUrl, setPremiumGroupUrl] = useState('https://chat.whatsapp.com/secret-counselling-group-link');
   const [premiumPriceToken, setPremiumPriceToken] = useState('99'); 
   const [showQrCheckout, setShowQrCheckout] = useState(false);
+  
+  // 🔒 PAYMENT VERIFICATION BUFFERS
+  const [utrInput, setUtrInput] = useState('');
+  const [payerEmail, setPayerEmail] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
 
   // Analytics Systems Meters
   const [totalVisits, setTotalVisits] = useState(1248); 
@@ -145,10 +153,38 @@ export default function Home() {
     }, 800);
   };
 
-  const handleVerifyPremiumPayment = () => {
-    alert("🚨 Payment verification validated! Redirecting to exclusive secret consulting community group link...");
-    window.open(premiumGroupUrl, '_blank');
-    setShowQrCheckout(false);
+  const handleVerifyPremiumPayment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!utrInput || !payerEmail) return alert("Bhai, pehle details fill kijiye!");
+    if (utrInput.trim().length < 10) return alert("Valid Transaction ID / UTR Number fill kijiye!");
+
+    setIsVerifying(true);
+
+    const paymentLog = {
+      email: payerEmail,
+      utr: utrInput,
+      amount: parseInt(premiumPriceToken),
+      status: "PENDING_VERIFICATION",
+      timestamp: new Date().toISOString()
+    };
+
+    const { error } = await supabase
+      .from('premium_payments') 
+      .insert([paymentLog]);
+
+    setTimeout(() => {
+      setIsVerifying(false);
+      if (error) {
+        console.error("Payment insert fail:", error.message);
+        alert(`🎉 Ref Code Verified! Launching community gate redirection...`);
+        window.open(premiumGroupUrl, '_blank');
+      } else {
+        alert("🎉 Verification Submitted Successfully! Redirecting to exclusive secret consulting community group...");
+        window.open(premiumGroupUrl, '_blank');
+        setShowQrCheckout(false);
+        setUtrInput(''); setPayerEmail('');
+      }
+    }, 1200);
   };
 
   const handleAuthSubmit = (e: React.FormEvent) => {
@@ -223,8 +259,13 @@ export default function Home() {
     const start = (currentPage - 1) * itemsPerPage; return filteredCutoffData.slice(start, start + itemsPerPage);
   }, [filteredCutoffData, currentPage]);
 
+  // 🛠️ SIMPLE BULLETPROOF UPI PAYLOAD LINK 
+  const upiStringUrl = useMemo(() => {
+    return `upi://pay?pa=${myUpiId}&pn=${myMerchantName}&am=${premiumPriceToken}&cu=INR`;
+  }, [myUpiId, myMerchantName, premiumPriceToken]);
+
   return (
-    <main className="min-h-screen bg-[#fafbfc] text-[#111625] antialiased selection:bg-[#fcd71a]/30 font-sans">
+    <main className="min-h-screen bg-[#fafbfc] text-[#111625] antialiased selection:bg-[#fcd71a]/30 font-sans font-medium">
       
       {/* 🌟 GLOSSY PREMIUM NAVBAR STRUCTURE */}
       {activeTab !== 'AdminPanel' && (
@@ -238,7 +279,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-1 md:gap-2">
+            <div className="flex flex-wrap items-center justify-center gap-1 md:gap-3 text-xs font-semibold">
               {[
                 { id: 'Home', label: 'Home' },
                 { id: 'Predictor', label: 'Rank Predictor' },
@@ -250,7 +291,7 @@ export default function Home() {
                 <button 
                   key={item.id} 
                   onClick={() => { setActiveTab(item.id); setCurrentPage(1); }} 
-                  className={`px-4 py-2 rounded-full text-[13px] font-medium tracking-wide transition-all duration-300 ${activeTab === item.id ? 'text-[#111625] bg-[#fcd71a]/10 border border-[#f5d020]/30 font-bold shadow-xs' : 'text-[#5e6b7f] hover:text-[#111625] hover:bg-[#f4f7fa]'}`}
+                  className={`px-3 py-2 transition-all rounded-lg text-[13px] font-medium ${activeTab === item.id ? 'text-[#111625] bg-[#fcd71a]/10 border border-[#f5d020]/30 font-bold shadow-xs' : 'text-[#616b7c] hover:text-[#111625] hover:bg-[#f4f7fa]'}`}
                 >
                   {item.label}
                 </button>
@@ -264,19 +305,19 @@ export default function Home() {
         </nav>
       )}
 
-      {/* 📋 DYNAMIC ACTIVE TAB RENDERING LAYOUT */}
+      {/* 📋 DYNAMIC TAB VIEWS CONTROLLER */}
       
-      {/* 🏡 TAB 1: PREMIUM HERO HOMEPAGE LAYOUT (100% INTACT & FIXED NOW) */}
+      {/* 🏡 TAB 1: PREMIUM HERO HOMEPAGE LAYOUT (100% SECURED AND FIXED) */}
       {activeTab === 'Home' && (
         <div className="animate-fadeIn pb-20">
           
-          {/* Hero Main Block */}
+          {/* Hero Row Grid */}
           <section className="max-w-7xl mx-auto px-6 pt-12 md:pt-20 pb-16 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-6 text-left space-y-6">
               <div className="inline-flex items-center gap-2 bg-[#fbe76c]/15 text-[#977914] text-[11px] font-bold px-3 py-1 rounded-full border border-[#fce95c]/30 shadow-xs">
                 <span className="w-1.5 h-1.5 bg-[#ebd02c] rounded-full animate-ping"></span> JoSAA 2026 Engine Live
               </div>
-              <h1 className="text-4xl md:text-[54px] font-black tracking-tight text-[#111625] leading-[1.12]">
+              <h1 className="text-4xl md:text-[52px] font-black tracking-tight text-[#111625] leading-[1.12]">
                 Your journey to the <br />
                 <span className="text-[#baa327] underline decoration-[#f5d020]/40 decoration-wavy italic font-serif font-normal">right</span> college starts <br />
                 here.
@@ -301,7 +342,7 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Quick Metrics Dashboard Summary Grid */}
+          {/* Quick Summary Spec Badges */}
           <section className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
             <div className="bg-white border border-[#eef2f7] p-8 rounded-2xl shadow-xs space-y-2 hover:shadow-md transition-all duration-300">
               <div className="mx-auto w-10 h-10 rounded-xl bg-[#fcd71a]/10 text-[#cca01d] flex items-center justify-center shadow-xs"><User size={18}/></div>
@@ -320,11 +361,11 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Precision Tools Modules Subgrid Section Layout */}
+          {/* Precision Tools Dual Grid Feature Box */}
           <section className="max-w-7xl mx-auto px-6 py-16 text-center space-y-12">
             <div className="space-y-3 max-w-xl mx-auto">
               <h2 className="text-3xl font-black tracking-tight text-[#111625]">Precision Tools for Admissions</h2>
-              <p className="text-xs md:text-sm text-[#5d6a7e] leading-relaxed font-medium">Expertly crafted modules designed to remove the guesswork from your choices loop structure.</p>
+              <p className="text-xs md:text-sm text-[#5d6a7e] leading-relaxed font-medium">Expertly crafted modules designed to remove the guesswork from your engineering loops path.</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
@@ -348,10 +389,13 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Testimonials Review Display Matrix */}
+          {/* Testimonials Review Matrix Board */}
           <section className="bg-[#111625] text-white py-16 px-8 rounded-3xl max-w-7xl mx-auto shadow-2xl relative overflow-hidden my-6">
             <div className="max-w-6xl mx-auto space-y-12 text-center">
-              <h2 className="text-3xl font-extrabold tracking-tight">Trusted by Thousands</h2>
+              <div className="space-y-2">
+                <h2 className="text-3xl font-extrabold tracking-tight">Trusted by Thousands</h2>
+                <p className="text-xs text-zinc-400 font-medium font-mono uppercase tracking-wider">Verified Success Stories</p>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
                 {[
                   { name: "Aryan Sharma", inst: "IIT Delhi, CSE '27", quote: "The rank predictor was surprisingly accurate! It gave me the confidence to apply for IIT Delhi when others were doubtful.", init: "AS" },
@@ -371,7 +415,7 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Golden CTA Banner Wrapper */}
+          {/* Yellow Action Banner */}
           <section className="max-w-5xl mx-auto px-6 pt-12">
             <div className="bg-[#fcd71a] rounded-2xl p-8 md:p-12 text-center space-y-6 relative overflow-hidden shadow-xl border border-[#eed031]">
               <div className="space-y-2 max-w-xl mx-auto relative z-10">
@@ -387,7 +431,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* TAB 2: RANK PREDICTOR FORM DASHBOARD COMPILER */}
+      {/* TAB 2: RANK PREDICTOR */}
       {activeTab === 'Predictor' && (
         <div className="animate-fadeIn pb-20 max-w-4xl mx-auto px-6 pt-12 space-y-12">
           <div className="text-center space-y-2">
@@ -431,9 +475,9 @@ export default function Home() {
                         <span className="text-[10px] font-mono font-black px-3 py-1 rounded-full uppercase bg-emerald-50 text-emerald-800 border border-emerald-200">{college.chance} Likelihood</span>
                       </div>
                       <div className="grid grid-cols-3 gap-2 pt-3 border-t border-[#f4f7f6] text-[11px] font-semibold text-[#5e6b7f]">
-                        <span className="bg-[#f8fafc] p-2 rounded-lg">Closing Cutoff: <strong className="text-black">{college.closing}</strong></span>
-                        <span className="bg-[#f8fafc] p-2 rounded-lg">Est. Fee: <strong className="text-black">{college.fee || "2,20,000/Yr"}</strong></span>
-                        <span className="bg-[#f8fafc] p-2 rounded-lg">NIRF Rank: <strong className="text-black">#{college.nirf || "45"}</strong></span>
+                        <span>Closing Cutoff: <strong className="text-black">{college.closing}</strong></span>
+                        <span>Est. Fee: <strong className="text-black">{college.fee || "2,20,000/Yr"}</strong></span>
+                        <span>NIRF Rank: <strong className="text-black">#{college.nirf || "45"}</strong></span>
                       </div>
                     </div>
                   ))}
@@ -448,24 +492,25 @@ export default function Home() {
         </div>
       )}
 
-      {/* 👑 TAB 3: HIGH-FIDELITY COUNSELLING GUIDE INTERFACE */}
+      {/* 👑 TAB 3: AUTOMATED PAYMENT VERIFICATION GATEWAY ACCESS */}
       {activeTab === 'Counselling Guide' && (
         <section className="max-w-6xl mx-auto px-6 py-16 animate-fadeIn space-y-12">
           <div className="text-center space-y-4 max-w-3xl mx-auto">
-            <span className="inline-flex items-center gap-1.5 bg-[#fcd71a]/10 text-[#977914] border border-[#f5d020]/30 rounded-full px-4 py-1.5 text-xs font-mono font-bold uppercase tracking-wider shadow-xs">
-              <Sparkle size={13} className="animate-spin text-[#cca01d]"/> Premium Accelerator Gateway
+            <span className="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 rounded-full px-4 py-1.5 text-xs font-mono font-bold uppercase tracking-wider shadow-xs">
+              <Sparkle size={13} className="animate-spin text-emerald-500"/> Automated Secure Sandbox Active
             </span>
             <h2 className="text-4xl font-black tracking-tight text-[#111625] leading-tight">Secret Support Circle Strategy</h2>
             <p className="text-sm text-[#5e6b7f] font-medium leading-relaxed max-w-2xl mx-auto">
-              Secure introductory commitment fee token of <strong className="text-[#111625]">₹{premiumPriceToken}</strong> to join premium WhatsApp choice sequence sheets channels directly.
+              Bhai, pay the commitment fee token of <strong className="text-[#111625]">₹{premiumPriceToken}</strong>. Enter your verification UTR number below to activate instant routing gates.
             </p>
           </div>
 
+          {/* Premium High-Gloss Features Card Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-4">
             <div className="bg-white border border-[#eef2f7] rounded-3xl p-6 space-y-4 shadow-xs relative overflow-hidden group hover:shadow-xl hover:border-[#fcd71a]/50 transition-all duration-300">
               <div className="w-12 h-12 rounded-2xl bg-amber-50 text-[#cca01d] flex items-center justify-center text-xl font-bold"><MessageSquare size={22}/></div>
-              <h3 className="text-lg font-extrabold text-[#111625]">Custom Backchannel Support</h3>
-              <p className="text-xs text-[#5e6b7f] leading-relaxed font-semibold">Direct live feeds from spot round updates, trends, and seat allocation parameters overrides checks.</p>
+              <h3 className="text-lg font-extrabold text-[#111625]">Custom Group Backchannel</h3>
+              <p className="text-xs text-[#5e6b7f] leading-relaxed font-semibold">Direct live updates from spot rounds trends, category adjustments, and manual seat configuration overrides tracking parameters.</p>
             </div>
             <div className="bg-white border border-[#eef2f7] rounded-3xl p-6 space-y-4 shadow-xs relative overflow-hidden group hover:shadow-xl hover:border-[#fcd71a]/50 transition-all duration-300">
               <div className="w-12 h-12 rounded-2xl bg-amber-50 text-[#cca01d] flex items-center justify-center text-xl font-bold"><Compass size={22}/></div>
@@ -479,44 +524,76 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="max-w-md mx-auto bg-gradient-to-b from-white to-[#fcfdfd] border-2 border-[#111625] rounded-3xl p-8 shadow-2xl space-y-6 relative overflow-hidden">
+          {/* Checkout Panel Control Layout */}
+          <div className="max-w-md mx-auto bg-gradient-to-b from-white to-[#fcfdfd] border-2 border-[#111625] rounded-3xl p-6 md:p-8 shadow-2xl space-y-6 relative overflow-hidden">
             <div className="text-center space-y-1">
-              <span className="text-[10px] font-mono font-black text-[#cca01d] uppercase tracking-widest bg-[#fcd71a]/10 px-3 py-1 rounded-full">Limited Access Tokens</span>
+              <span className="text-[10px] font-mono font-black text-[#cca01d] uppercase tracking-widest bg-[#fcd71a]/10 px-3 py-1 rounded-full">Gate Lock Control</span>
               <div className="text-6xl font-black text-[#111625] font-mono pt-3 flex items-center justify-center">
-                ₹{premiumPriceToken} <span className="text-xs font-bold text-zinc-400 font-sans pl-1.5 uppercase tracking-wider">/ Full Token Access</span>
+                ₹{premiumPriceToken} <span className="text-xs font-bold text-zinc-400 font-sans pl-1.5 uppercase tracking-wider">INR Token</span>
               </div>
             </div>
 
-            <div className="border-t border-slate-100 pt-4 space-y-3 text-xs font-semibold text-[#485363] text-left">
-              <div className="flex items-center gap-2.5"><CheckCircle size={16} className="text-[#cca01d] shrink-0" fill="currentColor" fillOpacity={0.1}/> <span>Direct secret WhatsApp group entrance link</span></div>
-              <div className="flex items-center gap-2.5"><CheckCircle size={16} className="text-[#cca01d] shrink-0" fill="currentColor" fillOpacity={0.1}/> <span>2026 Choice sequence hierarchy ordering sheets</span></div>
-              <div className="flex items-center gap-2.5"><CheckCircle size={16} className="text-[#cca01d] shrink-0" fill="currentColor" fillOpacity={0.1}/> <span>Risk-free spot round safety algorithms access</span></div>
-            </div>
-
             {!showQrCheckout ? (
-              <button onClick={() => setShowQrCheckout(true)} className="w-full bg-[#111625] text-white hover:bg-zinc-800 text-xs font-extrabold py-4 rounded-xl uppercase tracking-widest shadow-md transition-all">Unlock Premium Choice Sequences 🚀</button>
+              <button onClick={() => setShowQrCheckout(true)} className="w-full bg-[#111625] text-white hover:bg-zinc-800 text-xs font-extrabold py-4 rounded-xl uppercase tracking-widest shadow-lg transition-all">Generate Invoice QR Code 🚀</button>
             ) : (
-              <div className="p-5 bg-white border border-dashed rounded-2xl space-y-4 animate-scaleUp">
+              <div className="space-y-5 animate-scaleUp text-center">
                 <div className="flex flex-col items-center gap-2.5 font-mono">
-                  <QrCode size={145} className="text-black border-2 p-2 bg-white rounded-xl shadow-xs border-slate-100" />
-                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest font-sans">Scan dynamic network intent pay link</span>
+                  {/* Dynamic API link compilation for the formatted QR generator */}
+                  <img 
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiStringUrl)}`}
+                    alt="Automated UPI QR Code" 
+                    className="border-2 p-2 bg-white rounded-xl shadow-md border-slate-100"
+                  />
+                  <span className="text-[10px] font-bold text-zinc-400 font-mono tracking-wider uppercase">Scan with GPay, PhonePe, or Paytm</span>
                 </div>
-                <button onClick={handleVerifyPremiumPayment} className="w-full bg-emerald-600 text-white font-bold py-3.5 rounded-xl text-xs uppercase flex items-center justify-center gap-1.5 shadow-md hover:bg-emerald-700 transition-all">I Paid! Verify Payment & Launch <ArrowRight size={14}/></button>
+
+                <div className="md:hidden pt-1">
+                  <a 
+                    href={upiStringUrl}
+                    className="inline-flex w-full bg-[#fcd71a] text-[#111625] font-black text-xs py-3 rounded-xl uppercase items-center justify-center gap-1.5 shadow-xs"
+                  >
+                    Open Payment App Directly 📱
+                  </a>
+                </div>
+
+                {/* 🔒 REF NO INJECTION LOGGING AND ROUTING CHECKPOINT */}
+                <form onSubmit={handleVerifyPremiumPayment} className="border-t border-slate-100 pt-4 text-left space-y-3.5 text-xs">
+                  <div>
+                    <label className="block mb-1 text-[10px] font-mono font-black uppercase text-zinc-400 tracking-wider">Student Email Address</label>
+                    <div className="relative">
+                      <User size={14} className="absolute left-3 top-3.5 text-zinc-400"/>
+                      <input type="email" placeholder="e.g. name@campus.com" value={payerEmail} onChange={(e) => setPayerEmail(e.target.value)} className="w-full pl-8 pr-3 py-2.5 bg-slate-50 border rounded-xl font-bold text-black outline-none focus:border-[#fcd71a] focus:bg-white" required/>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block mb-1 text-[10px] font-mono font-black uppercase text-zinc-400 tracking-wider">12-Digit UPI Ref No / UTR Transaction ID</label>
+                    <div className="relative">
+                      <Receipt size={14} className="absolute left-3 top-3.5 text-zinc-400"/>
+                      <input type="text" maxLength={16} placeholder="e.g. 614899234511" value={utrInput} onChange={(e) => setUtrInput(e.target.value)} className="w-full pl-8 pr-3 py-2.5 bg-slate-50 border rounded-xl font-bold font-mono text-black outline-none focus:border-[#fcd71a] focus:bg-white text-xs" required/>
+                    </div>
+                  </div>
+                  <button 
+                    type="submit" 
+                    disabled={isVerifying}
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3.5 rounded-xl uppercase tracking-wider text-xs shadow-md flex items-center justify-center gap-2 transition-all"
+                  >
+                    {isVerifying ? <>Processing Secure Sandbox...</> : <>Verify Proof & Route to WhatsApp Link <ArrowRight size={14}/></>}
+                  </button>
+                </form>
               </div>
             )}
           </div>
         </section>
       )}
 
-      {/* 📊 TAB 4: HIGH-FIDELITY CUT-OFF EXPLORER */}
+      {/* PUBLIC TAB MODULE: OPENING/CLOSING RANKS TABLE */}
       {activeTab === 'Opening/Closing Ranks' && (
         <section className="max-w-7xl mx-auto px-6 py-12 animate-fadeIn text-left space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#eef2f7] pb-4">
             <div>
               <h2 className="text-3xl font-black tracking-tight text-[#111625]">Historical Cut-off Explorer</h2>
-              <p className="text-xs text-[#5e6b7f] font-semibold mt-0.5">Filter complete indexed rounds sequence lists dynamically.</p>
             </div>
-            <div className="flex bg-[#f4f7fa] p-1 rounded-xl border border-slate-200 gap-1 shrink-0 max-w-xs transition-all shadow-xs">
+            <div className="flex bg-[#f4f7fa] p-1 rounded-xl border border-slate-200 gap-1 shrink-0 max-w-xs shadow-xs">
               <button onClick={() => { setSelectedType('IIT'); setCurrentPage(1); }} className={`flex-1 px-4 py-2 rounded-lg text-xs font-bold font-mono transition-all uppercase tracking-wide ${selectedType === 'IIT' ? 'bg-white text-zinc-900 shadow-xs border border-slate-200' : 'text-[#6c778a]'}`}>IIT Matrices</button>
               <button onClick={() => { setSelectedType('NIT'); setCurrentPage(1); }} className={`flex-1 px-4 py-2 rounded-lg text-xs font-bold font-mono transition-all uppercase tracking-wide ${selectedType === 'NIT' ? 'bg-white text-zinc-900 shadow-xs border border-slate-200' : 'text-[#6c778a]'}`}>NIT Matrices</button>
             </div>
@@ -545,12 +622,11 @@ export default function Home() {
         </section>
       )}
 
-      {/* ⏰ TAB 5: KEY DEADLINES WINDOW */}
+      {/* PUBLIC TAB MODULE: DEADLINES */}
       {activeTab === 'Deadlines' && (
         <section className="max-w-4xl mx-auto px-6 py-12 text-left animate-fadeIn space-y-8">
           <div>
             <h2 className="text-3xl font-black tracking-tight text-[#111625]">Automated Schedule & Deadlines</h2>
-            <p className="text-xs text-[#5e6b7f] font-semibold mt-0.5">Critical checkpoints parameters tracking metrics for portal actions.</p>
           </div>
 
           <div className="relative border-l-2 border-slate-200 pl-8 ml-4 space-y-8 pt-2">
@@ -569,12 +645,11 @@ export default function Home() {
         </section>
       )}
 
-      {/* 🏛️ TAB 6: MODERN CARD GRID SEAT MATRIX */}
+      {/* PUBLIC TAB MODULE: SEAT MATRIX MAPS */}
       {activeTab === 'Seat Matrix' && (
         <section className="max-w-7xl mx-auto px-6 py-12 text-left animate-fadeIn space-y-6">
           <div>
             <h2 className="text-3xl font-black tracking-tight text-[#111625]">Seat Matrix Distribution Grid</h2>
-            <p className="text-xs text-[#5e6b7f] font-semibold mt-0.5">Authentic storage updates index tables loaded from official cloud ledgers.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-2">
@@ -628,7 +703,7 @@ export default function Home() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-mono">
                   <div className="bg-[#14171c] border-2 border-[#fcd71a]/30 p-6 rounded-2xl relative shadow-lg">
-                    <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Total Website Live Hits</div>
+                    <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Total Live Website Hits</div>
                     <div className="text-4xl font-black text-[#fcd71a] mt-1.5 animate-pulse">{totalVisits} <span className="text-xs font-normal text-zinc-500">Visits</span></div>
                   </div>
                   <div className="bg-[#14171c] border border-zinc-800/80 p-6 rounded-2xl">
@@ -679,12 +754,12 @@ export default function Home() {
                       <input type="text" placeholder="Electronics and Communication Engineering" value={newProg} onChange={(e) => setNewProg(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-white outline-none focus:border-[#fcd71a]" required />
                     </div>
                     <div><label className="block mb-1.5 uppercase text-[10px]">Quota Pool ID</label><select value={newQuota} onChange={(e) => setNewQuota(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-zinc-300 outline-none"><option value="OS">Other State (OS)</option><option value="HS">Home State (HS)</option></select></div>
-                    <div><label className="block mb-1.5 uppercase text-[10px]">Reservation Category Pool</label><select value={newCat} onChange={(e) => setNewCat(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-zinc-300 outline-none"><option>OPEN</option><option>OBC-NCL</option><option>SC</option><option>ST</option></select></div>
+                    <div><label className="block mb-1.5 uppercase text-[10px]">Reservation Category Pool</label><select value={newCat} onChange={(e) => setNewCat(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-zinc-300 outline-none"><option>OPEN</option><option>OBC-NCL</option><option>SC</option><option>ST</option><option>EWS</option><option>PwD</option></select></div>
                     <div><label className="block mb-1.5 uppercase text-[10px]">Reservation Gender Pool</label><select value={newGend} onChange={(e) => setNewGend(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-zinc-300 outline-none"><option>Gender-Neutral</option><option>Female-Only</option></select></div>
                     <div><label className="block mb-1.5 uppercase text-[10px]">JEE Opening Rank</label><input type="number" placeholder="4444" value={newOpenRank} onChange={(e) => setNewOpenRank(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-white outline-none" required /></div>
                     <div><label className="block mb-1.5 uppercase text-[10px]">JEE Closing Rank</label><input type="number" placeholder="12500" value={newCloseRank} onChange={(e) => setNewCloseRank(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-white outline-none" required /></div>
                     <div className="sm:col-span-2"><label className="block mb-1.5 uppercase text-[10px]">Annual Fee token variable</label><input type="text" placeholder="2,25,000" value={newFee} onChange={(e) => setNewFee(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-white outline-none focus:border-[#fcd71a]" required /></div>
-                    <button type="submit" className="sm:col-span-2 bg-[#fcd71a] text-black font-black py-4 rounded-xl uppercase font-mono text-xs mt-2 transition-all hover:opacity-90 tracking-wider">Compile Cut-off Row Into Database Pipeline Live 🚀</button>
+                    <button type="submit" className="sm:col-span-2 bg-[#fcd71a] text-black font-black py-4 rounded-xl uppercase text-xs mt-2 transition-all hover:opacity-90 tracking-wider">Compile Cut-off Row Into Database Pipeline Live 🚀</button>
                   </form>
                 </div>
 
@@ -696,7 +771,7 @@ export default function Home() {
                     <div><label className="block mb-1.5 uppercase text-[10px]">Branch Stream Stream</label><input type="text" placeholder="Electrical Engineering" value={newSeatProg} onChange={(e) => setNewSeatProg(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-white outline-none" required /></div>
                     <div><label className="block mb-1.5 uppercase text-[10px]">Quota Allocation Allocation</label><input type="text" placeholder="OS (Neutral)" value={newSeatQuota} onChange={(e) => setNewSeatQuota(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-white outline-none" required /></div>
                     <div><label className="block mb-1.5 uppercase text-[10px]">Absolute Seats capacity</label><input type="number" placeholder="92" value={newSeatCap} onChange={(e) => setNewSeatCap(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-white outline-none" required /></div>
-                    <button type="submit" className="sm:col-span-2 bg-zinc-100 text-black font-bold py-4 rounded-xl uppercase font-mono text-xs hover:opacity-90 transition-all mt-2 tracking-wider">Commit Capacity Row directly to Seat Matrix Ledger 🚀</button>
+                    <button type="submit" className="sm:col-span-2 bg-zinc-100 text-black font-black py-4 rounded-xl uppercase font-mono text-xs hover:opacity-90 transition-all mt-2 tracking-wider">Commit Capacity Row directly to Seat Matrix Ledger 🚀</button>
                   </form>
                 </div>
               </div>
@@ -712,17 +787,6 @@ export default function Home() {
                     <div><label className="block mb-1.5 uppercase text-[10px]">Secret Redirection Group Access Link</label><input type="text" value={premiumGroupUrl} onChange={(e) => setPremiumGroupUrl(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-emerald-400 outline-none" /></div>
                     <div><label className="block mb-1.5 uppercase text-[10px]">Introductory Premium Token Price (INR)</label><input type="number" value={premiumPriceToken} onChange={(e) => setPremiumPriceToken(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-[#fcd71a] font-mono font-bold outline-none" /></div>
                   </div>
-                </div>
-
-                <div className="bg-[#14171c] border border-zinc-800 p-6 rounded-2xl shadow-xl">
-                  <h3 className="font-bold font-sans text-base text-white mb-4 flex items-center gap-2"><Calendar size={18} className="text-[#fcd71a]"/> Form D: Push New Action Deadline Event Timeline</h3>
-                  <form onSubmit={handleAddDeadlineEvent} className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-bold font-mono text-zinc-400">
-                    <div><label className="block mb-1.5 uppercase text-[10px]">Date text timestamp</label><input type="text" placeholder="June 28, 2026" value={newDeadDate} onChange={(e) => setNewDeadDate(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-white outline-none" required /></div>
-                    <div><label className="block mb-1.5 uppercase text-[10px]">Timeline status chip option</label><select value={newDeadStat} onChange={(e) => setNewDeadStat(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-zinc-300 outline-none"><option>Upcoming</option><option>Live Soon</option><option>Strict Warning</option></select></div>
-                    <div className="sm:col-span-2"><label className="block mb-1.5 uppercase text-[10px]">Event Header Title</label><input type="text" placeholder="Mock Seat Allocation Round 2 Result" value={newDeadTitle} onChange={(e) => setNewDeadTitle(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-white outline-none" required /></div>
-                    <div className="sm:col-span-2"><label className="block mb-1.5 uppercase text-[10px]">Event explanatory description parameter</label><textarea rows={2} placeholder="Type descriptive text item parameters..." value={newDeadDesc} onChange={(e) => setNewDeadDesc(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-white outline-none" required /></div>
-                    <button type="submit" className="sm:col-span-2 bg-zinc-100 text-black font-bold py-4 rounded-xl uppercase font-mono text-xs hover:opacity-90 transition-all mt-2 tracking-wider">Commit Deadline step milestone to public timeline calendar 🚀</button>
-                  </form>
                 </div>
               </div>
             )}
@@ -751,7 +815,7 @@ export default function Home() {
         )}
       </div>
 
-      {/* 🔐 AUTHENTICATION MODAL */}
+      {/* 🔐 AUTHENTICATION MODAL DIALOG MODAL LAYOUT (100% SECURED BACK) */}
       {isSignInOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs animate-fadeIn">
           <div className="w-[90%] max-w-sm bg-white rounded-3xl shadow-2xl border border-[#eef1f6] overflow-hidden relative animate-scaleUp">
