@@ -2,6 +2,11 @@
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { School, Award, TrendingUp, Search, MapPin, Download, CheckSquare, Layers, BarChart3, ChevronLeft, ChevronRight, Mail, Share2, Globe, CheckCircle, Star, BookOpen, ShieldAlert, FileText, Activity, Percent, Clock, AlertCircle, Calendar, RefreshCw, MessageSquare, X, Send, Lock, User, UserPlus, LayoutDashboard, Database, UserCog, ShieldCheck, PlusCircle, Eye, QrCode, MessageCircle } from 'lucide-react';
 import { massiveJosaaData, CollegeData } from './josaaData';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = "https://ygyosdmzubwswnhuhere.supabase.co";
+const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlneW9zZG16dWJ3c3duaHVoZXJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3ODAzMDUsImV4cCI6MjA5NTM1NjMwNX0.1jSqaJKatV4lx9JCEi_dAHP6qJFBrPQl8XJ7bqDJeVY";
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 interface ExtendedCollegeData extends CollegeData {
   chance?: 'High' | 'Medium' | 'Low';
@@ -192,21 +197,45 @@ export default function Home() {
     setEmailInput(''); setPasswordInput(''); setConfirmPasswordInput('');
   };
 
-  // ⚙️ ADMINE ACTION 1: Append Cut-off Row Form A
-  const handleAddCutoffRecord = (e: React.FormEvent) => {
+  // ⚙️ ADMINE ACTION 1: REAL SUPABASE PRODUCTION INJECTION LIVE 🔥
+  const handleAddCutoffRecord = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newInst || !newProg || !newOpenRank || !newCloseRank) return alert("Form fill kijiye!");
-    const newRow = { id: dynamicJosaaRecords.length + 1, institute: newInst, program: newProg, quota: newQuota, category: newCat, gender: newGend, opening: parseInt(newOpenRank), closing: parseInt(newCloseRank), placement: "16.4 LPA", nirf: 42, fee: `${newFee} / Year` };
     
-    const updated = [newRow, ...dynamicJosaaRecords];
-    setDynamicJosaaRecords(updated);
-    localStorage.setItem('achiver_colleges', JSON.stringify(updated));
-    
-    alert("🔥 Success! Record appended straight to predictor local memory storage pipeline.");
-    setNewInst(''); setNewProg(''); setNewOpenRank(''); setNewCloseRank('');
+    const formData = {
+      institute: newInst,
+      program: newProg,
+      quota: newQuota,
+      category: newCat,
+      gender: newGend,
+      opening: parseInt(newOpenRank),
+      closing: parseInt(newCloseRank),
+      fee: `${newFee} / Year`,
+      placement: "16.4 LPA",
+      nirf: 42
+    };
+
+    // 🚀 Sending data directly to Supabase production table
+    const { data, error } = await supabase
+      .from('josaadata_record') // Agar aapke table ka naam alag hai toh use badal dena bhai
+      .insert([formData]);
+
+    if (error) {
+      console.error("Supabase error:", error.message);
+      alert("Database error: " + error.message);
+    } else {
+      // Local state update update taaki turant UI mein bhi dikhe
+      const newLocalRow = { id: dynamicJosaaRecords.length + 1, ...formData };
+      const updated = [newLocalRow, ...dynamicJosaaRecords];
+      setDynamicJosaaRecords(updated);
+      localStorage.setItem('achiver_colleges', JSON.stringify(updated));
+      
+      alert("🎉 Success! Record directly appended to Supabase production pipeline.");
+      setNewInst(''); setNewProg(''); setNewOpenRank(''); setNewCloseRank('');
+    }
   };
 
-  // ⚙️ ADMINE ACTION 2: Append Deadline Event Form C (Inside Users/Overrides Tab)
+  // ⚙️ ADMINE ACTION 2: Append Deadline Event Form C
   const handleAddDeadlineEvent = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newDeadDate || !newDeadTitle || !newDeadDesc) return alert("Fields fill kijiye!");
@@ -276,7 +305,7 @@ export default function Home() {
 
             <div className="flex flex-wrap items-center justify-center gap-1 md:gap-3 text-xs font-semibold text-[#5f5e5e]">
               {['Home', 'Predictor', 'Counselling Guide', 'Opening/Closing Ranks', 'Deadlines', 'Seat Matrix'].map((tab) => (
-                <button key={tab} onClick={() => { setActiveTab(tab); setCurrentPage(1); }} className={`px-3 py-2 transition-all rounded-lg text-[13px] font-medium ${activeTab === tab ? 'text-[#221b00] bg-[#ffd700] font-bold shadow-xs' : 'hover:text-[#705d00] hover:bg-[#eeeeee]'}`}>{tab}</button>
+                <button key={tab} onClick={() => { setActiveTab(tab); setCurrentPage(1); }} className="px-3 py-2 transition-all rounded-lg text-[13px] font-medium hover:text-[#705d00] hover:bg-[#eeeeee]">{tab}</button>
               ))}
             </div>
 
@@ -343,7 +372,6 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Predictor Core Output recommendations table lower area mapping logs */}
           <section ref={predictorRef} className="max-w-4xl mx-auto py-12 px-6 scroll-mt-20 text-left">
             {hasSearched ? (
               results.length > 0 ? (
@@ -440,8 +468,7 @@ export default function Home() {
         </section>
       )}
 
-
-      {/* 👑 ⚙️ 🌟 BACKDOOR CONTROL PANEL COCKPIT DESK INFRASTRUCTURE (100% INTINT RULES RESTORED) */}
+      {/* 👑 ⚙️ 🌟 BACKDOOR CONTROL PANEL COCKPIT DESK INFRASTRUCTURE */}
       {activeTab === 'AdminPanel' && (
         <div className="flex min-h-screen bg-[#111214] text-zinc-100 animate-fadeIn">
           
@@ -476,7 +503,6 @@ export default function Home() {
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {/* Visitiors live tracker counter widget box */}
                   <div className="bg-[#1a1b1e] border-2 border-[#ffd700]/40 p-6 rounded-2xl relative shadow-lg">
                     <div className="absolute top-0 right-0 p-4 text-[#ffd700]/20"><Eye size={20}/></div>
                     <div className="text-[10px] font-mono font-bold text-zinc-400 uppercase tracking-wider">Total Website Live Visits</div>
@@ -495,7 +521,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* 🔒 👤 REAL EMAIL LOG TRACKER CONTAINER ADDED PERMANENTLY UNDER OVERVIEW VIEW */}
                 <div className="bg-[#1a1b1e] border border-zinc-800 rounded-2xl p-6">
                   <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-zinc-400 mb-4">🔒 Live Student Authentication Registry Sessions Stream</h3>
                   <div className="border border-zinc-800 rounded-xl overflow-hidden text-xs font-mono">
@@ -518,7 +543,7 @@ export default function Home() {
               </div>
             )}
 
-            {/* 🚀 VIEW B: DATA INJECTION CONTROL WORKSPACE ZONE (RESTORED FORM A & FORM B COMBINED) */}
+            {/* 🚀 VIEW B: DATA INJECTION CONTROL WORKSPACE ZONE */}
             {adminView === 'Database' && (
               <div className="space-y-12 animate-fadeIn">
                 
@@ -560,7 +585,7 @@ export default function Home() {
                   </form>
                 </div>
 
-                {/* 📝 FORM B: INJECT NEW DYNAMIC SEAT Matrix CAP ROW LEDGER RECORD */}
+                {/* 📝 FORM B: INJECT NEW DYNAMIC SEAT MATRIX CAP ROW */}
                 <div className="bg-[#1a1b1e] border border-zinc-800 p-6 rounded-2xl relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-full h-1 bg-[#ffd700]"></div>
                   <h3 className="font-bold text-base text-white mb-4 flex items-center gap-2"><School size={18} className="text-[#ffd700]"/> Form B: Inject New Seat Matrix Capacity Row</h3>
@@ -576,11 +601,10 @@ export default function Home() {
               </div>
             )}
 
-            {/* 🚀 VIEW C: PREMIUM RE-ROUTING GATE LINKS OVERRIDES AND DEADLINES EVENTS GENERATIONS WORKSPACE */}
+            {/* 🚀 VIEW C: PREMIUM RE-ROUTING GATE LINKS OVERRIDES */}
             {adminView === 'Users' && (
               <div className="space-y-10 animate-fadeIn">
                 
-                {/* 📝 FORM C: LIVE REDIRECT GROUP CONFIGURATION OVERRIDES CARD */}
                 <div className="bg-[#1a1b1e] border-2 border-purple-900/60 p-6 rounded-2xl relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-full h-1.5 bg-[#ffd700]"></div>
                   <h3 className="font-bold text-base text-white mb-4 flex items-center gap-2"><ShieldCheck size={18} className="text-[#ffd700]"/> Form C: Elite Consulting Group Gateway Configuration Settings</h3>
@@ -596,7 +620,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* 📝 FORM D: INJECT NEW DEADLINE CALENDAR TIMESTAMP STEPS ARRAY RECORD */}
                 <div className="bg-[#1a1b1e] border border-zinc-800 p-6 rounded-2xl">
                   <h3 className="font-bold text-base text-white mb-4 flex items-center gap-2"><Calendar size={18} className="text-[#ffd700]"/> Form D: Push New Action Deadline Event Timeline</h3>
                   <form onSubmit={handleAddDeadlineEvent} className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-zinc-300">
@@ -636,7 +659,7 @@ export default function Home() {
         )}
       </div>
 
-      {/* 🔐 AUTHENTICATION MODAL LOGINS COMPONENT CONTAINER WINDOW FRAME */}
+      {/* 🔐 AUTHENTICATION MODAL LOGINS COMPONENT CONTAINER */}
       {isSignInOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fadeIn">
           <div className="w-[90%] max-w-md bg-white rounded-2xl shadow-2xl border border-[#e2e2e2] overflow-hidden relative animate-scaleUp">
