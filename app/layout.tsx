@@ -1,3 +1,4 @@
+// @ts-ignore: side-effect import for global CSS without explicit type declarations
 import './globals.css';
 
 export const metadata = {
