@@ -121,7 +121,7 @@ export default function Home() {
     setTotalVisits(prev => prev + 1);
     
     const fetchColleges = async () => {
-      const { data, error } = await supabase.from('colleges').select('*');
+      const { data, error } = await supabase.from('josaadata_record').select('*');
       if (error) {
         console.error('Error fetching colleges:', error);
       } else if (data) {
