@@ -1,8 +1,9 @@
 'use client';
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { School, Award, TrendingUp, Search, MapPin, Download, CheckSquare, Layers, BarChart3, ChevronLeft, ChevronRight, Mail, Share2, Globe, CheckCircle, Star, BookOpen, ShieldAlert, FileText, Activity, Percent, Clock, AlertCircle, Calendar, RefreshCw, MessageSquare, X, Send, Lock, User, UserPlus, LayoutDashboard, Database, UserCog, ShieldCheck, PlusCircle, Eye, QrCode, MessageCircle, Sparkles, Milestone, HelpCircle, ArrowRight, Server, Shield, Sparkle, Compass, Flame, Receipt } from 'lucide-react';
-import { massiveJosaaData, CollegeData } from './josaaData';
+import { CollegeData } from './josaaData';
 import { createClient } from '@supabase/supabase-js';
+import Link from 'next/link';
 
 // 🔥 DIRECT SUPABASE PRODUCTION CONNECTION PIPELINE
 const supabaseUrl = "https://ygyosdmzubwswnhuhere.supabase.co";
@@ -38,7 +39,7 @@ export default function Home() {
   const [hasSearched, setHasSearched] = useState(false);
 
   // 🏛️ DATA MATRICES STATE LAYERS
-  const [dynamicJosaaRecords, setDynamicJosaaRecords] = useState<CollegeData[]>(massiveJosaaData);
+  const [dynamicJosaaRecords, setDynamicJosaaRecords] = useState<CollegeData[]>([]);
   const [results, setResults] = useState<ExtendedCollegeData[]>([]);
 
   const [dynamicSeats, setDynamicSeats] = useState<SeatMatrixRecord[]>([
@@ -118,6 +119,16 @@ export default function Home() {
 
   useEffect(() => {
     setTotalVisits(prev => prev + 1);
+    
+    const fetchColleges = async () => {
+      const { data, error } = await supabase.from('colleges').select('*');
+      if (error) {
+        console.error('Error fetching colleges:', error);
+      } else if (data) {
+        setDynamicJosaaRecords(data);
+      }
+    };
+    fetchColleges();
   }, []);
 
   const handlePredict = (e: React.FormEvent) => {
@@ -298,9 +309,9 @@ export default function Home() {
               ))}
             </div>
 
-            <button type="button" onClick={() => { setIsSignUpMode(false); setIsSignInOpen(true); }} className="bg-[#fcd71a] text-[#111625] font-extrabold px-5 py-2 rounded-xl text-xs shadow-xs shrink-0 cursor-pointer hover:bg-[#ebd02c] transition-all hover:scale-[1.03]">
+            <Link href="/login" className="bg-[#fcd71a] text-[#111625] font-extrabold px-5 py-2 rounded-xl text-xs shadow-xs shrink-0 cursor-pointer hover:bg-[#ebd02c] transition-all hover:scale-[1.03] inline-block">
               Sign In
-            </button>
+            </Link>
           </div>
         </nav>
       )}
