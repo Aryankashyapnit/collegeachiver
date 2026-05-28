@@ -33,11 +33,12 @@ interface SeatMatrixRecord {
 export default function Home() {
   const [activeTab, setActiveTab] = useState('Home'); 
   const [rank, setRank] = useState('');
+  const [rankAdvanced, setRankAdvanced] = useState('');
+  const [rankMains, setRankMains] = useState('');
   const [category, setCategory] = useState('OPEN');
   const [gender, setGender] = useState('Gender-Neutral');
   const [homeState, setHomeState] = useState('OS'); 
   const [hasSearched, setHasSearched] = useState(false);
-  const [examType, setExamType] = useState<'JEE Advanced' | 'JEE Mains'>('JEE Advanced');
 
   // 🏛️ DATA MATRICES STATE LAYERS
   const [dynamicJosaaRecords, setDynamicJosaaRecords] = useState<CollegeData[]>([]);
@@ -129,29 +130,28 @@ export default function Home() {
 
   const handlePredict = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!rank) return alert("Pehle apni rank enter karo bhai!");
+    if (!rankAdvanced && !rankMains) return alert("Kam se kam ek rank toh bharo bhai — JEE Advanced ya JEE Mains!");
     setHasSearched(true);
-    const userRank = parseInt(rank);
 
-    const filtered = dynamicJosaaRecords.filter((col: any) => {
-      const examMatch = !col.exam_type || col.exam_type === examType;
-      return (
-        examMatch &&
-        col.category === category &&
-        col.gender === gender &&
-        (col.quota === homeState || col.quota === "AI") &&
-        col.closing >= userRank
-      );
-    }).map((col: any) => {
-      let chance: 'High' | 'Medium' | 'Low' = 'Low';
-      const safetyMargin = col.closing - userRank;
-      if (safetyMargin > 8000) chance = 'High';       
-      else if (safetyMargin >= 0) chance = 'Medium';   
-      return { ...col, chance };
-    });
+    const buildResults = (userRank: number, examLabel: string) =>
+      dynamicJosaaRecords.filter((col: any) => {
+        const examMatch = !col.exam_type || col.exam_type === examLabel;
+        return (
+          examMatch &&
+          col.category === category &&
+          col.gender === gender &&
+          (col.quota === homeState || col.quota === 'AI') &&
+          col.closing >= userRank
+        );
+      }).map((col: any) => {
+        const safetyMargin = col.closing - userRank;
+        const chance: 'High' | 'Medium' | 'Low' = safetyMargin > 8000 ? 'High' : 'Medium';
+        return { ...col, chance, _examLabel: examLabel };
+      }).sort((a: any, b: any) => a.closing - b.closing);
 
-    filtered.sort((a: any, b: any) => a.closing - b.closing);
-    setResults(filtered);
+    const advResults = rankAdvanced ? buildResults(parseInt(rankAdvanced), 'JEE Advanced') : [];
+    const mainsResults = rankMains ? buildResults(parseInt(rankMains), 'JEE Mains') : [];
+    setResults([...advResults, ...mainsResults]);
     setTimeout(() => { predictorRef.current?.scrollIntoView({ behavior: 'smooth' }); }, 100);
   };
 
@@ -456,112 +456,159 @@ export default function Home() {
 
       {/* TAB 2: RANK PREDICTOR */}
       {activeTab === 'Predictor' && (
-        <div className="animate-fadeIn pb-20 max-w-4xl mx-auto px-6 pt-12 space-y-12">
+        <div className="animate-fadeIn pb-20 max-w-4xl mx-auto px-6 pt-12 space-y-10">
           <div className="text-center space-y-2">
             <h2 className="text-3xl font-black tracking-tight text-[#111625]">Rank Prediction Cockpit</h2>
-            <p className="text-xs text-[#8492a6] font-medium">Select your exam and enter rank to find matching colleges</p>
-          </div>
-
-          {/* Exam Type Toggle */}
-          <div className="flex justify-center">
-            <div className="inline-flex bg-[#f4f7fa] p-1.5 rounded-2xl border border-slate-200 gap-2 shadow-xs">
-              <button
-                type="button"
-                onClick={() => { setExamType('JEE Advanced'); setHasSearched(false); setResults([]); }}
-                className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
-                  examType === 'JEE Advanced'
-                    ? 'bg-[#111625] text-[#fcd71a] shadow-md'
-                    : 'text-[#6c778a] hover:text-[#111625]'
-                }`}
-              >
-                🎯 JEE Advanced
-              </button>
-              <button
-                type="button"
-                onClick={() => { setExamType('JEE Mains'); setHasSearched(false); setResults([]); }}
-                className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
-                  examType === 'JEE Mains'
-                    ? 'bg-[#111625] text-[#fcd71a] shadow-md'
-                    : 'text-[#6c778a] hover:text-[#111625]'
-                }`}
-              >
-                📝 JEE Mains
-              </button>
-            </div>
+            <p className="text-xs text-[#8492a6] font-medium">Dono exam ka rank bharo — results ek saath dikhenge</p>
           </div>
 
           <div className="bg-white border border-[#e2e8f0] rounded-3xl p-6 md:p-8 shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1.5 bg-[#fcd71a]"></div>
-            {/* Active exam badge */}
-            <div className="mb-5 flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border bg-[#fcd71a]/10 text-[#cca01d] border-[#fcd71a]/30">
-                <span className="w-1.5 h-1.5 bg-[#fcd71a] rounded-full animate-pulse"></span>
-                {examType} Mode Active
-              </span>
-              {examType === 'JEE Advanced' && (
-                <span className="text-[10px] text-[#8492a6] font-medium">IITs · IISc · Results from JoSAA counselling</span>
-              )}
-              {examType === 'JEE Mains' && (
-                <span className="text-[10px] text-[#8492a6] font-medium">NITs · IIITs · GFTIs · Results from JoSAA/CSAB counselling</span>
-              )}
-            </div>
-            <form onSubmit={handlePredict} className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left text-xs font-semibold text-[#485363]">
-              <div className="md:col-span-2">
-                <label className="block mb-2 font-bold tracking-wide uppercase text-[10px] text-[#8492a6]">
-                  {examType === 'JEE Advanced' ? 'JEE Advanced Rank (CRL / Category Rank)' : 'JEE Mains Rank (CRL / Category Rank)'}
-                </label>
-                <input
-                  type="number"
-                  placeholder={examType === 'JEE Advanced' ? 'e.g. 2500' : 'e.g. 12500'}
-                  value={rank}
-                  onChange={(e) => setRank(e.target.value)}
-                  className="w-full px-4 py-3.5 bg-[#f8fafc] border border-[#e2e8f0] focus:border-[#fcd71a] focus:bg-white rounded-xl text-sm font-bold text-black outline-none transition-all"
-                  required
-                />
+            <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#fcd71a] via-[#111625] to-[#fcd71a]"></div>
+            <form onSubmit={handlePredict} className="space-y-6 text-left text-xs font-semibold text-[#485363]">
+
+              {/* Dual Rank Input Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* JEE Advanced */}
+                <div className="relative bg-[#f8fafc] border-2 border-[#e2e8f0] hover:border-[#fcd71a]/60 focus-within:border-[#fcd71a] rounded-2xl p-4 transition-all">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-6 h-6 rounded-lg bg-blue-600 flex items-center justify-center shrink-0">
+                      <span className="text-white text-[9px] font-black">ADV</span>
+                    </div>
+                    <span className="text-[11px] font-black uppercase tracking-widest text-blue-700">JEE Advanced</span>
+                    <span className="ml-auto text-[9px] font-mono text-[#a0abbc] bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">IITs · IISc</span>
+                  </div>
+                  <label className="block mb-1.5 text-[10px] font-bold tracking-wide uppercase text-[#8492a6]">CRL / Category Rank</label>
+                  <input
+                    type="number"
+                    placeholder="e.g. 2500"
+                    value={rankAdvanced}
+                    onChange={(e) => setRankAdvanced(e.target.value)}
+                    className="w-full px-4 py-3 bg-white border border-[#e2e8f0] focus:border-blue-400 rounded-xl text-sm font-bold text-black outline-none transition-all"
+                  />
+                  {rankAdvanced && (
+                    <p className="mt-1.5 text-[10px] text-blue-500 font-bold">✓ JEE Advanced rank set: {parseInt(rankAdvanced).toLocaleString()}</p>
+                  )}
+                </div>
+
+                {/* JEE Mains */}
+                <div className="relative bg-[#f8fafc] border-2 border-[#e2e8f0] hover:border-[#fcd71a]/60 focus-within:border-[#fcd71a] rounded-2xl p-4 transition-all">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-6 h-6 rounded-lg bg-purple-600 flex items-center justify-center shrink-0">
+                      <span className="text-white text-[9px] font-black">MNS</span>
+                    </div>
+                    <span className="text-[11px] font-black uppercase tracking-widest text-purple-700">JEE Mains</span>
+                    <span className="ml-auto text-[9px] font-mono text-[#a0abbc] bg-purple-50 px-2 py-0.5 rounded-full border border-purple-100">NITs · IIITs</span>
+                  </div>
+                  <label className="block mb-1.5 text-[10px] font-bold tracking-wide uppercase text-[#8492a6]">CRL / Category Rank</label>
+                  <input
+                    type="number"
+                    placeholder="e.g. 12500"
+                    value={rankMains}
+                    onChange={(e) => setRankMains(e.target.value)}
+                    className="w-full px-4 py-3 bg-white border border-[#e2e8f0] focus:border-purple-400 rounded-xl text-sm font-bold text-black outline-none transition-all"
+                  />
+                  {rankMains && (
+                    <p className="mt-1.5 text-[10px] text-purple-500 font-bold">✓ JEE Mains rank set: {parseInt(rankMains).toLocaleString()}</p>
+                  )}
+                </div>
               </div>
-              <div>
-                <label className="block mb-2 font-bold tracking-wide uppercase text-[10px] text-[#8492a6]">Reservation Category</label>
-                <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-4 py-3.5 bg-[#f8fafc] border border-[#e2e8f0] focus:border-[#fcd71a] focus:bg-white rounded-xl font-bold text-black outline-none"><option>OPEN</option><option>OPEN (PwD)</option><option>OBC-NCL</option><option>OBC-NCL (PwD)</option><option>SC</option><option>SC (PwD)</option><option>ST</option><option>ST (PwD)</option><option>EWS</option><option>EWS (PwD)</option></select>
+
+              {/* Filters Row */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block mb-2 font-bold tracking-wide uppercase text-[10px] text-[#8492a6]">Category</label>
+                  <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-4 py-3 bg-[#f8fafc] border border-[#e2e8f0] focus:border-[#fcd71a] focus:bg-white rounded-xl font-bold text-black outline-none text-xs">
+                    <option>OPEN</option><option>OPEN (PwD)</option><option>OBC-NCL</option><option>OBC-NCL (PwD)</option><option>SC</option><option>SC (PwD)</option><option>ST</option><option>ST (PwD)</option><option>EWS</option><option>EWS (PwD)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block mb-2 font-bold tracking-wide uppercase text-[10px] text-[#8492a6]">Gender Pool</label>
+                  <select value={gender} onChange={(e) => setGender(e.target.value)} className="w-full px-4 py-3 bg-[#f8fafc] border border-[#e2e8f0] focus:border-[#fcd71a] focus:bg-white rounded-xl font-bold text-black outline-none text-xs">
+                    <option>Gender-Neutral</option><option>Female-Only</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block mb-2 font-bold tracking-wide uppercase text-[10px] text-[#8492a6]">Quota</label>
+                  <select value={homeState} onChange={(e) => setHomeState(e.target.value)} className="w-full px-4 py-3 bg-[#f8fafc] border border-[#e2e8f0] focus:border-[#fcd71a] focus:bg-white rounded-xl font-bold text-black outline-none text-xs">
+                    <option value="OS">Other State (OS) / AI</option><option value="HS">Home State (HS)</option>
+                  </select>
+                </div>
               </div>
-              <div>
-                <label className="block mb-2 font-bold tracking-wide uppercase text-[10px] text-[#8492a6]">Gender Pool</label>
-                <select value={gender} onChange={(e) => setGender(e.target.value)} className="w-full px-4 py-3.5 bg-[#f8fafc] border border-[#e2e8f0] focus:border-[#fcd71a] focus:bg-white rounded-xl font-bold text-black outline-none"><option>Gender-Neutral</option><option>Female-Only</option></select>
-              </div>
-              <div className="md:col-span-2">
-                <label className="block mb-2 font-bold tracking-wide uppercase text-[10px] text-[#8492a6]">Quota System Location Filter</label>
-                <select value={homeState} onChange={(e) => setHomeState(e.target.value)} className="w-full px-4 py-3.5 bg-[#f8fafc] border border-[#e2e8f0] focus:border-[#fcd71a] focus:bg-white rounded-xl font-bold text-black outline-none"><option value="OS">Other State (OS) / All India (AI)</option><option value="HS">Home State (HS)</option></select>
-              </div>
-              <button type="submit" className="md:col-span-2 bg-[#111625] text-[#fcd71a] font-extrabold py-4 rounded-xl text-xs uppercase tracking-widest shadow-md hover:bg-zinc-800 transition-all mt-2">Execute Prediction Core Matrix 🚀</button>
+
+              <button type="submit" className="w-full bg-[#111625] text-[#fcd71a] font-extrabold py-4 rounded-xl text-xs uppercase tracking-widest shadow-md hover:bg-zinc-800 transition-all">
+                🚀 Predict Colleges for Both Exams
+              </button>
             </form>
           </div>
 
-          <section ref={predictorRef} className="scroll-mt-24 text-left space-y-4">
-            {hasSearched ? (
-              results.length > 0 ? (
-                <div className="space-y-4">
-                  {results.map(college => (
-                    <div key={college.id} className="bg-white border border-[#eef2f7] hover:border-[#fcd71a]/40 rounded-2xl p-5 shadow-xs border-l-4 border-l-[#fcd71a] flex flex-col justify-between gap-4">
-                      <div className="flex justify-between items-start gap-4">
-                        <div>
-                          <h4 className="font-bold text-[#111625] text-base tracking-tight">{college.institute}</h4>
-                          <p className="text-xs text-[#5e6b7f] mt-1 font-semibold">{college.program}</p>
-                        </div>
-                        <span className="text-[10px] font-mono font-black px-3 py-1 rounded-full uppercase bg-emerald-50 text-emerald-800 border border-emerald-200">{college.chance} Likelihood</span>
-                      </div>
-                      <div className="grid grid-cols-3 gap-2 pt-3 border-t border-[#f4f7f6] text-[11px] font-semibold text-[#5e6b7f]">
-                        <span>Closing Cutoff: <strong className="text-black">{college.closing}</strong></span>
-                        <span>Est. Fee: <strong className="text-black">{college.fee || "2,20,000/Yr"}</strong></span>
-                        <span>NIRF Rank: <strong className="text-black">#{college.nirf || "45"}</strong></span>
-                      </div>
+          {/* Results */}
+          <section ref={predictorRef} className="scroll-mt-24 text-left space-y-6">
+            {hasSearched && (() => {
+              const advResults = results.filter((r: any) => r._examLabel === 'JEE Advanced');
+              const mainsResults = results.filter((r: any) => r._examLabel === 'JEE Mains');
+              const noResults = results.length === 0;
+              return (
+                <>
+                  {noResults && (
+                    <div className="bg-amber-50/50 border border-amber-200 rounded-2xl p-8 text-center text-xs text-amber-800 font-mono font-bold flex items-center justify-center gap-2">
+                      <AlertCircle size={16}/> No colleges found for the given ranks and filters.
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="bg-amber-50/50 border border-amber-200 rounded-2xl p-8 text-center text-xs text-amber-800 font-mono font-bold flex items-center justify-center gap-2">
-                  <AlertCircle size={16}/> Logs empty for custom combinations metrics.
-                </div>
-              )
-            ) : null}
+                  )}
+
+                  {advResults.length > 0 && rankAdvanced && (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        <div className="h-px flex-1 bg-blue-100"></div>
+                        <span className="text-[11px] font-black uppercase tracking-widest text-blue-700 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-full">🎯 JEE Advanced Results — Rank {parseInt(rankAdvanced).toLocaleString()}</span>
+                        <div className="h-px flex-1 bg-blue-100"></div>
+                      </div>
+                      {advResults.map((college: any) => (
+                        <div key={`adv-${college.id}`} className="bg-white border border-[#eef2f7] hover:border-blue-300/60 rounded-2xl p-5 shadow-xs border-l-4 border-l-blue-500 flex flex-col justify-between gap-4 transition-all">
+                          <div className="flex justify-between items-start gap-4">
+                            <div>
+                              <h4 className="font-bold text-[#111625] text-base tracking-tight">{college.institute}</h4>
+                              <p className="text-xs text-[#5e6b7f] mt-1 font-semibold">{college.program}</p>
+                            </div>
+                            <span className={`text-[10px] font-mono font-black px-3 py-1 rounded-full uppercase border ${ college.chance === 'High' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-amber-50 text-amber-800 border-amber-200'}`}>{college.chance} Chance</span>
+                          </div>
+                          <div className="grid grid-cols-3 gap-2 pt-3 border-t border-[#f4f7f6] text-[11px] font-semibold text-[#5e6b7f]">
+                            <span>Closing: <strong className="text-black">{college.closing}</strong></span>
+                            <span>Fee: <strong className="text-black">{college.fee || '2,20,000/Yr'}</strong></span>
+                            <span>NIRF: <strong className="text-black">#{college.nirf || '—'}</strong></span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {mainsResults.length > 0 && rankMains && (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        <div className="h-px flex-1 bg-purple-100"></div>
+                        <span className="text-[11px] font-black uppercase tracking-widest text-purple-700 bg-purple-50 border border-purple-200 px-3 py-1.5 rounded-full">📝 JEE Mains Results — Rank {parseInt(rankMains).toLocaleString()}</span>
+                        <div className="h-px flex-1 bg-purple-100"></div>
+                      </div>
+                      {mainsResults.map((college: any) => (
+                        <div key={`mns-${college.id}`} className="bg-white border border-[#eef2f7] hover:border-purple-300/60 rounded-2xl p-5 shadow-xs border-l-4 border-l-purple-500 flex flex-col justify-between gap-4 transition-all">
+                          <div className="flex justify-between items-start gap-4">
+                            <div>
+                              <h4 className="font-bold text-[#111625] text-base tracking-tight">{college.institute}</h4>
+                              <p className="text-xs text-[#5e6b7f] mt-1 font-semibold">{college.program}</p>
+                            </div>
+                            <span className={`text-[10px] font-mono font-black px-3 py-1 rounded-full uppercase border ${ college.chance === 'High' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-amber-50 text-amber-800 border-amber-200'}`}>{college.chance} Chance</span>
+                          </div>
+                          <div className="grid grid-cols-3 gap-2 pt-3 border-t border-[#f4f7f6] text-[11px] font-semibold text-[#5e6b7f]">
+                            <span>Closing: <strong className="text-black">{college.closing}</strong></span>
+                            <span>Fee: <strong className="text-black">{college.fee || '2,20,000/Yr'}</strong></span>
+                            <span>NIRF: <strong className="text-black">#{college.nirf || '—'}</strong></span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              );
+            })()}
           </section>
         </div>
       )}
