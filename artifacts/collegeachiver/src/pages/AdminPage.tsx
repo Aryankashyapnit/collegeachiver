@@ -423,6 +423,13 @@ ALTER TABLE public.josaadata_record ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.seat_matrices ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.admission_schedules ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "public read josaadata" ON public.josaadata_record;
+DROP POLICY IF EXISTS "public read seats" ON public.seat_matrices;
+DROP POLICY IF EXISTS "public read schedules" ON public.admission_schedules;
+DROP POLICY IF EXISTS "anon insert josaadata" ON public.josaadata_record;
+DROP POLICY IF EXISTS "anon insert seats" ON public.seat_matrices;
+DROP POLICY IF EXISTS "anon insert schedules" ON public.admission_schedules;
+
 CREATE POLICY "public read josaadata" ON public.josaadata_record FOR SELECT USING (true);
 CREATE POLICY "public read seats" ON public.seat_matrices FOR SELECT USING (true);
 CREATE POLICY "public read schedules" ON public.admission_schedules FOR SELECT USING (true);
