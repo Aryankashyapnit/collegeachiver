@@ -1,7 +1,7 @@
 // @ts-ignore
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { Link } from 'wouter';
-import { School, BarChart3, Layers, Star, AlertCircle, MessageSquare, X, Send, User, ShieldCheck, PlusCircle, Clock, Sparkles, Milestone, ArrowRight, Sparkle, Compass, Flame, Receipt, Percent, BookOpen, CheckCircle2, TrendingUp, Users, Bell, ChevronDown, ChevronUp, Zap, Share2, Copy, Gift, Trophy, Link2, UserPlus } from 'lucide-react';
+import { School, BarChart3, Layers, Star, AlertCircle, MessageSquare, X, Send, User, ShieldCheck, PlusCircle, Clock, Sparkles, Milestone, ArrowRight, Sparkle, Compass, Flame, Receipt, Percent, BookOpen, CheckCircle2, TrendingUp, Users, Bell, ChevronDown, ChevronUp, Zap, Share2, Copy, Gift, Trophy, Link2, UserPlus, Menu } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import { CollegeData } from '@/lib/josaaData';
 
@@ -78,6 +78,7 @@ export default function HomePage() {
   const [adminView, setAdminView] = useState<'Overview' | 'Database' | 'Users'>('Overview');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [liveCount, setLiveCount] = useState(247);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Refer & Earn state
   const [referralName, setReferralName] = useState('');
@@ -320,10 +321,12 @@ export default function HomePage() {
 
       {/* NAVBAR */}
       {activeTab !== 'AdminPanel' && (
-        <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#eef1f6] px-6 py-4 shadow-xs transition-all">
-          <div className="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-center gap-4">
-            <div onClick={() => setActiveTab('Home')} className="flex items-center gap-2.5 cursor-pointer select-none shrink-0 transition-transform hover:scale-[1.02]">
-              <div className="w-9 h-9 rounded-xl bg-[#111625] flex items-center justify-center shadow-md relative overflow-hidden">
+        <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#eef1f6] shadow-sm">
+          {/* Main bar */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+            {/* Logo */}
+            <div onClick={() => { setActiveTab('Home'); setMobileMenuOpen(false); }} className="flex items-center gap-2.5 cursor-pointer select-none shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-[#111625] flex items-center justify-center shadow-md">
                 <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-6 h-6">
                   <path d="M18 8L4 15L18 22L32 15L18 8Z" fill="#fcd71a" stroke="#fcd71a" strokeWidth="1" strokeLinejoin="round"/>
                   <path d="M10 19v6c0 0 3.5 4 8 4s8-4 8-4v-6" stroke="#fcd71a" strokeWidth="2" strokeLinecap="round" fill="none"/>
@@ -331,30 +334,82 @@ export default function HomePage() {
                   <line x1="32" y1="15" x2="32" y2="22" stroke="#fcd71a" strokeWidth="1.5" strokeLinecap="round"/>
                 </svg>
               </div>
-              <div className="text-xl font-black tracking-tight text-[#111625]">
-                College<span className="text-[#cca01d]">Achiver</span>
+              <span className="text-lg font-black tracking-tight text-[#111625]">College<span className="text-[#cca01d]">Achiver</span></span>
+            </div>
+
+            {/* Desktop nav tabs — horizontally scrollable, hidden on mobile */}
+            <div className="hidden md:flex items-center overflow-x-auto scrollbar-hide flex-1 mx-4">
+              <div className="flex items-center gap-0.5 min-w-max">
+                {[
+                  { id: 'Home', label: 'Home' },
+                  { id: 'Predictor', label: 'Rank Predictor' },
+                  { id: 'Counselling Guide', label: 'Premium Circle' },
+                  { id: 'Opening/Closing Ranks', label: 'Cut-offs' },
+                  { id: 'Deadlines', label: 'Deadlines' },
+                  { id: 'Seat Matrix', label: 'Seat Matrix' },
+                  { id: 'Refer & Earn', label: '🎁 Refer & Earn' },
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => { setActiveTab(item.id); setCurrentPage(1); }}
+                    className={`whitespace-nowrap px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all ${
+                      activeTab === item.id
+                        ? 'text-[#111625] bg-[#fcd71a] font-bold shadow-sm'
+                        : 'text-[#5e6b7f] hover:text-[#111625] hover:bg-[#f4f7fa]'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
               </div>
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-1 md:gap-3 text-xs font-semibold">
+
+            {/* Right side */}
+            <div className="flex items-center gap-2 shrink-0">
+              <Link href="/login" className="hidden sm:inline-flex bg-[#fcd71a] text-[#111625] font-extrabold px-4 py-2 rounded-xl text-xs shadow-sm cursor-pointer hover:bg-[#ebd02c] transition-all items-center">
+                Sign In
+              </Link>
+              {/* Mobile hamburger */}
+              <button
+                className="md:hidden w-9 h-9 flex items-center justify-center rounded-xl hover:bg-[#f4f7fa] transition-all text-[#111625]"
+                onClick={() => setMobileMenuOpen(o => !o)}
+              >
+                {mobileMenuOpen ? <X size={20}/> : <Menu size={20}/>}
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile dropdown menu */}
+          {mobileMenuOpen && (
+            <div className="md:hidden border-t border-[#eef1f6] bg-white px-4 py-3 space-y-1">
               {[
                 { id: 'Home', label: 'Home' },
-                { id: 'Predictor', label: 'Rank Predictor' },
-                { id: 'Counselling Guide', label: 'Premium Circle' },
-                { id: 'Opening/Closing Ranks', label: 'Cut-off Explorer' },
-                { id: 'Deadlines', label: 'Key Deadlines' },
-                { id: 'Seat Matrix', label: 'Seat Matrix' },
-                { id: 'Refer & Earn', label: '🎁 Refer & Earn' }
+                { id: 'Predictor', label: '📊 Rank Predictor' },
+                { id: 'Counselling Guide', label: '⭐ Premium Circle' },
+                { id: 'Opening/Closing Ranks', label: '🔍 Cut-off Explorer' },
+                { id: 'Deadlines', label: '🗓️ Key Deadlines' },
+                { id: 'Seat Matrix', label: '📋 Seat Matrix' },
+                { id: 'Refer & Earn', label: '🎁 Refer & Earn' },
               ].map((item) => (
-                <button key={item.id} onClick={() => { setActiveTab(item.id); setCurrentPage(1); }}
-                  className={`px-3 py-2 transition-all rounded-lg text-[13px] font-medium ${activeTab === item.id ? 'text-[#111625] bg-[#fcd71a]/10 border border-[#f5d020]/30 font-bold shadow-xs' : 'text-[#616b7c] hover:text-[#111625] hover:bg-[#f4f7fa]'}`}>
+                <button
+                  key={item.id}
+                  onClick={() => { setActiveTab(item.id); setCurrentPage(1); setMobileMenuOpen(false); }}
+                  className={`w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
+                    activeTab === item.id
+                      ? 'bg-[#fcd71a] text-[#111625] font-bold'
+                      : 'text-[#5e6b7f] hover:bg-[#f4f7fa] hover:text-[#111625]'
+                  }`}
+                >
                   {item.label}
                 </button>
               ))}
+              <div className="pt-2 border-t border-[#eef1f6]">
+                <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="w-full block text-center bg-[#111625] text-[#fcd71a] font-extrabold px-4 py-3 rounded-xl text-sm">
+                  Sign In
+                </Link>
+              </div>
             </div>
-            <Link href="/login" className="bg-[#fcd71a] text-[#111625] font-extrabold px-5 py-2 rounded-xl text-xs shadow-xs shrink-0 cursor-pointer hover:bg-[#ebd02c] transition-all hover:scale-[1.03] inline-block">
-              Sign In
-            </Link>
-          </div>
+          )}
         </nav>
       )}
 
