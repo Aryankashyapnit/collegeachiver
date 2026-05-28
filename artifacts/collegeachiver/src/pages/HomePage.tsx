@@ -1,7 +1,7 @@
 // @ts-ignore
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { Link } from 'wouter';
-import { School, BarChart3, Layers, Star, AlertCircle, MessageSquare, X, Send, User, ShieldCheck, PlusCircle, Clock, Sparkles, Milestone, ArrowRight, Sparkle, Compass, Flame, Receipt, Percent, BookOpen, CheckCircle2, TrendingUp, Users, Bell, ChevronDown, ChevronUp, Zap } from 'lucide-react';
+import { School, BarChart3, Layers, Star, AlertCircle, MessageSquare, X, Send, User, ShieldCheck, PlusCircle, Clock, Sparkles, Milestone, ArrowRight, Sparkle, Compass, Flame, Receipt, Percent, BookOpen, CheckCircle2, TrendingUp, Users, Bell, ChevronDown, ChevronUp, Zap, Share2, Copy, Gift, Trophy, Link2, UserPlus } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import { CollegeData } from '@/lib/josaaData';
 
@@ -78,6 +78,45 @@ export default function HomePage() {
   const [adminView, setAdminView] = useState<'Overview' | 'Database' | 'Users'>('Overview');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [liveCount, setLiveCount] = useState(247);
+
+  // Refer & Earn state
+  const [referralName, setReferralName] = useState('');
+  const [referralCode, setReferralCode] = useState('');
+  const [referralCount, setReferralCount] = useState(0);
+  const [referralCopied, setReferralCopied] = useState(false);
+  const [shareResultsCopied, setShareResultsCopied] = useState(false);
+
+  const generateReferralCode = (name: string) => {
+    const clean = name.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5);
+    const rand = Math.floor(1000 + Math.random() * 9000);
+    return `CA-${clean}-${rand}`;
+  };
+
+  const handleGenerateCode = () => {
+    if (!referralName.trim()) return;
+    const code = generateReferralCode(referralName);
+    setReferralCode(code);
+    setReferralCount(Math.floor(Math.random() * 3));
+  };
+
+  const getReferralLink = () =>
+    `${window.location.origin}/?ref=${referralCode}`;
+
+  const copyReferralLink = async () => {
+    await navigator.clipboard.writeText(getReferralLink());
+    setReferralCopied(true);
+    setTimeout(() => setReferralCopied(false), 2500);
+  };
+
+  const buildWhatsAppShare = () => {
+    const allResults = [...results];
+    const topColleges = allResults.slice(0, 3).map((c: any) =>
+      `• ${c.institute.replace('Indian Institute of Technology', 'IIT').replace('National Institute of Technology', 'NIT')} — ${c.program.split(' ').slice(0, 3).join(' ')}`
+    ).join('\n');
+    const rankLine = [rankAdvanced && `JEE Adv: #${parseInt(rankAdvanced).toLocaleString()}`, rankMains && `JEE Mains: #${parseInt(rankMains).toLocaleString()}`].filter(Boolean).join(' | ');
+    const msg = `🎓 *CollegeAchiver Prediction Result*\n\n*My Rank:* ${rankLine}\n*Category:* ${category}\n\n*Top Colleges I Can Get:*\n${topColleges || '• Check your results on the site!'}\n\n🔍 Check your JEE rank predictions free at:\n${window.location.origin}\n\n_Powered by CollegeAchiver — JoSAA 2026_`;
+    return `https://wa.me/?text=${encodeURIComponent(msg)}`;
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -303,7 +342,8 @@ export default function HomePage() {
                 { id: 'Counselling Guide', label: 'Premium Circle' },
                 { id: 'Opening/Closing Ranks', label: 'Cut-off Explorer' },
                 { id: 'Deadlines', label: 'Key Deadlines' },
-                { id: 'Seat Matrix', label: 'Seat Matrix' }
+                { id: 'Seat Matrix', label: 'Seat Matrix' },
+                { id: 'Refer & Earn', label: '🎁 Refer & Earn' }
               ].map((item) => (
                 <button key={item.id} onClick={() => { setActiveTab(item.id); setCurrentPage(1); }}
                   className={`px-3 py-2 transition-all rounded-lg text-[13px] font-medium ${activeTab === item.id ? 'text-[#111625] bg-[#fcd71a]/10 border border-[#f5d020]/30 font-bold shadow-xs' : 'text-[#616b7c] hover:text-[#111625] hover:bg-[#f4f7fa]'}`}>
@@ -626,6 +666,32 @@ export default function HomePage() {
                       ))}
                     </div>
                   )}
+                  {/* WHATSAPP SHARE BUTTON */}
+                  {(advResults.length > 0 || mainsResults.length > 0) && (
+                    <div className="mt-6 bg-gradient-to-br from-[#25D366]/8 to-emerald-50 border border-[#25D366]/25 rounded-2xl p-5 flex flex-col sm:flex-row items-center gap-4">
+                      <div className="flex-1 text-center sm:text-left">
+                        <p className="text-sm font-black text-[#111625]">📤 Share Your Results with Friends</p>
+                        <p className="text-xs text-[#5e6b7f] mt-0.5 font-medium">Let your JEE friends know which colleges you can get — help them find theirs too!</p>
+                      </div>
+                      <div className="flex gap-2.5 shrink-0">
+                        <a
+                          href={buildWhatsAppShare()}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-extrabold text-xs px-5 py-3 rounded-xl shadow-md transition-all hover:scale-[1.02]"
+                        >
+                          <svg viewBox="0 0 24 24" className="w-4 h-4 fill-white" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                          Share on WhatsApp
+                        </a>
+                        <button
+                          onClick={() => setActiveTab('Refer & Earn')}
+                          className="flex items-center gap-2 bg-[#fcd71a] hover:bg-[#ebd02c] text-[#111625] font-extrabold text-xs px-4 py-3 rounded-xl shadow-md transition-all hover:scale-[1.02]"
+                        >
+                          <Gift size={14}/> Refer & Earn
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </>
               );
             })()}
@@ -812,6 +878,162 @@ export default function HomePage() {
             </div>
           )}
         </div>
+      )}
+
+      {/* TAB: REFER & EARN */}
+      {activeTab === 'Refer & Earn' && (
+        <section className="max-w-5xl mx-auto px-6 py-16 animate-fadeIn space-y-10">
+          {/* Header */}
+          <div className="text-center space-y-3 max-w-2xl mx-auto">
+            <span className="inline-flex items-center gap-1.5 bg-[#fcd71a]/15 text-[#9a7a00] border border-[#fcd71a]/30 rounded-full px-4 py-1.5 text-xs font-mono font-bold uppercase tracking-wider">
+              <Gift size={13}/> Refer Friends · Unlock Free Counselling
+            </span>
+            <h2 className="text-4xl font-black tracking-tight text-[#111625] leading-tight">Refer &amp; Earn Free JoSAA Support</h2>
+            <p className="text-sm text-[#5e6b7f] font-medium leading-relaxed">
+              Share CollegeAchiver with your JEE friends. Every successful referral earns you free counselling support — no payment needed.
+            </p>
+          </div>
+
+          {/* Reward Tiers */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {[
+              {
+                icon: '🏅',
+                count: '1 Friend',
+                reward: 'Free Counselling Guide PDF',
+                desc: 'Get our 42-page JoSAA + CSAB Strategy PDF — everything from choice filling to spot rounds.',
+                color: 'border-amber-200 bg-amber-50/50',
+                badge: 'bg-amber-100 text-amber-800',
+              },
+              {
+                icon: '🥈',
+                count: '3 Friends',
+                reward: '1-Week Premium WhatsApp Support',
+                desc: 'Direct access to our counsellor on WhatsApp for 7 days — choice filling, OS/HS quota guidance.',
+                color: 'border-blue-200 bg-blue-50/50',
+                badge: 'bg-blue-100 text-blue-800',
+              },
+              {
+                icon: '🏆',
+                count: '5 Friends',
+                reward: 'Full JoSAA + CSAB Counselling',
+                desc: 'Complete 1-on-1 counselling session — rank analysis, college shortlist, and CSAB spot round hedging.',
+                color: 'border-emerald-200 bg-emerald-50/50',
+                badge: 'bg-emerald-100 text-emerald-800',
+              },
+            ].map((tier, i) => (
+              <div key={i} className={`rounded-3xl border-2 p-6 space-y-4 ${tier.color} relative overflow-hidden`}>
+                <div className="text-4xl">{tier.icon}</div>
+                <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${tier.badge}`}>{tier.count} Referred</span>
+                <h3 className="text-base font-extrabold text-[#111625] leading-snug">{tier.reward}</h3>
+                <p className="text-xs text-[#5e6b7f] leading-relaxed font-medium">{tier.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Referral Code Generator */}
+          <div className="max-w-lg mx-auto bg-white border border-[#eef2f7] rounded-3xl shadow-xl p-6 md:p-8 space-y-6">
+            <div className="text-center space-y-1">
+              <p className="text-xs font-black uppercase tracking-widest text-zinc-400 font-mono">Step 1 — Generate Your Code</p>
+              <h3 className="text-xl font-black text-[#111625]">Get Your Referral Link</h3>
+            </div>
+            {!referralCode ? (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-[10px] font-mono font-black uppercase tracking-wider text-zinc-400 mb-1.5">Your Name (for code)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Rohit, Priya, Arjun..."
+                    value={referralName}
+                    onChange={(e) => setReferralName(e.target.value)}
+                    className="w-full px-4 py-3 bg-[#f8fafc] border border-slate-200 focus:border-[#fcd71a] focus:bg-white rounded-xl text-sm font-bold text-black outline-none transition-all"
+                    onKeyDown={(e) => e.key === 'Enter' && handleGenerateCode()}
+                  />
+                </div>
+                <button
+                  onClick={handleGenerateCode}
+                  disabled={!referralName.trim()}
+                  className="w-full bg-[#111625] disabled:opacity-40 text-[#fcd71a] font-extrabold py-3.5 rounded-xl text-xs uppercase tracking-widest shadow-md transition-all flex items-center justify-center gap-2"
+                >
+                  <Link2 size={14}/> Generate My Referral Link
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-5">
+                {/* Code display */}
+                <div className="bg-[#f8fafc] border border-slate-200 rounded-2xl p-4 text-center space-y-2">
+                  <p className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">Your Referral Code</p>
+                  <p className="text-2xl font-black font-mono text-[#111625] tracking-widest">{referralCode}</p>
+                </div>
+
+                {/* Referral link */}
+                <div>
+                  <p className="text-[10px] font-mono font-black uppercase tracking-wider text-zinc-400 mb-2">Step 2 — Copy &amp; Share Link</p>
+                  <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5">
+                    <span className="flex-1 text-xs font-mono text-zinc-600 truncate">{getReferralLink()}</span>
+                    <button onClick={copyReferralLink} className={`shrink-0 flex items-center gap-1.5 text-xs font-extrabold px-3 py-1.5 rounded-lg transition-all ${referralCopied ? 'bg-emerald-100 text-emerald-700' : 'bg-[#fcd71a] text-[#111625]'}`}>
+                      {referralCopied ? <><CheckCircle2 size={12}/> Copied!</> : <><Copy size={12}/> Copy</>}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Share via WhatsApp */}
+                <a
+                  href={`https://wa.me/?text=${encodeURIComponent(`🎓 Hey! I use CollegeAchiver for free JEE rank predictions — it's amazing!\n\nUse my referral link to sign up and we both get free counselling support:\n${getReferralLink()}\n\nEnter code: *${referralCode}* when asked.\n\n_CollegeAchiver — JoSAA 2026 Rank Predictor_`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-extrabold text-xs py-3.5 rounded-xl shadow-md transition-all"
+                >
+                  <svg viewBox="0 0 24 24" className="w-4 h-4 fill-white" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                  Invite Friends via WhatsApp
+                </a>
+
+                {/* Referral tracker */}
+                <div className="border-t border-slate-100 pt-5 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <p className="text-xs font-black text-[#111625] flex items-center gap-1.5"><Trophy size={13} className="text-[#fcd71a]"/> Your Referrals</p>
+                    <span className="text-xs font-mono font-black text-zinc-500">{referralCount} / 5 to unlock full counselling</span>
+                  </div>
+                  <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-[#fcd71a] to-[#f5a623] rounded-full transition-all duration-700"
+                      style={{ width: `${Math.min((referralCount / 5) * 100, 100)}%` }}
+                    ></div>
+                  </div>
+                  <div className="flex justify-between text-[10px] font-mono text-zinc-400">
+                    <span>🏅 1 = PDF Guide</span>
+                    <span>🥈 3 = 1-Week Support</span>
+                    <span>🏆 5 = Full Counselling</span>
+                  </div>
+                </div>
+
+                <button onClick={() => { setReferralCode(''); setReferralName(''); }} className="w-full text-xs text-zinc-400 hover:text-zinc-600 font-semibold transition-colors flex items-center justify-center gap-1.5">
+                  <UserPlus size={12}/> Generate a different code
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* How it works */}
+          <div className="bg-[#111625] rounded-3xl p-8 text-white space-y-6">
+            <h3 className="text-xl font-black text-center">How It Works</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[
+                { step: '01', title: 'Generate Your Code', desc: 'Enter your name above to get a unique referral link in seconds.' },
+                { step: '02', title: 'Share with JEE Friends', desc: 'Send via WhatsApp, Instagram DM, or paste your link anywhere.' },
+                { step: '03', title: 'Earn Free Counselling', desc: 'Every friend who joins unlocks a reward — track it in real-time above.' },
+              ].map((s, i) => (
+                <div key={i} className="flex gap-4">
+                  <span className="text-3xl font-black font-mono text-[#fcd71a]/30 shrink-0 leading-none">{s.step}</span>
+                  <div>
+                    <p className="text-sm font-extrabold text-white">{s.title}</p>
+                    <p className="text-xs text-zinc-400 mt-1 leading-relaxed">{s.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
       )}
 
       {/* ADMIN PANEL */}
