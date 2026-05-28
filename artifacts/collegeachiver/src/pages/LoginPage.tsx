@@ -16,9 +16,10 @@ export default function LoginPage() {
     setLoading(true);
     setMessage({ text: '', type: '' });
 
-    if (email === 'admin@collegeachiver.com' && password === 'admin123') {
+    if (email === 'admin@achiver.com' && password === 'admin123') {
       setMessage({ text: 'Admin Access Granted! Routing to Dashboard...', type: 'success' });
       setTimeout(() => setLocation('/admin'), 1500);
+      setLoading(false);
       return;
     }
 
@@ -63,7 +64,7 @@ export default function LoginPage() {
             </div>
           </div>
           <div className="flex justify-between items-center pt-1">
-            <div className="text-[10px] text-zinc-400 font-mono tracking-wider">*Admin: <span className="text-[#cca01d] cursor-help" title="Email: admin@collegeachiver.com | Pass: admin123">Hover for Hint</span></div>
+            <div className="text-[10px] text-zinc-400 font-mono tracking-wider">*Admin: <span className="text-[#cca01d] cursor-help" title="Email: admin@achiver.com | Pass: admin123">Hover for Hint</span></div>
             <Link href="/forgot-password" className="text-xs font-bold text-[#cca01d] hover:text-[#977914] transition-colors">Forgot Password?</Link>
           </div>
           <button disabled={loading} type="submit" className="w-full bg-[#111625] hover:bg-zinc-800 text-white font-extrabold py-4 rounded-xl text-xs uppercase tracking-widest shadow-md transition-all flex items-center justify-center gap-2 mt-4">
