@@ -37,6 +37,7 @@ export default function Home() {
   const [gender, setGender] = useState('Gender-Neutral');
   const [homeState, setHomeState] = useState('OS'); 
   const [hasSearched, setHasSearched] = useState(false);
+  const [examType, setExamType] = useState<'JEE Advanced' | 'JEE Mains'>('JEE Advanced');
 
   // 🏛️ DATA MATRICES STATE LAYERS
   const [dynamicJosaaRecords, setDynamicJosaaRecords] = useState<CollegeData[]>([]);
@@ -90,6 +91,7 @@ export default function Home() {
   // Form input logs fields buffer arrays
   const [newInst, setNewInst] = useState('');
   const [newProg, setNewProg] = useState('');
+  const [newExamType, setNewExamType] = useState('JEE Advanced');
   const [newQuota, setNewQuota] = useState('OS');
   const [newCat, setNewCat] = useState('OPEN');
   const [newGend, setNewGend] = useState('Gender-Neutral');
@@ -131,11 +133,16 @@ export default function Home() {
     setHasSearched(true);
     const userRank = parseInt(rank);
 
-    const filtered = dynamicJosaaRecords.filter(col => {
+    const filtered = dynamicJosaaRecords.filter((col: any) => {
+      const examMatch = !col.exam_type || col.exam_type === examType;
       return (
-        col.category === category && col.gender === gender && (col.quota === homeState || col.quota === "AI") && col.closing >= userRank
+        examMatch &&
+        col.category === category &&
+        col.gender === gender &&
+        (col.quota === homeState || col.quota === "AI") &&
+        col.closing >= userRank
       );
-    }).map(col => {
+    }).map((col: any) => {
       let chance: 'High' | 'Medium' | 'Low' = 'Low';
       const safetyMargin = col.closing - userRank;
       if (safetyMargin > 8000) chance = 'High';       
@@ -143,7 +150,7 @@ export default function Home() {
       return { ...col, chance };
     });
 
-    filtered.sort((a, b) => a.closing - b.closing);
+    filtered.sort((a: any, b: any) => a.closing - b.closing);
     setResults(filtered);
     setTimeout(() => { predictorRef.current?.scrollIntoView({ behavior: 'smooth' }); }, 100);
   };
@@ -212,6 +219,7 @@ export default function Home() {
     const formData = {
       institute: newInst,
       program: newProg,
+      exam_type: newExamType,
       quota: newQuota,
       category: newCat,
       gender: newGend,
@@ -451,14 +459,65 @@ export default function Home() {
         <div className="animate-fadeIn pb-20 max-w-4xl mx-auto px-6 pt-12 space-y-12">
           <div className="text-center space-y-2">
             <h2 className="text-3xl font-black tracking-tight text-[#111625]">Rank Prediction Cockpit</h2>
+            <p className="text-xs text-[#8492a6] font-medium">Select your exam and enter rank to find matching colleges</p>
+          </div>
+
+          {/* Exam Type Toggle */}
+          <div className="flex justify-center">
+            <div className="inline-flex bg-[#f4f7fa] p-1.5 rounded-2xl border border-slate-200 gap-2 shadow-xs">
+              <button
+                type="button"
+                onClick={() => { setExamType('JEE Advanced'); setHasSearched(false); setResults([]); }}
+                className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+                  examType === 'JEE Advanced'
+                    ? 'bg-[#111625] text-[#fcd71a] shadow-md'
+                    : 'text-[#6c778a] hover:text-[#111625]'
+                }`}
+              >
+                🎯 JEE Advanced
+              </button>
+              <button
+                type="button"
+                onClick={() => { setExamType('JEE Mains'); setHasSearched(false); setResults([]); }}
+                className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+                  examType === 'JEE Mains'
+                    ? 'bg-[#111625] text-[#fcd71a] shadow-md'
+                    : 'text-[#6c778a] hover:text-[#111625]'
+                }`}
+              >
+                📝 JEE Mains
+              </button>
+            </div>
           </div>
 
           <div className="bg-white border border-[#e2e8f0] rounded-3xl p-6 md:p-8 shadow-xl relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1.5 bg-[#fcd71a]"></div>
+            {/* Active exam badge */}
+            <div className="mb-5 flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border bg-[#fcd71a]/10 text-[#cca01d] border-[#fcd71a]/30">
+                <span className="w-1.5 h-1.5 bg-[#fcd71a] rounded-full animate-pulse"></span>
+                {examType} Mode Active
+              </span>
+              {examType === 'JEE Advanced' && (
+                <span className="text-[10px] text-[#8492a6] font-medium">IITs · IISc · Results from JoSAA counselling</span>
+              )}
+              {examType === 'JEE Mains' && (
+                <span className="text-[10px] text-[#8492a6] font-medium">NITs · IIITs · GFTIs · Results from JoSAA/CSAB counselling</span>
+              )}
+            </div>
             <form onSubmit={handlePredict} className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left text-xs font-semibold text-[#485363]">
               <div className="md:col-span-2">
-                <label className="block mb-2 font-bold tracking-wide uppercase text-[10px] text-[#8492a6]">JEE Rank (CRL or Category Rank)</label>
-                <input type="number" placeholder="e.g. 12500" value={rank} onChange={(e) => setRank(e.target.value)} className="w-full px-4 py-3.5 bg-[#f8fafc] border border-[#e2e8f0] focus:border-[#fcd71a] focus:bg-white rounded-xl text-sm font-bold text-black outline-none transition-all" required />
+                <label className="block mb-2 font-bold tracking-wide uppercase text-[10px] text-[#8492a6]">
+                  {examType === 'JEE Advanced' ? 'JEE Advanced Rank (CRL / Category Rank)' : 'JEE Mains Rank (CRL / Category Rank)'}
+                </label>
+                <input
+                  type="number"
+                  placeholder={examType === 'JEE Advanced' ? 'e.g. 2500' : 'e.g. 12500'}
+                  value={rank}
+                  onChange={(e) => setRank(e.target.value)}
+                  className="w-full px-4 py-3.5 bg-[#f8fafc] border border-[#e2e8f0] focus:border-[#fcd71a] focus:bg-white rounded-xl text-sm font-bold text-black outline-none transition-all"
+                  required
+                />
               </div>
               <div>
                 <label className="block mb-2 font-bold tracking-wide uppercase text-[10px] text-[#8492a6]">Reservation Category</label>
@@ -768,7 +827,8 @@ export default function Home() {
                       <label className="block mb-1.5 text-zinc-400 uppercase text-[10px] tracking-wide">Academic Program specialty course stream</label>
                       <input type="text" placeholder="Electronics and Communication Engineering" value={newProg} onChange={(e) => setNewProg(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-white outline-none focus:border-[#fcd71a]" required />
                     </div>
-                    <div><label className="block mb-1.5 uppercase text-[10px]">Quota Pool ID</label><select value={newQuota} onChange={(e) => setNewQuota(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-zinc-300 outline-none"><option value="OS">Other State (OS)</option><option value="HS">Home State (HS)</option></select></div>
+                    <div><label className="block mb-1.5 uppercase text-[10px]">Exam Type</label><select value={newExamType} onChange={(e) => setNewExamType(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-zinc-300 outline-none focus:border-[#fcd71a]"><option value="JEE Advanced">JEE Advanced (IITs)</option><option value="JEE Mains">JEE Mains (NITs / IIITs / GFTIs)</option></select></div>
+                    <div><label className="block mb-1.5 uppercase text-[10px]">Quota Pool ID</label><select value={newQuota} onChange={(e) => setNewQuota(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-zinc-300 outline-none"><option value="AI">All India (AI)</option><option value="OS">Other State (OS)</option><option value="HS">Home State (HS)</option></select></div>
                     <div><label className="block mb-1.5 uppercase text-[10px]">Reservation Category Pool</label><select value={newCat} onChange={(e) => setNewCat(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-zinc-300 outline-none"><option>OPEN</option><option>OPEN (PwD)</option><option>OBC-NCL</option><option>OBC-NCL (PwD)</option><option>SC</option><option>SC (PwD)</option><option>ST</option><option>ST (PwD)</option><option>EWS</option><option>EWS (PwD)</option></select></div>
                     <div><label className="block mb-1.5 uppercase text-[10px]">Reservation Gender Pool</label><select value={newGend} onChange={(e) => setNewGend(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-zinc-300 outline-none"><option>Gender-Neutral</option><option>Female-Only</option></select></div>
                     <div><label className="block mb-1.5 uppercase text-[10px]">JEE Opening Rank</label><input type="number" placeholder="4444" value={newOpenRank} onChange={(e) => setNewOpenRank(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-white outline-none" required /></div>

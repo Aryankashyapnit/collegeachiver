@@ -12,6 +12,7 @@ export default function AdminPanel() {
   const [formData, setFormData] = useState({
     institute: '',
     program: '',
+    exam_type: 'JEE Advanced',
     quota: '',
     category: '',
     gender: '',
@@ -62,7 +63,7 @@ export default function AdminPanel() {
     } else {
       setMessage("College Data added successfully!");
       setFormData({
-        institute: '', program: '', quota: '', category: '', gender: '',
+        institute: '', program: '', exam_type: 'JEE Advanced', quota: '', category: '', gender: '',
         opening: '', closing: '', fee: '', placement: '', nirf: ''
       });
       fetchColleges(); 
@@ -123,6 +124,14 @@ export default function AdminPanel() {
               <div>
                 <label className="block text-[10px] font-bold tracking-widest uppercase text-[#8492a6] mb-1.5">Program Name</label>
                 <input required name="program" value={formData.program} onChange={handleChange} className="w-full bg-[#f8fafc] border border-[#e2e8f0] rounded-xl px-4 py-3 text-sm font-bold focus:border-[#fcd71a] focus:bg-white outline-none transition-all" placeholder="e.g. Computer Science" />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold tracking-widest uppercase text-[#8492a6] mb-1.5">Exam Type</label>
+                <select name="exam_type" value={formData.exam_type} onChange={handleChange} className="w-full bg-[#f8fafc] border border-[#e2e8f0] rounded-xl px-4 py-3 text-sm font-bold focus:border-[#fcd71a] focus:bg-white outline-none transition-all">
+                  <option value="JEE Advanced">JEE Advanced (IITs)</option>
+                  <option value="JEE Mains">JEE Mains (NITs / IIITs / GFTIs)</option>
+                </select>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -214,6 +223,7 @@ export default function AdminPanel() {
                        <th className="px-6 py-4 font-black text-[11px] uppercase tracking-widest text-[#8492a6]">ID</th>
                        <th className="px-6 py-4 font-black text-[11px] uppercase tracking-widest text-[#8492a6]">Institute</th>
                        <th className="px-6 py-4 font-black text-[11px] uppercase tracking-widest text-[#8492a6]">Program</th>
+                       <th className="px-6 py-4 font-black text-[11px] uppercase tracking-widest text-[#8492a6]">Exam</th>
                        <th className="px-6 py-4 font-black text-[11px] uppercase tracking-widest text-[#8492a6]">Ranks (Open-Close)</th>
                        <th className="px-6 py-4 font-black text-[11px] uppercase tracking-widest text-[#8492a6]">Actions</th>
                      </tr>
@@ -224,6 +234,13 @@ export default function AdminPanel() {
                          <td className="px-6 py-4 text-[#a0abbc] font-mono text-xs">#{c.id}</td>
                          <td className="px-6 py-4 font-bold text-[#111625] max-w-[200px] truncate" title={c.institute}>{c.institute}</td>
                          <td className="px-6 py-4 text-[#5e6b7f] font-medium max-w-[150px] truncate" title={c.program}>{c.program}</td>
+                         <td className="px-6 py-4">
+                           <span className={`text-[10px] font-mono font-black px-2 py-1 rounded-full border ${
+                             c.exam_type === 'JEE Advanced'
+                               ? 'bg-blue-50 text-blue-700 border-blue-200'
+                               : 'bg-purple-50 text-purple-700 border-purple-200'
+                           }`}>{c.exam_type || 'JEE Advanced'}</span>
+                         </td>
                          <td className="px-6 py-4">
                             <span className="text-emerald-700 bg-emerald-50 px-2 py-1 rounded font-mono font-bold mr-2 text-[11px] border border-emerald-200">{c.opening}</span>
                             <span className="text-amber-700 bg-amber-50 px-2 py-1 rounded font-mono font-bold text-[11px] border border-amber-200">{c.closing}</span>
