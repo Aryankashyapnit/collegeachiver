@@ -80,6 +80,22 @@ export default function HomePage() {
   const [liveCount, setLiveCount] = useState(247);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // College comparison state
+  const [compareList, setCompareList] = useState<any[]>([]);
+  const [showCompareModal, setShowCompareModal] = useState(false);
+
+  const toggleCompare = (college: any) => {
+    setCompareList(prev => {
+      const already = prev.find(c => c.id === college.id && c._examLabel === college._examLabel);
+      if (already) return prev.filter(c => !(c.id === college.id && c._examLabel === college._examLabel));
+      if (prev.length >= 3) return prev;
+      return [...prev, college];
+    });
+  };
+
+  const isInCompare = (college: any) =>
+    compareList.some(c => c.id === college.id && c._examLabel === college._examLabel);
+
   // Refer & Earn state
   const [referralName, setReferralName] = useState('');
   const [referralCode, setReferralCode] = useState('');
@@ -684,19 +700,36 @@ export default function HomePage() {
                         <span className="text-[11px] font-black uppercase tracking-widest text-blue-700 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-full">🎯 JEE Advanced Results — Rank {parseInt(rankAdvanced).toLocaleString()}</span>
                         <div className="h-px flex-1 bg-blue-100"></div>
                       </div>
-                      {advResults.map((college: any) => (
-                        <div key={`adv-${college.id}`} className="bg-white border border-[#eef2f7] hover:border-blue-300/60 rounded-2xl p-5 shadow-xs border-l-4 border-l-blue-500 flex flex-col justify-between gap-4 transition-all">
-                          <div className="flex justify-between items-start gap-4">
-                            <div><h4 className="font-bold text-[#111625] text-base tracking-tight">{college.institute}</h4><p className="text-xs text-[#5e6b7f] mt-1 font-semibold">{college.program}</p></div>
-                            <span className={`text-[10px] font-mono font-black px-3 py-1 rounded-full uppercase border ${college.chance === 'High' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-amber-50 text-amber-800 border-amber-200'}`}>{college.chance} Chance</span>
+                      {advResults.map((college: any) => {
+                        const inCompare = isInCompare(college);
+                        const limitHit = compareList.length >= 3 && !inCompare;
+                        return (
+                          <div key={`adv-${college.id}`} className={`bg-white border rounded-2xl p-5 shadow-xs border-l-4 border-l-blue-500 flex flex-col justify-between gap-4 transition-all ${inCompare ? 'border-[#fcd71a] ring-2 ring-[#fcd71a]/40' : 'border-[#eef2f7] hover:border-blue-300/60'}`}>
+                            <div className="flex justify-between items-start gap-4">
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-bold text-[#111625] text-base tracking-tight leading-snug">{college.institute}</h4>
+                                <p className="text-xs text-[#5e6b7f] mt-1 font-semibold">{college.program}</p>
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <span className={`text-[10px] font-mono font-black px-3 py-1 rounded-full uppercase border ${college.chance === 'High' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-amber-50 text-amber-800 border-amber-200'}`}>{college.chance} Chance</span>
+                                <button
+                                  onClick={() => toggleCompare(college)}
+                                  disabled={limitHit}
+                                  title={limitHit ? 'Max 3 colleges' : inCompare ? 'Remove from compare' : 'Add to compare'}
+                                  className={`text-[10px] font-black px-2.5 py-1.5 rounded-lg border transition-all shrink-0 ${inCompare ? 'bg-[#fcd71a] border-[#fcd71a] text-[#111625]' : limitHit ? 'bg-gray-50 border-gray-200 text-gray-300 cursor-not-allowed' : 'bg-white border-[#e2e8f0] text-[#5e6b7f] hover:border-[#fcd71a] hover:text-[#111625]'}`}
+                                >
+                                  {inCompare ? '✓ Added' : '+ Compare'}
+                                </button>
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-3 gap-2 pt-3 border-t border-[#f4f7f6] text-[11px] font-semibold text-[#5e6b7f]">
+                              <span>Closing: <strong className="text-black">{college.closing}</strong></span>
+                              <span>Fee: <strong className="text-black">{college.fee || '2,20,000/Yr'}</strong></span>
+                              <span>NIRF: <strong className="text-black">#{college.nirf || '—'}</strong></span>
+                            </div>
                           </div>
-                          <div className="grid grid-cols-3 gap-2 pt-3 border-t border-[#f4f7f6] text-[11px] font-semibold text-[#5e6b7f]">
-                            <span>Closing: <strong className="text-black">{college.closing}</strong></span>
-                            <span>Fee: <strong className="text-black">{college.fee || '2,20,000/Yr'}</strong></span>
-                            <span>NIRF: <strong className="text-black">#{college.nirf || '—'}</strong></span>
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                   {mainsResults.length > 0 && rankMains && (
@@ -706,19 +739,36 @@ export default function HomePage() {
                         <span className="text-[11px] font-black uppercase tracking-widest text-purple-700 bg-purple-50 border border-purple-200 px-3 py-1.5 rounded-full">📝 JEE Mains Results — Rank {parseInt(rankMains).toLocaleString()}</span>
                         <div className="h-px flex-1 bg-purple-100"></div>
                       </div>
-                      {mainsResults.map((college: any) => (
-                        <div key={`mns-${college.id}`} className="bg-white border border-[#eef2f7] hover:border-purple-300/60 rounded-2xl p-5 shadow-xs border-l-4 border-l-purple-500 flex flex-col justify-between gap-4 transition-all">
-                          <div className="flex justify-between items-start gap-4">
-                            <div><h4 className="font-bold text-[#111625] text-base tracking-tight">{college.institute}</h4><p className="text-xs text-[#5e6b7f] mt-1 font-semibold">{college.program}</p></div>
-                            <span className={`text-[10px] font-mono font-black px-3 py-1 rounded-full uppercase border ${college.chance === 'High' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-amber-50 text-amber-800 border-amber-200'}`}>{college.chance} Chance</span>
+                      {mainsResults.map((college: any) => {
+                        const inCompare = isInCompare(college);
+                        const limitHit = compareList.length >= 3 && !inCompare;
+                        return (
+                          <div key={`mns-${college.id}`} className={`bg-white border rounded-2xl p-5 shadow-xs border-l-4 border-l-purple-500 flex flex-col justify-between gap-4 transition-all ${inCompare ? 'border-[#fcd71a] ring-2 ring-[#fcd71a]/40' : 'border-[#eef2f7] hover:border-purple-300/60'}`}>
+                            <div className="flex justify-between items-start gap-4">
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-bold text-[#111625] text-base tracking-tight leading-snug">{college.institute}</h4>
+                                <p className="text-xs text-[#5e6b7f] mt-1 font-semibold">{college.program}</p>
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <span className={`text-[10px] font-mono font-black px-3 py-1 rounded-full uppercase border ${college.chance === 'High' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-amber-50 text-amber-800 border-amber-200'}`}>{college.chance} Chance</span>
+                                <button
+                                  onClick={() => toggleCompare(college)}
+                                  disabled={limitHit}
+                                  title={limitHit ? 'Max 3 colleges' : inCompare ? 'Remove from compare' : 'Add to compare'}
+                                  className={`text-[10px] font-black px-2.5 py-1.5 rounded-lg border transition-all shrink-0 ${inCompare ? 'bg-[#fcd71a] border-[#fcd71a] text-[#111625]' : limitHit ? 'bg-gray-50 border-gray-200 text-gray-300 cursor-not-allowed' : 'bg-white border-[#e2e8f0] text-[#5e6b7f] hover:border-[#fcd71a] hover:text-[#111625]'}`}
+                                >
+                                  {inCompare ? '✓ Added' : '+ Compare'}
+                                </button>
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-3 gap-2 pt-3 border-t border-[#f4f7f6] text-[11px] font-semibold text-[#5e6b7f]">
+                              <span>Closing: <strong className="text-black">{college.closing}</strong></span>
+                              <span>Fee: <strong className="text-black">{college.fee || '2,20,000/Yr'}</strong></span>
+                              <span>NIRF: <strong className="text-black">#{college.nirf || '—'}</strong></span>
+                            </div>
                           </div>
-                          <div className="grid grid-cols-3 gap-2 pt-3 border-t border-[#f4f7f6] text-[11px] font-semibold text-[#5e6b7f]">
-                            <span>Closing: <strong className="text-black">{college.closing}</strong></span>
-                            <span>Fee: <strong className="text-black">{college.fee || '2,20,000/Yr'}</strong></span>
-                            <span>NIRF: <strong className="text-black">#{college.nirf || '—'}</strong></span>
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                   {/* WHATSAPP SHARE BUTTON */}
@@ -1290,6 +1340,167 @@ export default function HomePage() {
             <span>Data sourced from JoSAA official records. Not affiliated with JoSAA / NTA / IITs.</span>
           </div>
         </footer>
+      )}
+
+      {/* STICKY COMPARE BAR */}
+      {compareList.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#111625] border-t-2 border-[#fcd71a] shadow-2xl px-4 py-3">
+          <div className="max-w-5xl mx-auto flex items-center gap-3 flex-wrap">
+            <span className="text-[10px] font-black text-[#fcd71a] uppercase tracking-widest font-mono shrink-0">Compare ({compareList.length}/3):</span>
+            <div className="flex items-center gap-2 flex-1 flex-wrap">
+              {compareList.map((c, i) => (
+                <div key={i} className="flex items-center gap-1.5 bg-white/10 border border-white/20 rounded-xl px-3 py-1.5">
+                  <span className="text-xs font-bold text-white truncate max-w-[160px]">
+                    {c.institute.replace('Indian Institute of Technology', 'IIT').replace('National Institute of Technology', 'NIT')}
+                  </span>
+                  <button onClick={() => toggleCompare(c)} className="text-zinc-400 hover:text-white transition-colors shrink-0">
+                    <X size={12}/>
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              {compareList.length >= 2 && (
+                <button
+                  onClick={() => setShowCompareModal(true)}
+                  className="bg-[#fcd71a] text-[#111625] font-extrabold text-xs px-5 py-2.5 rounded-xl hover:bg-[#ebd02c] transition-all shadow-lg"
+                >
+                  Compare Side-by-Side →
+                </button>
+              )}
+              {compareList.length < 2 && (
+                <span className="text-[10px] text-zinc-500 font-mono">Add {2 - compareList.length} more to compare</span>
+              )}
+              <button onClick={() => setCompareList([])} className="text-[10px] text-zinc-500 hover:text-zinc-300 font-semibold transition-colors">Clear all</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* COMPARE MODAL */}
+      {showCompareModal && compareList.length >= 2 && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto relative">
+            {/* Modal header */}
+            <div className="sticky top-0 bg-white border-b border-[#eef1f6] px-6 py-4 flex items-center justify-between z-10 rounded-t-3xl">
+              <div>
+                <h2 className="text-lg font-black text-[#111625]">College Comparison</h2>
+                <p className="text-xs text-[#5e6b7f] font-medium mt-0.5">Side-by-side view of your selected colleges</p>
+              </div>
+              <button onClick={() => setShowCompareModal(false)} className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-[#f4f7fa] text-zinc-400 hover:text-black transition-all">
+                <X size={18}/>
+              </button>
+            </div>
+
+            {/* Comparison table */}
+            <div className="overflow-x-auto p-6">
+              <table className="w-full border-collapse">
+                {/* College name headers */}
+                <thead>
+                  <tr>
+                    <th className="text-left text-[10px] font-black uppercase tracking-widest text-zinc-400 pb-4 w-36 pr-4">Category</th>
+                    {compareList.map((c, i) => (
+                      <th key={i} className="pb-4 px-3 text-left align-top">
+                        <div className={`rounded-2xl p-4 ${i === 0 ? 'bg-blue-50 border border-blue-200' : i === 1 ? 'bg-purple-50 border border-purple-200' : 'bg-emerald-50 border border-emerald-200'}`}>
+                          <p className="text-xs font-black text-[#111625] leading-snug">{c.institute}</p>
+                          <p className="text-[10px] text-[#5e6b7f] mt-1 font-semibold leading-snug">{c.program}</p>
+                          <div className="flex items-center gap-1.5 mt-2">
+                            <span className={`text-[9px] font-mono font-black px-2 py-0.5 rounded-full uppercase border ${c._examLabel === 'JEE Advanced' ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-purple-100 text-purple-700 border-purple-200'}`}>{c._examLabel}</span>
+                            <span className={`text-[9px] font-mono font-black px-2 py-0.5 rounded-full uppercase border ${c.chance === 'High' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-amber-100 text-amber-700 border-amber-200'}`}>{c.chance} Chance</span>
+                          </div>
+                        </div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#f4f7f6]">
+                  {[
+                    {
+                      label: '📊 Closing Rank',
+                      key: 'closing',
+                      render: (v: any) => <span className="font-black text-[#111625]">{v?.toLocaleString() || '—'}</span>,
+                      best: (vals: any[]) => Math.min(...vals.filter(v => v).map(Number)),
+                      bestClass: 'bg-emerald-50 text-emerald-700',
+                    },
+                    {
+                      label: '💰 Annual Fee',
+                      key: 'fee',
+                      render: (v: any) => <span className="font-bold text-[#111625]">{v || '₹2,20,000/Yr'}</span>,
+                      best: null,
+                      bestClass: '',
+                    },
+                    {
+                      label: '🏆 NIRF Rank',
+                      key: 'nirf',
+                      render: (v: any) => v ? <span className="font-black text-[#111625]">#{v}</span> : <span className="text-zinc-300 font-mono">—</span>,
+                      best: (vals: any[]) => Math.min(...vals.filter(v => v).map(Number)),
+                      bestClass: 'bg-amber-50 text-amber-700',
+                    },
+                    {
+                      label: '📈 Avg Placement',
+                      key: 'placement',
+                      render: (v: any) => <span className="font-bold text-[#111625]">{v || '—'}</span>,
+                      best: null,
+                      bestClass: '',
+                    },
+                    {
+                      label: '🎯 Admission Chance',
+                      key: 'chance',
+                      render: (v: any) => (
+                        <span className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase ${v === 'High' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>{v}</span>
+                      ),
+                      best: null,
+                      bestClass: '',
+                    },
+                    {
+                      label: '📋 Quota',
+                      key: 'quota',
+                      render: (v: any) => <span className="font-semibold text-[#5e6b7f]">{v || 'OS / AI'}</span>,
+                      best: null,
+                      bestClass: '',
+                    },
+                    {
+                      label: '👥 Gender Pool',
+                      key: 'gender',
+                      render: (v: any) => <span className="font-semibold text-[#5e6b7f]">{v || 'Gender-Neutral'}</span>,
+                      best: null,
+                      bestClass: '',
+                    },
+                  ].map((row, ri) => {
+                    const vals = compareList.map(c => c[row.key]);
+                    const bestVal = row.best ? row.best(vals) : null;
+                    return (
+                      <tr key={ri} className="hover:bg-[#fafbfc] transition-colors">
+                        <td className="py-4 pr-4 text-[11px] font-bold text-[#5e6b7f] align-middle">{row.label}</td>
+                        {compareList.map((c, ci) => {
+                          const val = c[row.key];
+                          const isBest = bestVal !== null && Number(val) === bestVal;
+                          return (
+                            <td key={ci} className="py-4 px-3 text-sm align-middle">
+                              <div className={`inline-flex items-center gap-1.5 ${isBest ? `${row.bestClass} px-2.5 py-1 rounded-lg` : ''}`}>
+                                {row.render(val)}
+                                {isBest && <span className="text-[9px] font-black uppercase tracking-wide">Best</span>}
+                              </div>
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Modal footer */}
+            <div className="border-t border-[#eef1f6] px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#fafbfc] rounded-b-3xl">
+              <p className="text-[11px] text-zinc-400 font-mono">💡 <strong>Best</strong> = lowest rank needed / best NIRF</p>
+              <div className="flex items-center gap-2">
+                <button onClick={() => { setShowCompareModal(false); setCompareList([]); }} className="text-xs text-zinc-500 hover:text-zinc-700 font-semibold transition-colors">Clear & Close</button>
+                <button onClick={() => setShowCompareModal(false)} className="bg-[#111625] text-[#fcd71a] font-extrabold text-xs px-5 py-2.5 rounded-xl hover:bg-zinc-800 transition-all">Done</button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* AUTH MODAL */}
