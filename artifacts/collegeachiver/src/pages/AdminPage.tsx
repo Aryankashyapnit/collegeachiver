@@ -8,12 +8,18 @@ const supabaseUrl = "https://ygyosdmzubwswnhuhere.supabase.co";
 const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlneW9zZG16dWJ3c3duaHVoZXJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3ODAzMDUsImV4cCI6MjA5NTM1NjMwNX0.1jSqaJKatV4lx9JCEi_dAHP6qJFBrPQl8XJ7bqDJeVY";
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-type AdminView = 'overview' | 'cutoffs' | 'seats' | 'deadlines' | 'settings';
+type AdminView = 'overview' | 'cutoffs' | 'seats' | 'deadlines' | 'settings' | 'setup';
+
+const TABLE_MISSING_CODE = 'PGRST204';
+
+const isTableMissing = (msg: string) =>
+  msg.includes('does not exist') || msg.includes('schema cache') || msg.includes('relation') || msg.includes('PGRST');
 
 export default function AdminPage() {
   const [view, setView] = useState<AdminView>('overview');
   const [counts, setCounts] = useState({ cutoffs: 0, seats: 0, deadlines: 0 });
   const [toast, setToast] = useState('');
+  const [missingTables, setMissingTables] = useState<string[]>([]);
 
   // Cutoff form
   const [newInst, setNewInst] = useState('');
@@ -44,17 +50,25 @@ export default function AdminPage() {
 
   const showToast = (msg: string) => {
     setToast(msg);
-    setTimeout(() => setToast(''), 3000);
+    setTimeout(() => setToast(''), 4000);
   };
 
   useEffect(() => {
     const fetchCounts = async () => {
-      const [{ count: c1 }, { count: c2 }, { count: c3 }] = await Promise.all([
+      const missing: string[] = [];
+      const [r1, r2, r3] = await Promise.all([
         supabase.from('josaadata_record').select('*', { count: 'exact', head: true }),
         supabase.from('seat_matrices').select('*', { count: 'exact', head: true }),
         supabase.from('admission_schedules').select('*', { count: 'exact', head: true }),
       ]);
-      setCounts({ cutoffs: c1 || 0, seats: c2 || 0, deadlines: c3 || 0 });
+      if (r1.error && isTableMissing(r1.error.message)) missing.push('josaadata_record');
+      if (r2.error && isTableMissing(r2.error.message)) missing.push('seat_matrices');
+      if (r3.error && isTableMissing(r3.error.message)) missing.push('admission_schedules');
+      if (missing.length > 0) {
+        setMissingTables(missing);
+        setView('setup');
+      }
+      setCounts({ cutoffs: r1.count || 0, seats: r2.count || 0, deadlines: r3.count || 0 });
     };
     fetchCounts();
   }, []);
@@ -67,8 +81,10 @@ export default function AdminPage() {
       opening: parseInt(newOpenRank), closing: parseInt(newCloseRank),
       fee: `${newFee} / Year`, placement: "16.4 LPA", nirf: 42
     }]);
-    if (error) { showToast('❌ Error: ' + error.message); }
-    else {
+    if (error) {
+      if (isTableMissing(error.message)) { setView('setup'); }
+      else { showToast('❌ Error: ' + error.message); }
+    } else {
       showToast('✅ Cutoff record added to Supabase!');
       setCounts(c => ({ ...c, cutoffs: c.cutoffs + 1 }));
       setNewInst(''); setNewProg(''); setNewOpenRank(''); setNewCloseRank('');
@@ -80,8 +96,10 @@ export default function AdminPage() {
     const { error } = await supabase.from('seat_matrices').insert([{
       institute: newSeatInst, program: newSeatProg, quota: newSeatQuota, seats: parseInt(newSeatCap)
     }]);
-    if (error) { showToast('❌ Error: ' + error.message); }
-    else {
+    if (error) {
+      if (isTableMissing(error.message)) { setView('setup'); }
+      else { showToast('❌ Error: ' + error.message); }
+    } else {
       showToast('✅ Seat matrix row added!');
       setCounts(c => ({ ...c, seats: c.seats + 1 }));
       setNewSeatInst(''); setNewSeatProg(''); setNewSeatCap('');
@@ -93,8 +111,10 @@ export default function AdminPage() {
     const { error } = await supabase.from('admission_schedules').insert([{
       date: newDeadDate, title: newDeadTitle, desc: newDeadDesc, status: newDeadStat
     }]);
-    if (error) { showToast('❌ Error: ' + error.message); }
-    else {
+    if (error) {
+      if (isTableMissing(error.message)) { setView('setup'); }
+      else { showToast('❌ Error: ' + error.message); }
+    } else {
       showToast('✅ Deadline added to schedule!');
       setCounts(c => ({ ...c, deadlines: c.deadlines + 1 }));
       setNewDeadDate(''); setNewDeadTitle(''); setNewDeadDesc('');
@@ -107,6 +127,7 @@ export default function AdminPage() {
     { id: 'seats', label: 'Seat Matrix', icon: <School size={16} /> },
     { id: 'deadlines', label: 'Key Deadlines', icon: <Calendar size={16} /> },
     { id: 'settings', label: 'Settings', icon: <ShieldCheck size={16} /> },
+    ...(missingTables.length > 0 ? [{ id: 'setup' as AdminView, label: '⚠ DB Setup', icon: <Database size={16} /> }] : []),
   ];
 
   return (
@@ -154,7 +175,7 @@ export default function AdminPage() {
               <div className="flex items-center gap-2 text-[10px] text-zinc-500 font-mono mb-0.5">
                 <span>Admin</span><ChevronRight size={10}/><span className="text-[#fcd71a] capitalize">{view}</span>
               </div>
-              <h1 className="text-lg font-black text-white capitalize">{view === 'overview' ? 'Dashboard Overview' : view === 'cutoffs' ? 'Inject Cutoff Records' : view === 'seats' ? 'Inject Seat Matrix Rows' : view === 'deadlines' ? 'Inject Key Deadlines' : 'Gateway Settings'}</h1>
+              <h1 className="text-lg font-black text-white capitalize">{view === 'overview' ? 'Dashboard Overview' : view === 'cutoffs' ? 'Inject Cutoff Records' : view === 'seats' ? 'Inject Seat Matrix Rows' : view === 'deadlines' ? 'Inject Key Deadlines' : view === 'setup' ? 'Database Setup Required' : 'Gateway Settings'}</h1>
             </div>
             <div className="flex items-center gap-2 text-[10px] font-mono">
               <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
@@ -328,6 +349,96 @@ export default function AdminPage() {
                       <Calendar size={14}/> Add Deadline to Schedule
                     </button>
                   </form>
+                </div>
+              </div>
+            )}
+
+            {/* DATABASE SETUP GUIDE */}
+            {view === 'setup' && (
+              <div className="max-w-3xl animate-fadeIn space-y-6">
+                <div className="bg-amber-500/10 border border-amber-500/40 p-5 rounded-2xl flex items-start gap-4">
+                  <span className="text-amber-400 text-2xl mt-0.5">⚠</span>
+                  <div>
+                    <p className="text-amber-300 font-black text-sm mb-1">Supabase Tables Not Found</p>
+                    <p className="text-amber-200/70 text-xs">The following tables are missing from your Supabase project: <span className="font-mono text-amber-300">{missingTables.join(', ')}</span>. Run the SQL below in your Supabase SQL Editor to create them.</p>
+                  </div>
+                </div>
+
+                <div className="bg-[#0d1117] border border-zinc-800 p-6 rounded-2xl">
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-xs font-bold text-zinc-300 uppercase tracking-widest font-mono">Step 1 — Open Supabase SQL Editor</p>
+                  </div>
+                  <p className="text-xs text-zinc-500 mb-3">Go to <a href="https://supabase.com/dashboard/project/ygyosdmzubwswnhuhere/sql/new" target="_blank" className="text-[#fcd71a] underline hover:text-white">your Supabase SQL Editor</a>, paste the SQL below, and click Run.</p>
+                </div>
+
+                <div className="bg-[#0d1117] border border-zinc-800 rounded-2xl overflow-hidden">
+                  <div className="px-5 py-3 border-b border-zinc-800 flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-red-500/70"></span>
+                    <span className="w-3 h-3 rounded-full bg-yellow-500/70"></span>
+                    <span className="w-3 h-3 rounded-full bg-green-500/70"></span>
+                    <span className="ml-2 text-[10px] font-mono text-zinc-500">create_tables.sql</span>
+                  </div>
+                  <pre className="p-5 text-[11px] font-mono text-emerald-300 overflow-x-auto leading-relaxed">{`-- Run this in Supabase SQL Editor
+-- URL: https://supabase.com/dashboard/project/ygyosdmzubwswnhuhere/sql/new
+
+-- 1. JoSAA Cutoff Data (rank predictor)
+CREATE TABLE IF NOT EXISTS public.josaadata_record (
+  id          bigserial PRIMARY KEY,
+  institute   text NOT NULL,
+  program     text NOT NULL,
+  exam_type   text DEFAULT 'JEE Advanced',
+  quota       text NOT NULL,
+  category    text NOT NULL,
+  gender      text NOT NULL,
+  opening     integer NOT NULL,
+  closing     integer NOT NULL,
+  fee         text,
+  placement   text,
+  nirf        integer,
+  created_at  timestamptz DEFAULT now()
+);
+
+-- 2. Seat Matrix
+CREATE TABLE IF NOT EXISTS public.seat_matrices (
+  id          bigserial PRIMARY KEY,
+  institute   text NOT NULL,
+  program     text NOT NULL,
+  quota       text NOT NULL,
+  seats       integer NOT NULL,
+  created_at  timestamptz DEFAULT now()
+);
+
+-- 3. Admission Schedules / Deadlines
+CREATE TABLE IF NOT EXISTS public.admission_schedules (
+  id          bigserial PRIMARY KEY,
+  date        text NOT NULL,
+  title       text NOT NULL,
+  desc        text,
+  status      text DEFAULT 'Upcoming',
+  created_at  timestamptz DEFAULT now()
+);
+
+-- Enable public read access (Row Level Security)
+ALTER TABLE public.josaadata_record ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.seat_matrices ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.admission_schedules ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "public read josaadata" ON public.josaadata_record FOR SELECT USING (true);
+CREATE POLICY "public read seats" ON public.seat_matrices FOR SELECT USING (true);
+CREATE POLICY "public read schedules" ON public.admission_schedules FOR SELECT USING (true);
+
+CREATE POLICY "anon insert josaadata" ON public.josaadata_record FOR INSERT WITH CHECK (true);
+CREATE POLICY "anon insert seats" ON public.seat_matrices FOR INSERT WITH CHECK (true);
+CREATE POLICY "anon insert schedules" ON public.admission_schedules FOR INSERT WITH CHECK (true);`}</pre>
+                </div>
+
+                <div className="bg-[#0d1117] border border-zinc-800 p-5 rounded-2xl">
+                  <p className="text-xs font-bold text-zinc-300 uppercase tracking-widest font-mono mb-3">Step 2 — Refresh Admin Panel</p>
+                  <p className="text-xs text-zinc-500 mb-4">After running the SQL, reload this page and the tables will be detected automatically.</p>
+                  <button onClick={() => window.location.reload()}
+                    className="bg-[#fcd71a] hover:bg-[#ebd02c] text-[#111625] font-black py-3 px-6 rounded-xl uppercase text-xs tracking-wider transition-all">
+                    Reload Panel Now
+                  </button>
                 </div>
               </div>
             )}

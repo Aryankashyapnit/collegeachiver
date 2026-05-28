@@ -99,17 +99,52 @@ export default function HomePage() {
 
   const predictorRef = useRef<HTMLDivElement>(null);
 
+  const FALLBACK_DEADLINES = [
+    { id: 1, date: 'June 3, 2026', title: 'JoSAA 2026 Registration Begins', desc: 'Students can register on josaa.nic.in and begin choice filling.', status: 'Upcoming' },
+    { id: 2, date: 'June 10, 2026', title: 'Round 1 Choice Filling Closes', desc: 'Last date to lock in your choices for Round 1 seat allotment.', status: 'Upcoming' },
+    { id: 3, date: 'June 18, 2026', title: 'Round 1 Seat Allotment Result', desc: 'Round 1 results declared — check allotment on josaa.nic.in.', status: 'Live Soon' },
+    { id: 4, date: 'June 20–22, 2026', title: 'Document Verification Window', desc: 'Upload required documents within the Reporting window to confirm seat.', status: 'Strict Warning' },
+    { id: 5, date: 'June 28, 2026', title: 'Round 2 Seat Allotment Result', desc: 'Second round allotment published for floating/sliding candidates.', status: 'Upcoming' },
+    { id: 6, date: 'July 10, 2026', title: 'Final Round (Round 6) Allotment', desc: 'Last JoSAA round — freeze your seat before CSAB Special Stray begins.', status: 'Upcoming' },
+  ];
+
+  const FALLBACK_SEATS = [
+    { id: 1, institute: 'Indian Institute of Technology Bombay', program: 'Computer Science and Engineering', quota: 'OPEN (AI)', seats: 59 },
+    { id: 2, institute: 'Indian Institute of Technology Delhi', program: 'Computer Science and Engineering', quota: 'OPEN (AI)', seats: 62 },
+    { id: 3, institute: 'Indian Institute of Technology Madras', program: 'Computer Science and Engineering', quota: 'OPEN (AI)', seats: 83 },
+    { id: 4, institute: 'National Institute of Technology Trichy', program: 'Computer Science and Engineering', quota: 'OPEN (OS)', seats: 45 },
+    { id: 5, institute: 'National Institute of Technology Agartala', program: 'Computer Science & Engineering', quota: 'OPEN (OS)', seats: 32 },
+    { id: 6, institute: 'National Institute of Technology Agartala', program: 'Electronics and Communication Engineering', quota: 'OPEN (OS)', seats: 28 },
+    { id: 7, institute: 'National Institute of Technology Agartala', program: 'Electrical Engineering', quota: 'OPEN (HS)', seats: 24 },
+    { id: 8, institute: 'IIIT Hyderabad', program: 'Computer Science and Engineering', quota: 'OPEN (AI)', seats: 120 },
+  ];
+
   useEffect(() => {
     setTotalVisits(prev => prev + 1);
     const fetchData = async () => {
-      const [{ data: josaaData }, { data: seatsData }, { data: deadlinesData }] = await Promise.all([
+      const [
+        { data: josaaData, error: josaaError },
+        { data: seatsData, error: seatsError },
+        { data: deadlinesData, error: deadlinesError }
+      ] = await Promise.all([
         supabase.from('josaadata_record').select('*'),
         supabase.from('seat_matrices').select('*').order('id', { ascending: false }),
         supabase.from('admission_schedules').select('*').order('id', { ascending: true })
       ]);
-      if (josaaData) setDynamicJosaaRecords(josaaData as CollegeData[]);
-      if (seatsData) setDynamicSeats(seatsData as SeatMatrixRecord[]);
-      if (deadlinesData) setDynamicDeadlines(deadlinesData);
+
+      if (!josaaError && josaaData && josaaData.length > 0) {
+        setDynamicJosaaRecords(josaaData as CollegeData[]);
+      }
+      if (!seatsError && seatsData && seatsData.length > 0) {
+        setDynamicSeats(seatsData as SeatMatrixRecord[]);
+      } else {
+        setDynamicSeats(FALLBACK_SEATS);
+      }
+      if (!deadlinesError && deadlinesData && deadlinesData.length > 0) {
+        setDynamicDeadlines(deadlinesData);
+      } else {
+        setDynamicDeadlines(FALLBACK_DEADLINES);
+      }
     };
     fetchData();
   }, []);
