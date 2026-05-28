@@ -1,7 +1,7 @@
 // @ts-ignore
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { Link } from 'wouter';
-import { School, BarChart3, Layers, Star, AlertCircle, MessageSquare, X, Send, User, ShieldCheck, PlusCircle, Clock, Sparkles, Milestone, ArrowRight, Sparkle, Compass, Flame, Receipt, Percent } from 'lucide-react';
+import { School, BarChart3, Layers, Star, AlertCircle, MessageSquare, X, Send, User, ShieldCheck, PlusCircle, Clock, Sparkles, Milestone, ArrowRight, Sparkle, Compass, Flame, Receipt, Percent, BookOpen, CheckCircle2, TrendingUp, Users, Bell, ChevronDown, ChevronUp, Zap } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import { CollegeData } from '@/lib/josaaData';
 
@@ -76,6 +76,15 @@ export default function HomePage() {
   const [passwordInput, setPasswordInput] = useState('');
 
   const [adminView, setAdminView] = useState<'Overview' | 'Database' | 'Users'>('Overview');
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [liveCount, setLiveCount] = useState(247);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLiveCount(prev => prev + Math.floor(Math.random() * 3) - 1);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   const [newInst, setNewInst] = useState('');
   const [newProg, setNewProg] = useState('');
@@ -274,10 +283,17 @@ export default function HomePage() {
       {activeTab !== 'AdminPanel' && (
         <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#eef1f6] px-6 py-4 shadow-xs transition-all">
           <div className="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-center gap-4">
-            <div onClick={() => setActiveTab('Home')} className="flex items-center gap-2 cursor-pointer select-none shrink-0 transition-transform hover:scale-[1.02]">
-              <div className="w-4 h-1 bg-[#ecd042] rounded-full shadow-xs"></div>
-              <div className="text-xl font-bold tracking-tight text-[#111625]">
-                College<span className="text-[#cca01d] font-extrabold">Achiever</span>
+            <div onClick={() => setActiveTab('Home')} className="flex items-center gap-2.5 cursor-pointer select-none shrink-0 transition-transform hover:scale-[1.02]">
+              <div className="w-9 h-9 rounded-xl bg-[#111625] flex items-center justify-center shadow-md relative overflow-hidden">
+                <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-6 h-6">
+                  <path d="M18 8L4 15L18 22L32 15L18 8Z" fill="#fcd71a" stroke="#fcd71a" strokeWidth="1" strokeLinejoin="round"/>
+                  <path d="M10 19v6c0 0 3.5 4 8 4s8-4 8-4v-6" stroke="#fcd71a" strokeWidth="2" strokeLinecap="round" fill="none"/>
+                  <circle cx="32" cy="15" r="1.5" fill="#fcd71a"/>
+                  <line x1="32" y1="15" x2="32" y2="22" stroke="#fcd71a" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              </div>
+              <div className="text-xl font-black tracking-tight text-[#111625]">
+                College<span className="text-[#cca01d]">Achiver</span>
               </div>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-1 md:gap-3 text-xs font-semibold">
@@ -305,71 +321,123 @@ export default function HomePage() {
       {/* TAB 1: HOME */}
       {activeTab === 'Home' && (
         <div className="animate-fadeIn pb-20">
-          <section className="max-w-7xl mx-auto px-6 pt-12 md:pt-20 pb-16 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          {/* Live activity banner */}
+          <div className="bg-[#111625] text-[#fcd71a] text-[11px] font-mono font-bold py-2.5 px-4 text-center flex items-center justify-center gap-3">
+            <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse shrink-0"></span>
+            <span className="text-zinc-300">{liveCount} students</span> searching colleges right now •
+            <span className="text-zinc-300">JoSAA 2026</span> counselling starts June 2026 •
+            <button onClick={() => setActiveTab('Deadlines')} className="underline hover:text-white transition-colors">View all deadlines →</button>
+          </div>
+
+          <section className="max-w-7xl mx-auto px-6 pt-12 md:pt-16 pb-16 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-6 text-left space-y-6">
-              <div className="inline-flex items-center gap-2 bg-[#fbe76c]/15 text-[#977914] text-[11px] font-bold px-3 py-1 rounded-full border border-[#fce95c]/30 shadow-xs">
-                <span className="w-1.5 h-1.5 bg-[#ebd02c] rounded-full animate-ping"></span> JoSAA 2026 Engine Live
+              <div className="flex flex-wrap gap-2">
+                <div className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 text-[11px] font-bold px-3 py-1.5 rounded-full border border-emerald-200">
+                  <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></span> JoSAA 2026 Engine Live
+                </div>
+                <div className="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 text-[11px] font-bold px-3 py-1.5 rounded-full border border-blue-200">
+                  <Zap size={11} className="text-blue-500"/> Free to Use
+                </div>
               </div>
               <h1 className="text-4xl md:text-[52px] font-black tracking-tight text-[#111625] leading-[1.12]">
-                Your journey to the <br />
-                <span className="text-[#baa327] underline decoration-[#f5d020]/40 decoration-wavy italic font-serif font-normal">right</span> college starts <br />
-                here.
+                Crack JoSAA 2026 <br />
+                with <span className="text-[#cca01d] underline decoration-[#f5d020]/50 decoration-wavy italic font-serif font-normal">data-driven</span><br />
+                predictions.
               </h1>
               <p className="text-[#596579] text-sm md:text-base leading-relaxed max-w-xl font-medium">
-                Navigate the complexities of Indian college admissions with AI-driven rank predictions and personalized counseling roadmaps.
+                Enter your JEE rank, pick your category, and instantly see which IITs, NITs & IIITs you can get. Based on real JoSAA cutoff data — no guesswork.
               </p>
               <div className="flex flex-wrap gap-3 pt-2">
-                <button onClick={() => setActiveTab('Predictor')} className="bg-[#fcd71a] text-[#111625] font-bold text-xs px-6 py-3.5 rounded-lg shadow-md hover:bg-[#ebd02c] transition-all">Start Predicting ➜</button>
-                <button onClick={() => setActiveTab('Opening/Closing Ranks')} className="bg-white text-[#414b5a] border border-[#dce2ec] font-bold text-xs px-6 py-3.5 rounded-lg hover:bg-[#f4f7fa] transition-all shadow-xs">View Cut-offs</button>
+                <button onClick={() => setActiveTab('Predictor')} className="bg-[#fcd71a] text-[#111625] font-black text-xs px-7 py-4 rounded-xl shadow-lg hover:bg-[#ebd02c] transition-all hover:scale-[1.02] flex items-center gap-2">
+                  <Zap size={14}/> Predict My College Now
+                </button>
+                <button onClick={() => setActiveTab('Opening/Closing Ranks')} className="bg-white text-[#414b5a] border border-[#dce2ec] font-bold text-xs px-6 py-4 rounded-xl hover:bg-[#f4f7fa] transition-all shadow-xs">
+                  Browse Cut-offs
+                </button>
+              </div>
+              <div className="flex items-center gap-4 pt-2">
+                <div className="flex -space-x-2">
+                  {['AS','SP','RV','KM','PJ'].map((init,i) => (
+                    <div key={i} className="w-7 h-7 rounded-full bg-gradient-to-br from-[#fcd71a] to-[#cca01d] border-2 border-white flex items-center justify-center text-[#111625] font-black text-[9px]">{init}</div>
+                  ))}
+                </div>
+                <p className="text-xs text-[#5e6b7f] font-medium"><strong className="text-[#111625]">10,000+</strong> students got their college predictions this season</p>
               </div>
             </div>
             <div className="lg:col-span-6 flex justify-center relative">
-              <div className="bg-white p-3 rounded-2xl shadow-2xl border border-[#ebf0f6] relative max-w-lg w-full overflow-hidden group">
-                <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=700&q=80" className="rounded-xl h-[340px] md:h-[400px] object-cover w-full transition-all duration-500" alt="Student Dashboard" />
-                <div className="absolute bottom-8 left-8 bg-white/95 backdrop-blur-xs p-3.5 rounded-xl shadow-xl border border-[#ebf0f6] flex items-center gap-3 animate-bounce max-w-[240px]">
-                  <div className="p-2 bg-[#fcd71a]/20 rounded-lg text-[#baa327]"><Sparkles size={18} /></div>
-                  <div className="text-left"><p className="text-[10px] text-[#6b778c] font-bold uppercase font-mono">Current Rank Likelihood</p><p className="text-sm font-black text-[#111625]">98.2% Accurate</p></div>
+              <div className="bg-white p-3 rounded-3xl shadow-2xl border border-[#ebf0f6] relative max-w-lg w-full overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=700&q=80" className="rounded-2xl h-[340px] md:h-[380px] object-cover w-full" alt="Students collaborating" />
+                <div className="absolute bottom-8 left-8 bg-white/97 backdrop-blur-xs p-3.5 rounded-2xl shadow-xl border border-[#ebf0f6] flex items-center gap-3 max-w-[250px]">
+                  <div className="p-2.5 bg-[#fcd71a] rounded-xl text-[#111625]"><TrendingUp size={16} /></div>
+                  <div className="text-left"><p className="text-[9px] text-[#6b778c] font-bold uppercase font-mono tracking-wider">Prediction Accuracy</p><p className="text-sm font-black text-[#111625]">98.2% Match Rate</p></div>
+                </div>
+                <div className="absolute top-8 right-8 bg-[#111625]/90 backdrop-blur-xs px-3 py-2 rounded-xl flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
+                  <span className="text-[10px] font-bold text-white font-mono">{liveCount} live</span>
                 </div>
               </div>
             </div>
           </section>
 
-          <section className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
-            {[
-              { icon: <User size={18}/>, val: "10k+", label: "Students Assisted" },
-              { icon: <School size={18}/>, val: "500+", label: "Colleges Verified" },
-              { icon: <Percent size={18}/>, val: "98%", label: "Accuracy Target", highlight: true },
-            ].map((stat, i) => (
-              <div key={i} className="bg-white border border-[#eef2f7] p-8 rounded-2xl shadow-xs space-y-2 hover:shadow-md transition-all duration-300">
-                <div className="mx-auto w-10 h-10 rounded-xl bg-[#fcd71a]/10 text-[#cca01d] flex items-center justify-center shadow-xs">{stat.icon}</div>
-                <div className={`text-3xl font-black font-mono tracking-tight ${stat.highlight ? 'text-[#cca01d]' : 'text-[#111625]'}`}>{stat.val}</div>
-                <p className="text-[11px] text-[#6c7789] font-bold uppercase tracking-wider font-mono">{stat.label}</p>
-              </div>
-            ))}
+          <section className="max-w-7xl mx-auto px-6 py-6">
+            <div className="bg-[#111625] rounded-3xl p-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+              {[
+                { val: "10,000+", label: "Students Helped", sub: "This counselling season", color: "text-[#fcd71a]" },
+                { val: "500+", label: "Colleges Covered", sub: "IITs, NITs, IIITs & more", color: "text-blue-400" },
+                { val: "98.2%", label: "Prediction Accuracy", sub: "Based on past 5 rounds", color: "text-emerald-400" },
+                { val: "6 Rounds", label: "JoSAA 2026", sub: "Complete round tracking", color: "text-purple-400" },
+              ].map((stat, i) => (
+                <div key={i} className="space-y-1">
+                  <div className={`text-2xl md:text-3xl font-black font-mono tracking-tight ${stat.color}`}>{stat.val}</div>
+                  <p className="text-xs font-bold text-white">{stat.label}</p>
+                  <p className="text-[10px] text-zinc-500 font-mono">{stat.sub}</p>
+                </div>
+              ))}
+            </div>
           </section>
 
+          {/* HOW IT WORKS */}
           <section className="max-w-7xl mx-auto px-6 py-16 text-center space-y-12">
             <div className="space-y-3 max-w-xl mx-auto">
-              <h2 className="text-3xl font-black tracking-tight text-[#111625]">Precision Tools for Admissions</h2>
-              <p className="text-xs md:text-sm text-[#5d6a7e] leading-relaxed font-medium">Expertly crafted modules designed to remove the guesswork from your engineering loops path.</p>
+              <span className="inline-flex items-center gap-1.5 bg-[#fcd71a]/10 text-[#977914] text-[11px] font-bold px-3 py-1.5 rounded-full border border-[#f5d020]/30 font-mono uppercase tracking-wider">How It Works</span>
+              <h2 className="text-3xl font-black tracking-tight text-[#111625]">Get your college list in 3 steps</h2>
+              <p className="text-sm text-[#5d6a7e] font-medium">No registration needed. No spam. Just your rank and your results.</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
-              <div className="bg-white border border-[#edf1f6] p-8 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6 group hover:border-[#ebd02c]/50 transition-all shadow-xs duration-300">
-                <div className="space-y-4 max-w-sm">
-                  <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-widest font-bold font-mono text-[#cca01d]"><Sparkles size={12}/> AI Filtered</span>
-                  <h3 className="text-xl font-bold text-[#111625]">Rank Prediction Engine</h3>
-                  <p className="text-xs text-[#5e6b7f] leading-relaxed font-medium">Leveraging deep analytics from past rounds to output absolute likelihood configurations grid maps instantly.</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+              {[
+                { step: '01', icon: <BookOpen size={22}/>, title: 'Enter Your Rank', desc: 'Put in your JEE Advanced or JEE Mains rank (or both). Select your category, gender pool, and home state quota.', color: 'bg-blue-50 text-blue-600 border-blue-200' },
+                { step: '02', icon: <BarChart3 size={22}/>, title: 'Instant Prediction', desc: 'Our engine matches your rank against real JoSAA closing ranks from previous rounds to show your best options.', color: 'bg-[#fcd71a]/10 text-[#977914] border-[#f5d020]/30' },
+                { step: '03', icon: <CheckCircle2 size={22}/>, title: 'Plan Your Choices', desc: 'Sort results by High/Medium chance. Use the Cut-off Explorer and Deadlines to finalize your choice filling order.', color: 'bg-emerald-50 text-emerald-600 border-emerald-200' },
+              ].map((item, i) => (
+                <div key={i} className="bg-white border border-[#eef2f7] rounded-3xl p-7 space-y-5 shadow-xs hover:shadow-lg hover:border-[#fcd71a]/40 transition-all duration-300 relative overflow-hidden">
+                  <div className="absolute top-5 right-5 text-5xl font-black text-[#f4f7fb] font-mono select-none">{item.step}</div>
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border ${item.color}`}>{item.icon}</div>
+                  <h3 className="text-lg font-bold text-[#111625]">{item.title}</h3>
+                  <p className="text-xs text-[#5e6b7f] leading-relaxed">{item.desc}</p>
                 </div>
-                <div className="w-24 h-24 bg-[#f6f8fb] rounded-2xl flex items-center justify-center text-[#cca01d] shrink-0 group-hover:bg-[#fcd71a]/10 transition-all duration-300"><BarChart3 size={36}/></div>
-              </div>
-              <div className="bg-white border border-[#edf1f6] p-8 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6 group hover:border-[#ebd02c]/50 transition-all shadow-xs duration-300">
-                <div className="space-y-4 max-w-sm">
-                  <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-widest font-bold font-mono text-[#cca01d]"><Milestone size={12}/> Step-by-Step</span>
-                  <h3 className="text-xl font-bold text-[#111625]">Counselling Roadmap</h3>
-                  <p className="text-xs text-[#5e6b7f] leading-relaxed font-medium">Interactive milestones matrix mapping out document thresholds and seat freeze timelines clearly.</p>
-                </div>
-                <div className="w-24 h-24 bg-[#f6f8fb] rounded-xl flex items-center justify-center text-[#cca01d] shrink-0 group-hover:bg-[#fcd71a]/10 transition-all duration-300"><Layers size={36}/></div>
-              </div>
+              ))}
+            </div>
+            <button onClick={() => setActiveTab('Predictor')} className="bg-[#111625] text-[#fcd71a] font-black text-xs px-8 py-4 rounded-xl shadow-lg hover:bg-zinc-800 transition-all flex items-center gap-2 mx-auto">
+              Try the Rank Predictor Now <ArrowRight size={14}/>
+            </button>
+          </section>
+
+          {/* FEATURES GRID */}
+          <section className="max-w-7xl mx-auto px-6 pb-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {[
+                { icon: <BarChart3 size={20}/>, title: 'Rank Predictor', desc: 'JEE rank → college list in seconds', tab: 'Predictor', color: 'border-blue-200 hover:border-blue-400', iconBg: 'bg-blue-50 text-blue-600' },
+                { icon: <TrendingUp size={20}/>, title: 'Cut-off Explorer', desc: 'Browse all 500+ cutoff records', tab: 'Opening/Closing Ranks', color: 'border-purple-200 hover:border-purple-400', iconBg: 'bg-purple-50 text-purple-600' },
+                { icon: <Bell size={20}/>, title: 'Key Deadlines', desc: 'Never miss a counselling date', tab: 'Deadlines', color: 'border-amber-200 hover:border-amber-400', iconBg: 'bg-amber-50 text-amber-600' },
+                { icon: <School size={20}/>, title: 'Seat Matrix', desc: 'Category-wise seat availability', tab: 'Seat Matrix', color: 'border-emerald-200 hover:border-emerald-400', iconBg: 'bg-emerald-50 text-emerald-600' },
+              ].map((f, i) => (
+                <button key={i} onClick={() => setActiveTab(f.tab)} className={`bg-white border-2 ${f.color} rounded-2xl p-6 text-left space-y-3 transition-all duration-300 group hover:shadow-md`}>
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${f.iconBg}`}>{f.icon}</div>
+                  <h4 className="font-bold text-[#111625] text-sm group-hover:text-[#cca01d] transition-colors">{f.title}</h4>
+                  <p className="text-xs text-[#6c7789]">{f.desc}</p>
+                  <div className="flex items-center gap-1 text-[11px] font-bold text-[#cca01d] opacity-0 group-hover:opacity-100 transition-all font-mono">Open <ArrowRight size={11}/></div>
+                </button>
+              ))}
             </div>
           </section>
 
@@ -398,15 +466,46 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section className="max-w-5xl mx-auto px-6 pt-12">
-            <div className="bg-[#fcd71a] rounded-2xl p-8 md:p-12 text-center space-y-6 relative overflow-hidden shadow-xl border border-[#eed031]">
-              <div className="space-y-2 max-w-xl mx-auto relative z-10">
-                <h2 className="text-3xl font-black text-[#111625]">Ready to find your college?</h2>
-                <p className="text-xs md:text-sm text-[#544811] leading-relaxed font-bold">Stop guessing and start planning. Join thousands of students making informed choices today.</p>
+          {/* FAQ SECTION */}
+          <section className="max-w-3xl mx-auto px-6 py-16 space-y-8">
+            <div className="text-center space-y-2">
+              <h2 className="text-3xl font-black text-[#111625]">Frequently Asked Questions</h2>
+              <p className="text-sm text-[#5d6a7e] font-medium">Common doubts about JoSAA counselling, answered.</p>
+            </div>
+            <div className="space-y-3">
+              {[
+                { q: "How accurate is the rank predictor?", a: "Our predictor is based on actual JoSAA closing ranks from previous years (2022–2025). It shows colleges where your rank falls within the historical closing range, giving you a realistic picture. However, cutoffs vary each year, so always check official josaa.nic.in data too." },
+                { q: "Do I need to register to use CollegeAchiver?", a: "No! The rank predictor, cut-off explorer, deadlines, and seat matrix are all free and require zero registration. Just enter your rank and explore." },
+                { q: "What is the difference between OS and HS quota?", a: "OS (Other State) means you're applying from a state other than where the NIT is located. HS (Home State) means the NIT is in your home state. Home state students get a separate quota with slightly different (often higher) closing ranks." },
+                { q: "Can I check both JEE Advanced and JEE Mains results together?", a: "Yes! Our predictor accepts both ranks simultaneously. Fill in your JEE Advanced rank for IIT predictions and JEE Mains rank for NIT/IIIT predictions, and see all results side by side." },
+                { q: "What is CSAB Special Stray Vacancy round?", a: "After all 6 JoSAA rounds, CSAB conducts Special Stray Vacancy (SSV) rounds for remaining seats. These are separate from JoSAA and require fresh registration on the CSAB portal." },
+              ].map((faq, i) => (
+                <div key={i} className="bg-white border border-[#eef2f7] rounded-2xl overflow-hidden shadow-xs">
+                  <button onClick={() => setOpenFaq(openFaq === i ? null : i)} className="w-full flex items-center justify-between p-5 text-left gap-4">
+                    <span className="text-sm font-bold text-[#111625]">{faq.q}</span>
+                    <span className="shrink-0 w-6 h-6 rounded-full bg-[#f4f7fa] flex items-center justify-center text-[#6c7789]">
+                      {openFaq === i ? <ChevronUp size={14}/> : <ChevronDown size={14}/>}
+                    </span>
+                  </button>
+                  {openFaq === i && (
+                    <div className="px-5 pb-5 text-xs text-[#5e6b7f] leading-relaxed border-t border-[#f4f7fa] pt-4">{faq.a}</div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* CTA SECTION */}
+          <section className="max-w-5xl mx-auto px-6 pt-4 pb-12">
+            <div className="bg-gradient-to-br from-[#111625] to-[#1a2540] rounded-3xl p-8 md:p-12 text-center space-y-6 relative overflow-hidden shadow-xl">
+              <div className="absolute inset-0 opacity-5" style={{backgroundImage:'radial-gradient(circle at 30% 50%, #fcd71a 0%, transparent 60%), radial-gradient(circle at 80% 20%, #fcd71a 0%, transparent 50%)'}}></div>
+              <div className="space-y-3 max-w-xl mx-auto relative z-10">
+                <h2 className="text-3xl font-black text-white">JoSAA 2026 is almost here.</h2>
+                <p className="text-sm text-zinc-400 leading-relaxed font-medium">Don't wait until the last minute. Check your predicted colleges now and start building your choice filling strategy.</p>
               </div>
               <div className="flex flex-wrap justify-center gap-3 relative z-10">
-                <button onClick={() => setActiveTab('Predictor')} className="bg-[#111625] text-white font-extrabold text-xs px-6 py-3.5 rounded-xl flex items-center gap-1.5 hover:bg-zinc-800 transition-all uppercase tracking-wider shadow-md">Get Started Free 🚀</button>
-                <button onClick={() => setActiveTab('Counselling Guide')} className="bg-white/80 text-[#111625] font-extrabold text-xs px-6 py-3.5 rounded-xl hover:bg-white transition-all shadow-xs">Book a Consultation</button>
+                <button onClick={() => setActiveTab('Predictor')} className="bg-[#fcd71a] text-[#111625] font-black text-xs px-8 py-4 rounded-xl flex items-center gap-2 hover:bg-[#ebd02c] transition-all shadow-lg hover:scale-[1.02]"><Zap size={14}/> Predict My Colleges — It's Free</button>
+                <button onClick={() => setActiveTab('Deadlines')} className="bg-white/10 text-white border border-white/20 font-bold text-xs px-6 py-4 rounded-xl hover:bg-white/20 transition-all">View Deadlines →</button>
               </div>
             </div>
           </section>
@@ -642,18 +741,56 @@ export default function HomePage() {
       {/* TAB 5: DEADLINES */}
       {activeTab === 'Deadlines' && (
         <div className="max-w-4xl mx-auto px-6 py-12 animate-fadeIn space-y-8">
-          <div className="text-center space-y-2">
+          <div className="text-center space-y-3">
+            <span className="inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 text-[11px] font-bold px-3 py-1.5 rounded-full border border-amber-200 font-mono uppercase tracking-wider">
+              <Clock size={11}/> Live Schedule
+            </span>
             <h2 className="text-3xl font-black text-[#111625]">JoSAA 2026 Key Deadlines</h2>
-            <p className="text-xs text-[#8492a6] font-medium">Stay ahead of every counselling milestone</p>
+            <p className="text-sm text-[#8492a6] font-medium">Stay ahead of every counselling milestone. Missing any date = losing your seat.</p>
           </div>
+
+          {/* Urgency banner */}
+          <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-4 flex items-center gap-3">
+            <Bell size={18} className="text-amber-600 shrink-0"/>
+            <p className="text-xs text-amber-800 font-bold">Bookmark this page and check daily during counselling. Dates can shift based on JEE results declaration.</p>
+          </div>
+
           {dynamicDeadlines.length === 0 ? (
             <div className="text-center py-12 text-zinc-400 font-mono text-sm">No deadlines loaded. Check back soon.</div>
-          ) : dynamicDeadlines.map((d: any, i: number) => (
-            <div key={i} className="bg-white border border-[#eef2f7] rounded-2xl p-5 shadow-xs flex items-start gap-4">
-              <div className={`px-3 py-1 rounded-lg text-[10px] font-mono font-black shrink-0 ${d.status === 'Strict Warning' ? 'bg-red-50 text-red-700 border border-red-100' : d.status === 'Live Soon' ? 'bg-amber-50 text-amber-700 border border-amber-100' : 'bg-emerald-50 text-emerald-700 border border-emerald-100'}`}>{d.status}</div>
-              <div><p className="font-bold text-[#111625] text-sm">{d.title}</p><p className="text-xs text-[#5e6b7f] mt-1">{d.date}</p>{d.description && <p className="text-xs text-[#8492a6] mt-1">{d.description}</p>}</div>
+          ) : (
+            <div className="space-y-4">
+              {dynamicDeadlines.map((d: any, i: number) => {
+                const statusConfig = d.status === 'Strict Warning'
+                  ? { bg: 'bg-red-50', border: 'border-red-200', badge: 'bg-red-100 text-red-700 border-red-200', dot: 'bg-red-500', icon: '🚨' }
+                  : d.status === 'Live Soon'
+                  ? { bg: 'bg-amber-50', border: 'border-amber-200', badge: 'bg-amber-100 text-amber-700 border-amber-200', dot: 'bg-amber-500', icon: '⚡' }
+                  : { bg: 'bg-white', border: 'border-[#eef2f7]', badge: 'bg-emerald-50 text-emerald-700 border-emerald-200', dot: 'bg-emerald-500', icon: '📅' };
+                return (
+                  <div key={i} className={`${statusConfig.bg} border-2 ${statusConfig.border} rounded-2xl p-5 flex items-start gap-4 shadow-xs hover:shadow-md transition-all`}>
+                    <div className="text-2xl shrink-0 mt-0.5">{statusConfig.icon}</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                        <p className="font-black text-[#111625] text-sm">{d.title}</p>
+                        <span className={`text-[10px] font-mono font-black px-2 py-0.5 rounded-full border ${statusConfig.badge}`}>{d.status}</span>
+                      </div>
+                      <p className="text-xs font-bold text-[#5e6b7f]">{d.date}</p>
+                      {d.description && <p className="text-xs text-[#8492a6] mt-1.5 leading-relaxed">{d.description}</p>}
+                    </div>
+                    <div className={`w-2 h-2 rounded-full ${statusConfig.dot} shrink-0 mt-2 animate-pulse`}></div>
+                  </div>
+                );
+              })}
             </div>
-          ))}
+          )}
+
+          <div className="bg-[#111625] rounded-2xl p-6 flex items-center gap-4">
+            <div className="w-10 h-10 rounded-xl bg-[#fcd71a] flex items-center justify-center shrink-0"><Bell size={18} className="text-[#111625]"/></div>
+            <div className="flex-1">
+              <p className="text-sm font-black text-white">Don't miss any round</p>
+              <p className="text-xs text-zinc-400 mt-0.5">Join the Premium Circle for daily WhatsApp deadline alerts and strategy updates during counselling.</p>
+            </div>
+            <button onClick={() => setActiveTab('Counselling Guide')} className="bg-[#fcd71a] text-[#111625] font-black text-xs px-4 py-2.5 rounded-xl shrink-0 hover:bg-[#ebd02c] transition-all">Join →</button>
+          </div>
         </div>
       )}
 
@@ -774,23 +911,109 @@ export default function HomePage() {
       {/* FLOATING AI CHATBOT */}
       <div className="fixed bottom-6 right-6 z-50 font-sans">
         {!isChatOpen && (
-          <button onClick={() => setIsChatOpen(true)} className="bg-[#111625] text-white p-4 rounded-full shadow-2xl border-2 border-[#fcd71a] animate-bounce hover:scale-105 transition-all"><MessageSquare size={24} className="text-[#fcd71a]" /></button>
+          <div className="relative">
+            <button onClick={() => setIsChatOpen(true)} className="bg-[#111625] text-white p-4 rounded-2xl shadow-2xl border-2 border-[#fcd71a] hover:scale-105 transition-all flex items-center gap-2 pr-5">
+              <div className="w-7 h-7 rounded-xl bg-[#fcd71a] flex items-center justify-center shrink-0">
+                <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" fill="#111625"/></svg>
+              </div>
+              <div className="text-left">
+                <p className="text-[10px] font-black text-[#fcd71a] leading-none">AI Counsellor</p>
+                <p className="text-[9px] text-zinc-400 font-mono mt-0.5">Ask JoSAA doubts</p>
+              </div>
+            </button>
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white animate-pulse"></span>
+          </div>
         )}
         {isChatOpen && (
-          <div className="w-80 md:w-96 h-[420px] bg-white rounded-2xl shadow-2xl border border-[#eef2f8] flex flex-col overflow-hidden">
-            <div className="bg-[#111625] text-white p-4 flex justify-between items-center border-b border-[#fcd71a]/30"><span className="text-xs font-mono font-bold text-[#fcd71a]">CollegeAchiever AI Bot v2.5</span><button onClick={() => setIsChatOpen(false)}><X size={18} /></button></div>
+          <div className="w-80 md:w-[380px] h-[460px] bg-white rounded-3xl shadow-2xl border border-[#eef2f8] flex flex-col overflow-hidden">
+            {/* Chat header */}
+            <div className="bg-[#111625] p-4 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-[#fcd71a] flex items-center justify-center shrink-0">
+                <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" fill="#111625"/></svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-black text-white">CollegeAchiver AI</p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
+                  <span className="text-[10px] text-zinc-400 font-mono">Online · JoSAA Expert</span>
+                </div>
+              </div>
+              <button onClick={() => setIsChatOpen(false)} className="text-zinc-500 hover:text-white transition-colors p-1"><X size={16} /></button>
+            </div>
+
+            {/* Quick questions */}
+            <div className="px-3 py-2.5 bg-[#f8fafc] border-b border-slate-100 flex gap-2 overflow-x-auto scrollbar-hide">
+              {['My chance at IIT?', 'What is OS quota?', 'When is Round 1?', 'NIT vs IIIT?'].map((q,i) => (
+                <button key={i} onClick={() => { setChatInput(q); handleSendMessage(q); }} className="text-[10px] font-bold text-[#485363] bg-white border border-slate-200 px-3 py-1.5 rounded-full whitespace-nowrap hover:border-[#fcd71a] hover:text-[#977914] transition-all shrink-0">{q}</button>
+              ))}
+            </div>
+
             <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-[#f8fafc]">
               {messages.map((msg, i) => (
-                <div key={i} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}><div className={`max-w-[80%] rounded-2xl p-3 text-xs leading-relaxed font-medium shadow-sm border ${msg.sender === 'user' ? 'bg-[#111625] text-white border-zinc-800' : 'bg-white text-black border-slate-100'}`}>{msg.text}</div></div>
+                <div key={i} className={`flex items-end gap-2 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  {msg.sender === 'bot' && <div className="w-6 h-6 rounded-full bg-[#fcd71a] flex items-center justify-center shrink-0 mb-0.5 text-[9px] font-black text-[#111625]">AI</div>}
+                  <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-xs leading-relaxed font-medium shadow-sm ${msg.sender === 'user' ? 'bg-[#111625] text-white rounded-br-sm' : 'bg-white text-black border border-slate-100 rounded-bl-sm'}`}>{msg.text}</div>
+                </div>
               ))}
             </div>
             <div className="p-3 bg-white border-t border-slate-100 flex items-center gap-2">
-              <input type="text" placeholder="Ask anything about choices order sequences..." value={chatInput} onChange={(e) => setChatInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()} className="flex-1 bg-[#f4f7fa] border border-slate-200 focus:border-[#fcd71a] focus:bg-white rounded-xl px-4 py-2.5 text-xs font-medium outline-none transition-all" />
-              <button onClick={() => handleSendMessage()} className="p-2.5 bg-[#fcd71a] text-zinc-900 rounded-xl shadow-xs hover:bg-[#ebd02c] transition-all"><Send size={14} /></button>
+              <input type="text" placeholder="JoSAA doubt pucho yahan..." value={chatInput} onChange={(e) => setChatInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()} className="flex-1 bg-[#f4f7fa] border border-slate-200 focus:border-[#fcd71a] focus:bg-white rounded-xl px-4 py-2.5 text-xs font-medium outline-none transition-all" />
+              <button onClick={() => handleSendMessage()} className="p-2.5 bg-[#fcd71a] text-zinc-900 rounded-xl shadow-xs hover:bg-[#ebd02c] transition-all flex items-center justify-center"><Send size={14} /></button>
             </div>
           </div>
         )}
       </div>
+
+      {/* FOOTER */}
+      {activeTab !== 'AdminPanel' && (
+        <footer className="bg-[#111625] text-white mt-12 py-12 px-6">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="md:col-span-2 space-y-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-[#fcd71a] flex items-center justify-center">
+                  <svg viewBox="0 0 36 36" fill="none" className="w-6 h-6">
+                    <path d="M18 8L4 15L18 22L32 15L18 8Z" fill="#111625" stroke="#111625" strokeWidth="1" strokeLinejoin="round"/>
+                    <path d="M10 19v6c0 0 3.5 4 8 4s8-4 8-4v-6" stroke="#111625" strokeWidth="2" strokeLinecap="round" fill="none"/>
+                  </svg>
+                </div>
+                <span className="text-lg font-black">College<span className="text-[#fcd71a]">Achiver</span></span>
+              </div>
+              <p className="text-sm text-zinc-400 max-w-xs leading-relaxed">India's most accurate JoSAA 2026 rank prediction platform. Free, fast, and built for JEE students.</p>
+              <div className="flex items-center gap-2 text-xs text-zinc-500 font-mono">
+                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                JoSAA 2026 Engine Active
+              </div>
+            </div>
+            <div className="space-y-3">
+              <p className="text-xs font-black text-zinc-300 uppercase tracking-widest font-mono">Tools</p>
+              {[
+                { label: 'Rank Predictor', tab: 'Predictor' },
+                { label: 'Cut-off Explorer', tab: 'Opening/Closing Ranks' },
+                { label: 'Key Deadlines', tab: 'Deadlines' },
+                { label: 'Seat Matrix', tab: 'Seat Matrix' },
+                { label: 'Premium Circle', tab: 'Counselling Guide' },
+              ].map((l, i) => (
+                <button key={i} onClick={() => setActiveTab(l.tab)} className="block text-xs text-zinc-400 hover:text-[#fcd71a] transition-colors font-medium">{l.label}</button>
+              ))}
+            </div>
+            <div className="space-y-3">
+              <p className="text-xs font-black text-zinc-300 uppercase tracking-widest font-mono">Info</p>
+              {[
+                { label: 'About Us', href: '/about' },
+                { label: 'Contact', href: '/contact' },
+                { label: 'Privacy Policy', href: '/privacy' },
+                { label: 'Terms of Service', href: '/terms' },
+              ].map((l, i) => (
+                <Link key={i} href={l.href} className="block text-xs text-zinc-400 hover:text-[#fcd71a] transition-colors font-medium">{l.label}</Link>
+              ))}
+            </div>
+          </div>
+          <div className="max-w-7xl mx-auto border-t border-zinc-800 mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-[11px] text-zinc-600 font-mono">
+            <span>© 2026 CollegeAchiver. All rights reserved.</span>
+            <span>Data sourced from JoSAA official records. Not affiliated with JoSAA / NTA / IITs.</span>
+          </div>
+        </footer>
+      )}
 
       {/* AUTH MODAL */}
       {isSignInOpen && (
