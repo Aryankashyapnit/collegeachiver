@@ -100,12 +100,12 @@ export default function HomePage() {
   const predictorRef = useRef<HTMLDivElement>(null);
 
   const FALLBACK_DEADLINES = [
-    { id: 1, date: 'June 3, 2026', title: 'JoSAA 2026 Registration Begins', desc: 'Students can register on josaa.nic.in and begin choice filling.', status: 'Upcoming' },
-    { id: 2, date: 'June 10, 2026', title: 'Round 1 Choice Filling Closes', desc: 'Last date to lock in your choices for Round 1 seat allotment.', status: 'Upcoming' },
-    { id: 3, date: 'June 18, 2026', title: 'Round 1 Seat Allotment Result', desc: 'Round 1 results declared — check allotment on josaa.nic.in.', status: 'Live Soon' },
-    { id: 4, date: 'June 20–22, 2026', title: 'Document Verification Window', desc: 'Upload required documents within the Reporting window to confirm seat.', status: 'Strict Warning' },
-    { id: 5, date: 'June 28, 2026', title: 'Round 2 Seat Allotment Result', desc: 'Second round allotment published for floating/sliding candidates.', status: 'Upcoming' },
-    { id: 6, date: 'July 10, 2026', title: 'Final Round (Round 6) Allotment', desc: 'Last JoSAA round — freeze your seat before CSAB Special Stray begins.', status: 'Upcoming' },
+    { id: 1, date: 'June 3, 2026', title: 'JoSAA 2026 Registration Begins', description: 'Students can register on josaa.nic.in and begin choice filling.', status: 'Upcoming' },
+    { id: 2, date: 'June 10, 2026', title: 'Round 1 Choice Filling Closes', description: 'Last date to lock in your choices for Round 1 seat allotment.', status: 'Upcoming' },
+    { id: 3, date: 'June 18, 2026', title: 'Round 1 Seat Allotment Result', description: 'Round 1 results declared — check allotment on josaa.nic.in.', status: 'Live Soon' },
+    { id: 4, date: 'June 20–22, 2026', title: 'Document Verification Window', description: 'Upload required documents within the Reporting window to confirm seat.', status: 'Strict Warning' },
+    { id: 5, date: 'June 28, 2026', title: 'Round 2 Seat Allotment Result', description: 'Second round allotment published for floating/sliding candidates.', status: 'Upcoming' },
+    { id: 6, date: 'July 10, 2026', title: 'Final Round (Round 6) Allotment', description: 'Last JoSAA round — freeze your seat before CSAB Special Stray begins.', status: 'Upcoming' },
   ];
 
   const FALLBACK_SEATS = [
@@ -236,7 +236,7 @@ export default function HomePage() {
 
   const handleAddDeadlineEvent = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newEvent = { date: newDeadDate, title: newDeadTitle, desc: newDeadDesc, status: newDeadStat };
+    const newEvent = { date: newDeadDate, title: newDeadTitle, description: newDeadDesc, status: newDeadStat };
     const { data, error } = await supabase.from('admission_schedules').insert([newEvent]).select();
     if (error) { alert("Error adding deadline: " + error.message); }
     else if (data) { setDynamicDeadlines([...dynamicDeadlines, data[0]]); alert("⏰ Timeline deadline updated in Supabase!"); setNewDeadDate(''); setNewDeadTitle(''); setNewDeadDesc(''); }
@@ -651,7 +651,7 @@ export default function HomePage() {
           ) : dynamicDeadlines.map((d: any, i: number) => (
             <div key={i} className="bg-white border border-[#eef2f7] rounded-2xl p-5 shadow-xs flex items-start gap-4">
               <div className={`px-3 py-1 rounded-lg text-[10px] font-mono font-black shrink-0 ${d.status === 'Strict Warning' ? 'bg-red-50 text-red-700 border border-red-100' : d.status === 'Live Soon' ? 'bg-amber-50 text-amber-700 border border-amber-100' : 'bg-emerald-50 text-emerald-700 border border-emerald-100'}`}>{d.status}</div>
-              <div><p className="font-bold text-[#111625] text-sm">{d.title}</p><p className="text-xs text-[#5e6b7f] mt-1">{d.date}</p>{d.desc && <p className="text-xs text-[#8492a6] mt-1">{d.desc}</p>}</div>
+              <div><p className="font-bold text-[#111625] text-sm">{d.title}</p><p className="text-xs text-[#5e6b7f] mt-1">{d.date}</p>{d.description && <p className="text-xs text-[#8492a6] mt-1">{d.description}</p>}</div>
             </div>
           ))}
         </div>

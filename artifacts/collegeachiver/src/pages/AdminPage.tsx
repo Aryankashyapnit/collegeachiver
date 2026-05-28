@@ -109,7 +109,7 @@ export default function AdminPage() {
   const handleAddDeadline = async (e: React.FormEvent) => {
     e.preventDefault();
     const { error } = await supabase.from('admission_schedules').insert([{
-      date: newDeadDate, title: newDeadTitle, desc: newDeadDesc, status: newDeadStat
+      date: newDeadDate, title: newDeadTitle, description: newDeadDesc, status: newDeadStat
     }]);
     if (error) {
       if (isTableMissing(error.message)) { setView('setup'); }
@@ -413,7 +413,7 @@ CREATE TABLE IF NOT EXISTS public.admission_schedules (
   id          bigserial PRIMARY KEY,
   date        text NOT NULL,
   title       text NOT NULL,
-  desc        text,
+  description text,
   status      text DEFAULT 'Upcoming',
   created_at  timestamptz DEFAULT now()
 );
