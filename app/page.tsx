@@ -42,17 +42,9 @@ export default function Home() {
   const [dynamicJosaaRecords, setDynamicJosaaRecords] = useState<CollegeData[]>([]);
   const [results, setResults] = useState<ExtendedCollegeData[]>([]);
 
-  const [dynamicSeats, setDynamicSeats] = useState<SeatMatrixRecord[]>([
-    { id: 1, institute: 'Indian Institute of Technology Bombay', program: 'Computer Science and Engineering', quota: 'OPEN (Neutral)', seats: 124 },
-    { id: 2, institute: 'Indian Institute of Technology Delhi', program: 'Data Science & AI', quota: 'OPEN (Neutral)', seats: 40 },
-    { id: 3, institute: 'National Institute of Technology Agartala', program: 'Electronics & Communication Engineering', quota: 'OS (Neutral)', seats: 92 }
-  ]);
+  const [dynamicSeats, setDynamicSeats] = useState<SeatMatrixRecord[]>([]);
 
-  const [dynamicDeadlines, setDynamicDeadlines] = useState([
-    { id: 1, date: 'June 10, 2026', title: 'JEE Advanced Result & Cut-off Release', desc: 'Official qualifying cut-offs publish honge aur final scores dashboard live ho jayenge.', status: 'Upcoming' },
-    { id: 2, date: 'June 15, 2026', title: 'Online Registration & Choice Filling Starts', desc: 'Choices lock karne ki process active hogi. Priority sequences configure kar sakte hain.', status: 'Live Soon' },
-    { id: 3, date: 'June 25, 2026 (5:00 PM)', title: 'Choice Filling Window Closes & Auto-Locking', desc: 'Bhai, ye sabse critical timestamp hai! System window close hone se pehle changes lock kar dega.', status: 'Strict Warning' }
-  ]);
+  const [dynamicDeadlines, setDynamicDeadlines] = useState<any[]>([]);
 
   // 💰 AUTOMATED PAYMENT GATEWAY STATE SETTINGS
   const [myUpiId, setMyUpiId] = useState("9296276633-2@ybl"); // 👈 Yahan apni real UPI ID change kar lena bhai
@@ -120,15 +112,17 @@ export default function Home() {
   useEffect(() => {
     setTotalVisits(prev => prev + 1);
     
-    const fetchColleges = async () => {
-      const { data, error } = await supabase.from('josaadata_record').select('*');
-      if (error) {
-        console.error('Error fetching colleges:', error);
-      } else if (data) {
-        setDynamicJosaaRecords(data);
-      }
+    const fetchData = async () => {
+      const [{ data: josaaData }, { data: seatsData }, { data: deadlinesData }] = await Promise.all([
+        supabase.from('josaadata_record').select('*'),
+        supabase.from('seat_matrices').select('*').order('id', { ascending: false }),
+        supabase.from('admission_schedules').select('*').order('id', { ascending: true })
+      ]);
+      if (josaaData) setDynamicJosaaRecords(josaaData);
+      if (seatsData) setDynamicSeats(seatsData);
+      if (deadlinesData) setDynamicDeadlines(deadlinesData);
     };
-    fetchColleges();
+    fetchData();
   }, []);
 
   const handlePredict = (e: React.FormEvent) => {
@@ -242,20 +236,30 @@ export default function Home() {
     }
   };
 
-  const handleAddDeadlineEvent = (e: React.FormEvent) => {
+  const handleAddDeadlineEvent = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newEvent = { id: dynamicDeadlines.length + 1, date: newDeadDate, title: newDeadTitle, desc: newDeadDesc, status: newDeadStat };
-    setDynamicDeadlines([...dynamicDeadlines, newEvent]);
-    alert("⏰ Timeline deadline updated!");
-    setNewDeadDate(''); setNewDeadTitle(''); setNewDeadDesc('');
+    const newEvent = { date: newDeadDate, title: newDeadTitle, desc: newDeadDesc, status: newDeadStat };
+    const { data, error } = await supabase.from('admission_schedules').insert([newEvent]).select();
+    if (error) {
+      alert("Error adding deadline: " + error.message);
+    } else if (data) {
+      setDynamicDeadlines([...dynamicDeadlines, data[0]]);
+      alert("⏰ Timeline deadline updated in Supabase!");
+      setNewDeadDate(''); setNewDeadTitle(''); setNewDeadDesc('');
+    }
   };
 
-  const handleAddSeatMatrixRow = (e: React.FormEvent) => {
+  const handleAddSeatMatrixRow = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newSeatRow = { id: dynamicSeats.length + 1, institute: newSeatInst, program: newSeatProg, quota: newSeatQuota, seats: parseInt(newSeatCap) };
-    setDynamicSeats([...dynamicSeats, newSeatRow]);
-    alert("🏛️ Seat Row Matrix updated!");
-    setNewSeatInst(''); setNewSeatProg(''); setNewSeatCap('');
+    const newSeatRow = { institute: newSeatInst, program: newSeatProg, quota: newSeatQuota, seats: parseInt(newSeatCap) };
+    const { data, error } = await supabase.from('seat_matrices').insert([newSeatRow]).select();
+    if (error) {
+      alert("Error adding seat matrix row: " + error.message);
+    } else if (data) {
+      setDynamicSeats([data[0], ...dynamicSeats]);
+      alert("🏛️ Seat Row Matrix updated in Supabase!");
+      setNewSeatInst(''); setNewSeatProg(''); setNewSeatCap('');
+    }
   };
 
   const filteredCutoffData = useMemo(() => {
@@ -458,7 +462,7 @@ export default function Home() {
               </div>
               <div>
                 <label className="block mb-2 font-bold tracking-wide uppercase text-[10px] text-[#8492a6]">Reservation Category</label>
-                <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-4 py-3.5 bg-[#f8fafc] border border-[#e2e8f0] focus:border-[#fcd71a] focus:bg-white rounded-xl font-bold text-black outline-none"><option>OPEN</option><option>OBC-NCL</option><option>SC</option><option>ST</option></select>
+                <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-4 py-3.5 bg-[#f8fafc] border border-[#e2e8f0] focus:border-[#fcd71a] focus:bg-white rounded-xl font-bold text-black outline-none"><option>OPEN</option><option>OPEN (PwD)</option><option>OBC-NCL</option><option>OBC-NCL (PwD)</option><option>SC</option><option>SC (PwD)</option><option>ST</option><option>ST (PwD)</option><option>EWS</option><option>EWS (PwD)</option></select>
               </div>
               <div>
                 <label className="block mb-2 font-bold tracking-wide uppercase text-[10px] text-[#8492a6]">Gender Pool</label>
@@ -765,7 +769,7 @@ export default function Home() {
                       <input type="text" placeholder="Electronics and Communication Engineering" value={newProg} onChange={(e) => setNewProg(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-white outline-none focus:border-[#fcd71a]" required />
                     </div>
                     <div><label className="block mb-1.5 uppercase text-[10px]">Quota Pool ID</label><select value={newQuota} onChange={(e) => setNewQuota(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-zinc-300 outline-none"><option value="OS">Other State (OS)</option><option value="HS">Home State (HS)</option></select></div>
-                    <div><label className="block mb-1.5 uppercase text-[10px]">Reservation Category Pool</label><select value={newCat} onChange={(e) => setNewCat(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-zinc-300 outline-none"><option>OPEN</option><option>OBC-NCL</option><option>SC</option><option>ST</option></select></div>
+                    <div><label className="block mb-1.5 uppercase text-[10px]">Reservation Category Pool</label><select value={newCat} onChange={(e) => setNewCat(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-zinc-300 outline-none"><option>OPEN</option><option>OPEN (PwD)</option><option>OBC-NCL</option><option>OBC-NCL (PwD)</option><option>SC</option><option>SC (PwD)</option><option>ST</option><option>ST (PwD)</option><option>EWS</option><option>EWS (PwD)</option></select></div>
                     <div><label className="block mb-1.5 uppercase text-[10px]">Reservation Gender Pool</label><select value={newGend} onChange={(e) => setNewGend(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-zinc-300 outline-none"><option>Gender-Neutral</option><option>Female-Only</option></select></div>
                     <div><label className="block mb-1.5 uppercase text-[10px]">JEE Opening Rank</label><input type="number" placeholder="4444" value={newOpenRank} onChange={(e) => setNewOpenRank(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-white outline-none" required /></div>
                     <div><label className="block mb-1.5 uppercase text-[10px]">JEE Closing Rank</label><input type="number" placeholder="12500" value={newCloseRank} onChange={(e) => setNewCloseRank(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-white outline-none" required /></div>
@@ -783,6 +787,18 @@ export default function Home() {
                     <div><label className="block mb-1.5 uppercase text-[10px]">Quota Allocation Allocation</label><input type="text" placeholder="OS (Neutral)" value={newSeatQuota} onChange={(e) => setNewSeatQuota(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-white outline-none" required /></div>
                     <div><label className="block mb-1.5 uppercase text-[10px]">Absolute Seats capacity</label><input type="number" placeholder="92" value={newSeatCap} onChange={(e) => setNewSeatCap(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-white outline-none" required /></div>
                     <button type="submit" className="sm:col-span-2 bg-zinc-100 text-black font-black py-4 rounded-xl uppercase font-mono text-xs hover:opacity-90 transition-all mt-2 tracking-wider">Commit Capacity Row directly to Seat Matrix Ledger 🚀</button>
+                  </form>
+                </div>
+
+                <div className="bg-[#14171c] border border-zinc-800 p-6 rounded-2xl relative overflow-hidden shadow-xl">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-[#fcd71a]"></div>
+                  <h3 className="font-bold font-sans text-base text-white mb-4 flex items-center gap-2"><Clock size={18} className="text-[#fcd71a]"/> Form C: Inject New Admission Schedule Timeline</h3>
+                  <form onSubmit={handleAddDeadlineEvent} className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-bold font-mono text-zinc-400">
+                    <div><label className="block mb-1.5 uppercase text-[10px]">Date / Time</label><input type="text" placeholder="June 10, 2026" value={newDeadDate} onChange={(e) => setNewDeadDate(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-white outline-none" required /></div>
+                    <div><label className="block mb-1.5 uppercase text-[10px]">Event Title</label><input type="text" placeholder="Result Release" value={newDeadTitle} onChange={(e) => setNewDeadTitle(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-white outline-none" required /></div>
+                    <div className="sm:col-span-2"><label className="block mb-1.5 uppercase text-[10px]">Event Description</label><textarea placeholder="Details..." value={newDeadDesc} onChange={(e) => setNewDeadDesc(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-white outline-none h-20" required /></div>
+                    <div><label className="block mb-1.5 uppercase text-[10px]">Status</label><select value={newDeadStat} onChange={(e) => setNewDeadStat(e.target.value)} className="w-full bg-[#0e1013] border border-zinc-800 rounded-xl p-3.5 text-white outline-none"><option value="Upcoming">Upcoming</option><option value="Live Soon">Live Soon</option><option value="Strict Warning">Strict Warning</option></select></div>
+                    <button type="submit" className="sm:col-span-2 bg-emerald-600 text-white font-black py-4 rounded-xl uppercase font-mono text-xs hover:bg-emerald-700 transition-all mt-2 tracking-wider">Add Schedule Timeline to Database ⏰</button>
                   </form>
                 </div>
               </div>

@@ -44,4 +44,4 @@ export const massiveJosaaData: CollegeData[] = [
   { id: 18, institute: "National Institute of Technology Agartala", program: "Electronics and Communication Engineering (4 Years, Bachelor of Technology)", quota: "OS", category: "OBC-NCL", gender: "Gender-Neutral", opening: 6500, closing: 8900, fee: "1.5L/yr", placement: "11.5 LPA", nirf: 91 },
   { id: 19, institute: "Indian Institute of Technology Bombay", program: "Computer Science and Engineering (4 Years, Bachelor of Technology)", quota: "AI", category: "SC", gender: "Gender-Neutral", opening: 1, closing: 25, fee: "2.3L/yr", placement: "25.0 LPA", nirf: 3 },
   { id: 20, institute: "National Institute of Technology Agartala", program: "Computer Science & Engineering (4 Years, Bachelor of Technology)", quota: "OS", category: "SC", gender: "Gender-Neutral", opening: 1500, closing: 3200, fee: "1.5L/yr", placement: "14.0 LPA", nirf: 91 }
-];
+]

@@ -140,10 +140,15 @@ export default function AdminPanel() {
                   <select required name="category" value={formData.category} onChange={handleChange} className="w-full bg-[#f8fafc] border border-[#e2e8f0] rounded-xl px-4 py-3 text-sm font-bold focus:border-[#fcd71a] focus:bg-white outline-none transition-all">
                     <option value="">Select</option>
                     <option value="OPEN">OPEN</option>
+                    <option value="OPEN (PwD)">OPEN (PwD)</option>
                     <option value="OBC-NCL">OBC-NCL</option>
+                    <option value="OBC-NCL (PwD)">OBC-NCL (PwD)</option>
                     <option value="SC">SC</option>
+                    <option value="SC (PwD)">SC (PwD)</option>
                     <option value="ST">ST</option>
+                    <option value="ST (PwD)">ST (PwD)</option>
                     <option value="EWS">EWS</option>
+                    <option value="EWS (PwD)">EWS (PwD)</option>
                   </select>
                 </div>
               </div>
