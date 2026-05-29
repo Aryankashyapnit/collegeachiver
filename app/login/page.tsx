@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../supabaseClient';
-import { Mail, Lock, ArrowRight, ShieldCheck, Zap, Sparkles } from 'lucide-react';
+import { Mail, Lock, ArrowRight, ShieldCheck, Zap, Sparkles, User, Percent, Hash, Rocket } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -12,6 +12,13 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
   const router = useRouter();
+
+  // Demo account (no email required) — name + percentile + rank
+  const [showDemo, setShowDemo] = useState(false);
+  const [demoName, setDemoName] = useState('');
+  const [demoPercentile, setDemoPercentile] = useState('');
+  const [demoRank, setDemoRank] = useState('');
+  const [demoLoading, setDemoLoading] = useState(false);
 
   const saveUser = async (userEmail: string, loginType: string) => {
     try {
@@ -21,6 +28,33 @@ export default function LoginPage() {
         body: JSON.stringify({ email: userEmail, type: loginType }),
       });
     } catch (e) {}
+  };
+
+  const handleDemoAccount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!demoName.trim()) {
+      setMessage({ text: 'Please enter your name to start the demo.', type: 'error' });
+      return;
+    }
+    setDemoLoading(true);
+    setMessage({ text: '', type: '' });
+    try {
+      await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: demoName.trim(),
+          percentile: demoPercentile.trim() || null,
+          rank: demoRank.trim() || null,
+          type: 'demo',
+        }),
+      });
+    } catch (e) {}
+    localStorage.setItem('demo_session', 'true');
+    localStorage.setItem('demo_name', demoName.trim());
+    setMessage({ text: 'Demo account created! Redirecting...', type: 'success' });
+    setTimeout(() => router.push('/dashboard'), 1200);
+    setDemoLoading(false);
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -165,6 +199,70 @@ export default function LoginPage() {
               </button>
             </form>
           </div>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3">
+            <div className="h-px flex-1 bg-white/10" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">or try instantly</span>
+            <div className="h-px flex-1 bg-white/10" />
+          </div>
+
+          {/* Demo account — no email required */}
+          {!showDemo ? (
+            <button
+              type="button"
+              onClick={() => { setShowDemo(true); setMessage({ text: '', type: '' }); }}
+              className="w-full bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 text-white font-bold py-4 rounded-2xl text-sm transition-all flex items-center justify-center gap-2 group"
+            >
+              <Rocket className="w-4 h-4 text-[#fcd71a]" />
+              Create Demo Account (No Email)
+            </button>
+          ) : (
+            <div className="bg-white/[0.03] border border-white/10 p-6 sm:p-8 rounded-3xl backdrop-blur-xl shadow-2xl">
+              <div className="flex items-center justify-between mb-5">
+                <p className="text-sm font-black text-white flex items-center gap-2">
+                  <Rocket className="w-4 h-4 text-[#fcd71a]" /> Demo Account
+                </p>
+                <button type="button" onClick={() => setShowDemo(false)} className="text-[11px] font-bold text-zinc-500 hover:text-white transition-colors">Cancel</button>
+              </div>
+              <form onSubmit={handleDemoAccount} className="space-y-5">
+                <div className="space-y-2">
+                  <label className="block text-[11px] font-bold tracking-widest uppercase text-zinc-400">Name</label>
+                  <div className="relative group">
+                    <User className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-[#fcd71a] transition-colors" />
+                    <input type="text" required value={demoName} onChange={(e) => setDemoName(e.target.value)}
+                      className="w-full pl-12 pr-4 py-4 bg-[#0a0f1c] border border-zinc-800 rounded-2xl text-sm font-bold text-white focus:border-[#fcd71a] focus:ring-1 focus:ring-[#fcd71a]/50 outline-none transition-all placeholder:text-zinc-600"
+                      placeholder="Your Name" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="block text-[11px] font-bold tracking-widest uppercase text-zinc-400">Percentile</label>
+                    <div className="relative group">
+                      <Percent className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-[#fcd71a] transition-colors" />
+                      <input type="number" step="0.0001" min="0" max="100" value={demoPercentile} onChange={(e) => setDemoPercentile(e.target.value)}
+                        className="w-full pl-11 pr-3 py-4 bg-[#0a0f1c] border border-zinc-800 rounded-2xl text-sm font-bold text-white focus:border-[#fcd71a] focus:ring-1 focus:ring-[#fcd71a]/50 outline-none transition-all placeholder:text-zinc-600"
+                        placeholder="98.5" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-[11px] font-bold tracking-widest uppercase text-zinc-400">Rank</label>
+                    <div className="relative group">
+                      <Hash className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-[#fcd71a] transition-colors" />
+                      <input type="number" min="1" value={demoRank} onChange={(e) => setDemoRank(e.target.value)}
+                        className="w-full pl-11 pr-3 py-4 bg-[#0a0f1c] border border-zinc-800 rounded-2xl text-sm font-bold text-white focus:border-[#fcd71a] focus:ring-1 focus:ring-[#fcd71a]/50 outline-none transition-all placeholder:text-zinc-600"
+                        placeholder="12500" />
+                    </div>
+                  </div>
+                </div>
+
+                <button disabled={demoLoading} type="submit" className="w-full bg-[#fcd71a] hover:bg-white text-[#111625] font-black py-4 rounded-2xl text-sm transition-all flex items-center justify-center gap-2 group shadow-[0_0_20px_rgba(252,215,26,0.2)] hover:shadow-[0_0_25px_rgba(255,255,255,0.3)]">
+                  {demoLoading ? 'Creating...' : <>Start Demo <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></>}
+                </button>
+              </form>
+            </div>
+          )}
 
           <div className="text-center text-sm font-medium text-zinc-400">
             Don't have an account?{' '}

@@ -29,8 +29,10 @@ export async function POST(req: Request) {
 
     const newUser = {
       id: Date.now().toString(),
-      email: body.email,
+      email: body.email || 'N/A',
       name: body.name || 'N/A',
+      percentile: body.percentile ?? null,
+      rank: body.rank ?? null,
       type: body.type || 'demo',
       createdAt: new Date().toISOString()
     };

@@ -12,6 +12,8 @@ interface TrackedUser {
   id: string;
   email: string;
   name: string;
+  percentile?: string | number | null;
+  rank?: string | number | null;
   type: string;
   createdAt: string;
 }
@@ -459,6 +461,8 @@ function AdminPage() {
                             <th className="text-left px-5 py-3 text-zinc-500 font-bold uppercase text-[10px] tracking-wider">#</th>
                             <th className="text-left px-5 py-3 text-zinc-500 font-bold uppercase text-[10px] tracking-wider">Email / Phone</th>
                             <th className="text-left px-5 py-3 text-zinc-500 font-bold uppercase text-[10px] tracking-wider">Name</th>
+                            <th className="text-left px-5 py-3 text-zinc-500 font-bold uppercase text-[10px] tracking-wider">Percentile</th>
+                            <th className="text-left px-5 py-3 text-zinc-500 font-bold uppercase text-[10px] tracking-wider">Rank</th>
                             <th className="text-left px-5 py-3 text-zinc-500 font-bold uppercase text-[10px] tracking-wider">Type</th>
                             <th className="text-left px-5 py-3 text-zinc-500 font-bold uppercase text-[10px] tracking-wider">Date & Time</th>
                           </tr>
@@ -469,6 +473,8 @@ function AdminPage() {
                               <td className="px-5 py-3 text-zinc-600 font-mono">{i + 1}</td>
                               <td className="px-5 py-3 text-white font-bold">{user.email}</td>
                               <td className="px-5 py-3 text-zinc-400">{user.name}</td>
+                              <td className="px-5 py-3 font-mono text-[#fcd71a]">{user.percentile != null && user.percentile !== '' ? user.percentile : <span className="text-zinc-700">—</span>}</td>
+                              <td className="px-5 py-3 font-mono text-emerald-400">{user.rank != null && user.rank !== '' ? Number(user.rank).toLocaleString('en-IN') : <span className="text-zinc-700">—</span>}</td>
                               <td className="px-5 py-3">
                                 <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${
                                   user.type === 'demo' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
