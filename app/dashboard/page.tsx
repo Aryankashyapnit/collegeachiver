@@ -72,6 +72,8 @@ export default function DashboardPage() {
   const [referralCode, setReferralCode] = useState('');
   const [referralCount, setReferralCount] = useState(0);
   const [referralCopied, setReferralCopied] = useState(false);
+  const [seatSearchQuery, setSeatSearchQuery] = useState('');
+  const [expandedInstitute, setExpandedInstitute] = useState<string | null>(null);
 
   const predictorRef = useRef<HTMLDivElement>(null);
 
@@ -1114,31 +1116,89 @@ export default function DashboardPage() {
 
       {/* TAB 6: SEAT MATRIX */}
       {activeTab === 'Seat Matrix' && (
-        <div className="max-w-5xl mx-auto px-6 py-12 animate-fadeIn space-y-8 pb-24 md:pb-12">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12 animate-fadeIn space-y-6 sm:space-y-8 pb-24 md:pb-12">
           <div className="text-center space-y-2">
-            <h2 className="text-3xl font-black text-[#111625]">JoSAA Seat Matrix</h2>
-            <p className="text-xs text-[#8492a6] font-medium">Category-wise seat allocation data</p>
+            <h2 className="text-2xl sm:text-3xl font-black text-[#111625]">JoSAA Seat Matrix</h2>
+            <p className="text-xs text-[#8492a6] font-medium">Tap an institute to see its branch-wise seat allocation</p>
           </div>
+          
+          <div className="relative max-w-2xl mx-auto">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
+            <input 
+              type="text" 
+              placeholder="Search institute e.g. IIT Bombay, NIT Trichy..." 
+              value={seatSearchQuery}
+              onChange={(e) => setSeatSearchQuery(e.target.value)}
+              className="w-full pl-11 pr-4 py-3.5 bg-white border border-[#eef2f7] hover:border-[#fcd71a]/50 focus:border-[#fcd71a] rounded-2xl text-sm font-semibold text-[#111625] outline-none transition-all shadow-sm focus:shadow-md"
+            />
+          </div>
+
           {dynamicSeats.length === 0 ? (
             <div className="text-center py-12 text-zinc-400 font-mono text-sm">No seat data loaded yet.</div>
           ) : (
-            <div className="overflow-x-auto bg-white rounded-2xl border border-[#eef2f7] shadow-xs">
-              <table className="w-full text-xs">
-                <thead><tr className="bg-[#f8fafc] border-b border-[#eef2f7]">
-                  <th className="text-left p-3 font-bold text-[#485363]">Institute</th>
-                  <th className="text-left p-3 font-bold text-[#485363]">Program</th>
-                  <th className="text-left p-3 font-bold text-[#485363]">Quota</th>
-                  <th className="text-right p-3 font-bold text-[#485363]">Seats</th>
-                </tr></thead>
-                <tbody>{dynamicSeats.map((row, i) => (
-                  <tr key={i} className="border-b border-[#eef2f7] hover:bg-[#fafbfc]">
-                    <td className="p-3 text-[#111625] font-semibold">{row.institute}</td>
-                    <td className="p-3 text-[#5e6b7f]">{row.program}</td>
-                    <td className="p-3"><span className="bg-[#fcd71a]/10 text-[#977914] px-2 py-0.5 rounded font-mono font-bold">{row.quota}</span></td>
-                    <td className="p-3 text-right font-black text-[#111625] font-mono">{row.seats}</td>
-                  </tr>
-                ))}</tbody>
-              </table>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {Object.entries(
+                dynamicSeats
+                  .filter(row => row.institute.toLowerCase().includes(seatSearchQuery.toLowerCase()))
+                  .reduce((acc, row) => {
+                    if (!acc[row.institute]) acc[row.institute] = [];
+                    acc[row.institute].push(row);
+                    return acc;
+                  }, {} as Record<string, typeof dynamicSeats>)
+              ).map(([institute, seats]) => {
+                const uniqueBranches = new Set(seats.map(s => s.program)).size;
+                const totalSeats = seats.reduce((sum, s) => sum + s.seats, 0);
+                const isExpanded = expandedInstitute === institute;
+
+                return (
+                  <div key={institute} className="bg-white border border-[#eef2f7] rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all hover:border-[#fcd71a]/40 group flex flex-col h-full">
+                    <button 
+                      onClick={() => setExpandedInstitute(isExpanded ? null : institute)}
+                      className="w-full flex items-center p-5 gap-4 text-left"
+                    >
+                      <div className="w-12 h-12 rounded-2xl bg-[#111625] flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+                        <School className="text-[#fcd71a]" size={20} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-black text-[#111625] leading-snug truncate whitespace-normal line-clamp-2">{institute}</h3>
+                        <div className="flex items-center gap-2 mt-2">
+                          <span className="inline-flex items-center gap-1.5 bg-[#f4f7fa] text-[#5e6b7f] px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-wider border border-[#e8edf4]">
+                            <Layers size={10} /> {uniqueBranches} Branches
+                          </span>
+                          <span className="inline-flex items-center gap-1.5 bg-[#fcd71a]/15 text-[#977914] px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-wider border border-[#f5d020]/30">
+                            <Users size={10} /> {totalSeats} Seats
+                          </span>
+                        </div>
+                      </div>
+                      <div className={`w-8 h-8 rounded-full bg-[#f8fafc] border border-[#eef2f7] flex items-center justify-center text-zinc-400 shrink-0 transition-transform ${isExpanded ? 'rotate-180 bg-[#fcd71a]/10 text-[#977914] border-[#fcd71a]/30' : 'group-hover:bg-[#fcd71a]/10 group-hover:text-[#977914] group-hover:border-[#fcd71a]/30'}`}>
+                        <ChevronDown size={16} />
+                      </div>
+                    </button>
+                    {isExpanded && (
+                      <div className="border-t border-[#eef2f7] bg-[#fafbfc] px-5 pb-5 pt-3 overflow-x-auto">
+                        <table className="w-full text-xs">
+                          <thead>
+                            <tr className="border-b border-[#eef2f7]">
+                              <th className="text-left py-2 font-bold text-[#8492a6] uppercase tracking-wider text-[9px]">Program</th>
+                              <th className="text-left py-2 font-bold text-[#8492a6] uppercase tracking-wider text-[9px]">Quota</th>
+                              <th className="text-right py-2 font-bold text-[#8492a6] uppercase tracking-wider text-[9px]">Seats</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {seats.map((row, i) => (
+                              <tr key={i} className="border-b border-[#eef2f7] last:border-0 hover:bg-white transition-colors">
+                                <td className="py-2 pr-3 text-[#111625] font-semibold leading-relaxed min-w-[200px]">{row.program}</td>
+                                <td className="py-2 px-2"><span className="bg-[#fcd71a]/10 text-[#977914] px-1.5 py-0.5 rounded text-[10px] font-mono font-bold whitespace-nowrap">{row.quota}</span></td>
+                                <td className="py-2 pl-3 text-right font-black text-[#111625] font-mono">{row.seats}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
