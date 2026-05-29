@@ -3,12 +3,12 @@
   "/about/page": "app/about/page.js",
   "/contact/page": "app/contact/page.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/admin/page": "app/admin/page.js",
   "/forgot-password/page": "app/forgot-password/page.js",
-  "/reset-password/page": "app/reset-password/page.js",
-  "/privacy/page": "app/privacy/page.js",
-  "/terms/page": "app/terms/page.js",
-  "/register/page": "app/register/page.js",
-  "/page": "app/page.js",
   "/login/page": "app/login/page.js",
-  "/admin/page": "app/admin/page.js"
+  "/privacy/page": "app/privacy/page.js",
+  "/register/page": "app/register/page.js",
+  "/reset-password/page": "app/reset-password/page.js",
+  "/page": "app/page.js",
+  "/terms/page": "app/terms/page.js"
 }

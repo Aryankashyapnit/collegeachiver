@@ -1,16 +1,15 @@
-// @ts-nocheck
 "use client";
+// @ts-nocheck
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { supabase } from '../supabaseClient';
-import { PlusCircle, School, Clock, ShieldCheck, BarChart3, Users, Database, Calendar, LogOut, ChevronRight, TrendingUp } from 'lucide-react';
+import { PlusCircle, School, Clock, ShieldCheck, BarChart3, Users, Database, Calendar, LogOut, ChevronRight, TrendingUp, Upload, Download, FileText, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 
-type AdminView = 'overview' | 'cutoffs' | 'seats' | 'deadlines' | 'settings';
+type AdminView = 'overview' | 'cutoffs' | 'csv' | 'seats' | 'deadlines' | 'settings';
 
-const isTableMissing = (msg: string) =>
-  msg.includes('does not exist') || msg.includes('schema cache') || msg.includes('relation') || msg.includes('PGRST');
-
-export default function AdminPage() {
+function AdminPage() {
+  const [isMounted, setIsMounted] = useState(false);
   const [view, setView] = useState<AdminView>('overview');
   const [counts, setCounts] = useState({ cutoffs: 0, seats: 0, deadlines: 0 });
   const [toast, setToast] = useState('');
@@ -41,6 +40,178 @@ export default function AdminPage() {
   const [premiumGroupUrl, setPremiumGroupUrl] = useState('https://chat.whatsapp.com/secret-counselling-group-link');
   const [premiumPrice, setPremiumPrice] = useState('99');
 
+  // Seat Matrix CSV Import state
+  const [seatCsvRaw, setSeatCsvRaw] = useState('');
+  const [seatCsvRows, setSeatCsvRows] = useState<any[]>([]);
+  const [seatCsvErrors, setSeatCsvErrors] = useState<string[]>([]);
+  const [seatCsvImporting, setSeatCsvImporting] = useState(false);
+  const [seatCsvProgress, setSeatCsvProgress] = useState(0);
+  const [seatCsvDone, setSeatCsvDone] = useState<{ ok: number; fail: number } | null>(null);
+  const [seatCsvDragOver, setSeatCsvDragOver] = useState(false);
+
+  // CSV Import state
+  const [csvRaw, setCsvRaw] = useState('');
+  const [csvRows, setCsvRows] = useState<any[]>([]);
+  const [csvErrors, setCsvErrors] = useState<string[]>([]);
+  const [csvImporting, setCsvImporting] = useState(false);
+  const [csvProgress, setCsvProgress] = useState(0);
+  const [csvDone, setCsvDone] = useState<{ ok: number; fail: number } | null>(null);
+  const [csvDragOver, setCsvDragOver] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const SEAT_CSV_EXAMPLE = [
+    'institute,program,quota,seats',
+    'Indian Institute of Technology Bombay,Computer Science and Engineering,OPEN (AI),59',
+    'National Institute of Technology Trichy,Computer Science and Engineering,OPEN (OS),45',
+    'Indian Institute of Information Technology Allahabad,Computer Science and Engineering,OPEN (AI),60',
+  ].join('\n');
+
+  const downloadSeatTemplate = () => {
+    const blob = new Blob([SEAT_CSV_EXAMPLE], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'collegeachiver_seat_matrix_template.csv';
+    a.click();
+  };
+
+  const parseSeatCSV = (text: string) => {
+    const lines = text.trim().split('\n').filter(l => l.trim());
+    if (lines.length < 2) { setSeatCsvErrors(['Kam se kam 1 data row honi chahiye']); setSeatCsvRows([]); return; }
+    const header = lines[0].toLowerCase().split(',').map(h => h.trim().replace(/"/g, ''));
+    const required = ['institute', 'program', 'quota', 'seats'];
+    const missing = required.filter(r => !header.includes(r));
+    if (missing.length > 0) { setSeatCsvErrors([`Missing columns: ${missing.join(', ')}`]); setSeatCsvRows([]); return; }
+    const errs: string[] = [];
+    const rows: any[] = [];
+    for (let i = 1; i < lines.length; i++) {
+      const vals = lines[i].split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(v => v.trim().replace(/^"|"$/g, ''));
+      const row: any = {};
+      header.forEach((h, idx) => { row[h] = vals[idx] ?? ''; });
+      const seats = parseInt(row.seats);
+      if (!row.institute) { errs.push(`Row ${i}: institute missing`); continue; }
+      if (!row.program) { errs.push(`Row ${i}: program missing`); continue; }
+      if (isNaN(seats)) { errs.push(`Row ${i}: seats must be a number (got: ${row.seats})`); continue; }
+      rows.push({ institute: row.institute, program: row.program, quota: row.quota || 'OPEN (AI)', seats });
+    }
+    setSeatCsvErrors(errs);
+    setSeatCsvRows(rows);
+  };
+
+  const handleSeatCsvFile = (file: File) => {
+    if (!file.name.endsWith('.csv') && file.type !== 'text/csv') { setSeatCsvErrors(['Sirf .csv files allowed hain']); return; }
+    const reader = new FileReader();
+    reader.onload = (e) => { const text = e.target?.result as string; setSeatCsvRaw(text); setSeatCsvDone(null); parseSeatCSV(text); };
+    reader.readAsText(file);
+  };
+
+  const handleSeatCsvImport = async () => {
+    if (seatCsvRows.length === 0) return;
+    setSeatCsvImporting(true);
+    setSeatCsvProgress(0);
+    setSeatCsvDone(null);
+    const BATCH = 100;
+    let ok = 0, fail = 0;
+    for (let i = 0; i < seatCsvRows.length; i += BATCH) {
+      const batch = seatCsvRows.slice(i, i + BATCH);
+      const { error } = await supabase.from('seat_matrices').insert(batch);
+      if (error) { fail += batch.length; } else { ok += batch.length; }
+      setSeatCsvProgress(Math.round(((i + batch.length) / seatCsvRows.length) * 100));
+    }
+    setSeatCsvImporting(false);
+    setSeatCsvDone({ ok, fail });
+    setCounts(c => ({ ...c, seats: c.seats + ok }));
+    if (ok > 0) showToast(`✅ ${ok} seat rows import ho gaye!`);
+  };
+
+  const CSV_TEMPLATE_HEADERS = 'institute,program,quota,category,gender,opening,closing,fee,placement,nirf';
+  const CSV_TEMPLATE_EXAMPLE = [
+    CSV_TEMPLATE_HEADERS,
+    'Indian Institute of Technology Bombay,Computer Science and Engineering,AI,OPEN,Gender-Neutral,87,342,₹2,25,000/year,₹42 LPA,3',
+    'National Institute of Technology Trichy,Computer Science and Engineering,OS,OPEN,Gender-Neutral,4500,8200,₹1,25,000/year,₹18 LPA,8',
+    'Indian Institute of Information Technology Allahabad,Computer Science and Engineering,AI,OPEN,Gender-Neutral,8000,14500,₹1,00,000/year,₹12 LPA,28',
+  ].join('\n');
+
+  const downloadTemplate = () => {
+    const blob = new Blob([CSV_TEMPLATE_EXAMPLE], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'collegeachiver_cutoff_template.csv';
+    a.click();
+  };
+
+  const parseCSV = (text: string) => {
+    const lines = text.trim().split('\n').filter(l => l.trim());
+    if (lines.length < 2) { setCsvErrors(['CSV mein kam se kam 1 data row honi chahiye (header ke baad)']); setCsvRows([]); return; }
+    const header = lines[0].toLowerCase().split(',').map(h => h.trim().replace(/"/g, ''));
+    const required = ['institute', 'program', 'quota', 'category', 'gender', 'opening', 'closing'];
+    const missing = required.filter(r => !header.includes(r));
+    if (missing.length > 0) { setCsvErrors([`Missing columns: ${missing.join(', ')}`]); setCsvRows([]); return; }
+
+    const errs: string[] = [];
+    const rows: any[] = [];
+    for (let i = 1; i < lines.length; i++) {
+      const vals = lines[i].split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(v => v.trim().replace(/^"|"$/g, ''));
+      const row: any = {};
+      header.forEach((h, idx) => { row[h] = vals[idx] ?? ''; });
+      const open = parseInt(row.opening);
+      const close = parseInt(row.closing);
+      if (!row.institute) { errs.push(`Row ${i}: institute missing`); continue; }
+      if (!row.program) { errs.push(`Row ${i}: program missing`); continue; }
+      if (isNaN(open) || isNaN(close)) { errs.push(`Row ${i}: opening/closing ranks must be numbers`); continue; }
+      rows.push({
+        institute: row.institute,
+        program: row.program,
+        quota: row.quota || 'AI',
+        category: row.category || 'OPEN',
+        gender: row.gender || 'Gender-Neutral',
+        opening: open,
+        closing: close,
+        fee: row.fee || null,
+        placement: row.placement || null,
+        nirf: row.nirf && !isNaN(parseInt(row.nirf)) ? parseInt(row.nirf) : null,
+      });
+    }
+    setCsvErrors(errs);
+    setCsvRows(rows);
+  };
+
+  const handleCsvFile = (file: File) => {
+    if (!file.name.endsWith('.csv') && file.type !== 'text/csv') {
+      setCsvErrors(['Sirf .csv files allowed hain']);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result as string;
+      setCsvRaw(text);
+      setCsvDone(null);
+      parseCSV(text);
+    };
+    reader.readAsText(file);
+  };
+
+  const handleCsvImport = async () => {
+    if (csvRows.length === 0) return;
+    setCsvImporting(true);
+    setCsvProgress(0);
+    setCsvDone(null);
+    const BATCH = 100;
+    let ok = 0, fail = 0;
+    for (let i = 0; i < csvRows.length; i += BATCH) {
+      const batch = csvRows.slice(i, i + BATCH);
+      const { error } = await supabase.from('josaadata_record').insert(batch);
+      if (error) { fail += batch.length; } else { ok += batch.length; }
+      setCsvProgress(Math.round(((i + batch.length) / csvRows.length) * 100));
+    }
+    setCsvImporting(false);
+    setCsvDone({ ok, fail });
+    setCounts(c => ({ ...c, cutoffs: c.cutoffs + ok }));
+    if (ok > 0) showToast(`✅ ${ok} records import ho gaye!`);
+  };
+
   const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(''), 4000);
@@ -54,10 +225,6 @@ export default function AdminPage() {
         supabase.from('seat_matrices').select('*', { count: 'exact', head: true }),
         supabase.from('admission_schedules').select('*', { count: 'exact', head: true }),
       ]);
-      if (r1.error && isTableMissing(r1.error.message)) missing.push('josaadata_record');
-      if (r2.error && isTableMissing(r2.error.message)) missing.push('seat_matrices');
-      if (r3.error && isTableMissing(r3.error.message)) missing.push('admission_schedules');
-      if (missing.length > 0) { setMissingTables(missing); }
       setCounts({ cutoffs: r1.count || 0, seats: r2.count || 0, deadlines: r3.count || 0 });
     };
     fetchCounts();
@@ -127,10 +294,13 @@ export default function AdminPage() {
   const navItems: { id: AdminView; label: string; icon: React.ReactNode }[] = [
     { id: 'overview', label: 'Overview', icon: <BarChart3 size={16} /> },
     { id: 'cutoffs', label: 'Cutoff Data', icon: <Database size={16} /> },
+    { id: 'csv', label: 'CSV Bulk Import', icon: <Upload size={16} /> },
     { id: 'seats', label: 'Seat Matrix', icon: <School size={16} /> },
     { id: 'deadlines', label: 'Key Deadlines', icon: <Calendar size={16} /> },
-    { id: 'settings', label: 'Settings', icon: <ShieldCheck size={16} /> }
+    { id: 'settings', label: 'Settings', icon: <ShieldCheck size={16} /> },
   ];
+
+  if (!isMounted) return null;
 
   return (
     <div className="min-h-screen bg-[#0a0c10] text-white font-sans">
@@ -174,7 +344,7 @@ export default function AdminPage() {
                 <span>Admin</span><ChevronRight size={10}/><span className="text-[#fcd71a] capitalize">{view}</span>
               </div>
               <h1 className="text-lg font-black text-white capitalize">
-                {view === 'overview' ? 'Dashboard Overview' : view === 'cutoffs' ? 'Inject Cutoff Records' : view === 'seats' ? 'Inject Seat Matrix Rows' : view === 'deadlines' ? 'Inject Key Deadlines' : 'Gateway Settings'}
+                {view === 'overview' ? 'Dashboard Overview' : view === 'cutoffs' ? 'Inject Cutoff Records' : view === 'csv' ? 'CSV Bulk Import' : view === 'seats' ? 'Inject Seat Matrix Rows' : view === 'deadlines' ? 'Inject Key Deadlines' : 'Gateway Settings'}
               </h1>
             </div>
             <div className="flex items-center gap-2 text-[10px] font-mono">
@@ -324,19 +494,357 @@ export default function AdminPage() {
               </div>
             )}
 
+            {view === 'csv' && (
+              <div className="max-w-3xl animate-fadeIn space-y-6">
+
+                {/* Step 1 — Download Template */}
+                <div className="bg-[#0d1117] border border-zinc-800 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-[#fcd71a]/10 border border-[#fcd71a]/30 flex items-center justify-center shrink-0">
+                    <Download size={18} className="text-[#fcd71a]"/>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-black text-white">Step 1 — CSV Template Download karo</p>
+                    <p className="text-xs text-zinc-400 mt-0.5">Isme sahi columns hain: <span className="font-mono text-zinc-300">institute, program, quota, category, gender, opening, closing, fee, placement, nirf</span></p>
+                  </div>
+                  <button onClick={downloadTemplate} className="shrink-0 flex items-center gap-2 bg-[#fcd71a] hover:bg-[#ebd02c] text-[#111625] font-black text-xs px-4 py-2.5 rounded-xl transition-all">
+                    <Download size={13}/> Download Template
+                  </button>
+                </div>
+
+                {/* CSV Format reference */}
+                <div className="bg-[#0d1117] border border-zinc-800 rounded-2xl overflow-hidden">
+                  <div className="px-5 py-3 border-b border-zinc-800 flex items-center gap-2">
+                    <FileText size={13} className="text-zinc-500"/>
+                    <span className="text-[10px] font-mono text-zinc-500">CSV format — columns ki jankari</span>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-[11px]">
+                      <thead>
+                        <tr className="border-b border-zinc-800/60">
+                          {['Column', 'Required?', 'Example', 'Notes'].map(h => (
+                            <th key={h} className="px-4 py-2.5 text-left text-zinc-500 font-bold uppercase text-[10px] tracking-wider">{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[
+                          ['institute', '✅ Yes', 'Indian Institute of Technology Bombay', 'Full name likho'],
+                          ['program', '✅ Yes', 'Computer Science and Engineering', 'Branch ka pura naam'],
+                          ['quota', '✅ Yes', 'AI / OS / HS', 'AI=IITs, OS/HS=NITs'],
+                          ['category', '✅ Yes', 'OPEN / OBC-NCL / SC / ST / EWS', 'Category as per JoSAA'],
+                          ['gender', '✅ Yes', 'Gender-Neutral / Female-Only', 'Pool type'],
+                          ['opening', '✅ Yes', '87', 'Opening rank (number)'],
+                          ['closing', '✅ Yes', '342', 'Closing rank (number)'],
+                          ['fee', '⬜ Optional', '₹2,25,000/year', 'Annual fee (text)'],
+                          ['placement', '⬜ Optional', '₹42 LPA', 'Avg placement (text)'],
+                          ['nirf', '⬜ Optional', '3', 'NIRF rank (number)'],
+                        ].map(([col, req, ex, note], i) => (
+                          <tr key={i} className={`border-b border-zinc-900 ${i % 2 === 0 ? 'bg-[#0a0c10]/30' : ''}`}>
+                            <td className="px-4 py-2.5 font-mono text-[#fcd71a] font-bold">{col}</td>
+                            <td className="px-4 py-2.5 text-zinc-400">{req}</td>
+                            <td className="px-4 py-2.5 font-mono text-zinc-300 text-[10px]">{ex}</td>
+                            <td className="px-4 py-2.5 text-zinc-500 text-[10px]">{note}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Step 2 — File Upload */}
+                <div className="bg-[#0d1117] border border-zinc-800 rounded-2xl p-5 space-y-4">
+                  <p className="text-sm font-black text-white flex items-center gap-2"><Upload size={15} className="text-[#fcd71a]"/> Step 2 — CSV File Upload karo</p>
+                  <label
+                    className={`flex flex-col items-center justify-center gap-3 border-2 border-dashed rounded-2xl py-12 cursor-pointer transition-all ${csvDragOver ? 'border-[#fcd71a] bg-[#fcd71a]/5' : 'border-zinc-700 hover:border-zinc-500 bg-[#0a0c10]/50'}`}
+                    onDragOver={(e) => { e.preventDefault(); setCsvDragOver(true); }}
+                    onDragLeave={() => setCsvDragOver(false)}
+                    onDrop={(e) => { e.preventDefault(); setCsvDragOver(false); const f = e.dataTransfer.files[0]; if (f) handleCsvFile(f); }}
+                  >
+                    <input type="file" accept=".csv,text/csv" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleCsvFile(f); }}/>
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all ${csvDragOver ? 'bg-[#fcd71a]/20' : 'bg-zinc-800'}`}>
+                      <Upload size={22} className={csvDragOver ? 'text-[#fcd71a]' : 'text-zinc-400'}/>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm font-bold text-zinc-300">Drag & drop karo ya click karke select karo</p>
+                      <p className="text-xs text-zinc-600 mt-1">Sirf .csv files — Excel mein "Save As CSV" karke use karo</p>
+                    </div>
+                    {csvRaw && (
+                      <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 bg-emerald-950/40 px-4 py-2 rounded-xl border border-emerald-800/40">
+                        <CheckCircle2 size={13}/> File loaded — {csvRows.length} valid rows parsed
+                      </div>
+                    )}
+                  </label>
+
+                  {/* Paste CSV manually */}
+                  <div>
+                    <p className="text-[10px] text-zinc-500 mb-2 font-mono uppercase tracking-wider">Ya seedha paste karo (CSV text):</p>
+                    <textarea
+                      rows={5}
+                      placeholder={`institute,program,quota,category,gender,opening,closing,fee,placement,nirf\nIndian Institute of Technology Bombay,Computer Science and Engineering,AI,OPEN,Gender-Neutral,87,342,₹2,25,000/year,₹42 LPA,3`}
+                      value={csvRaw}
+                      onChange={(e) => { setCsvRaw(e.target.value); setCsvDone(null); parseCSV(e.target.value); }}
+                      className="w-full bg-[#0a0c10] border border-zinc-800 focus:border-[#fcd71a] rounded-xl p-3 text-zinc-300 font-mono text-[11px] outline-none transition-colors resize-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Errors */}
+                {csvErrors.length > 0 && (
+                  <div className="bg-red-950/30 border border-red-800/50 rounded-2xl p-4 space-y-2">
+                    <p className="text-xs font-black text-red-400 flex items-center gap-2"><XCircle size={14}/> {csvErrors.length} parsing error{csvErrors.length > 1 ? 's' : ''}</p>
+                    <ul className="space-y-1">
+                      {csvErrors.slice(0, 8).map((e, i) => <li key={i} className="text-[11px] font-mono text-red-300">{e}</li>)}
+                      {csvErrors.length > 8 && <li className="text-[11px] text-red-400">...aur {csvErrors.length - 8} errors</li>}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Preview Table */}
+                {csvRows.length > 0 && (
+                  <div className="bg-[#0d1117] border border-zinc-800 rounded-2xl overflow-hidden">
+                    <div className="px-5 py-3 border-b border-zinc-800 flex items-center justify-between">
+                      <p className="text-xs font-black text-white flex items-center gap-2"><Database size={13} className="text-emerald-400"/> Preview — first {Math.min(csvRows.length, 8)} of {csvRows.length} rows</p>
+                      <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/40 px-3 py-1 rounded-lg border border-emerald-800/30">{csvRows.length} rows ready</span>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-[11px]">
+                        <thead>
+                          <tr className="border-b border-zinc-800/60">
+                            {['Institute', 'Program', 'Quota', 'Cat', 'Gender', 'Open', 'Close', 'NIRF'].map(h => (
+                              <th key={h} className="px-3 py-2.5 text-left text-zinc-500 font-bold uppercase text-[9px] tracking-wider whitespace-nowrap">{h}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {csvRows.slice(0, 8).map((row, i) => (
+                            <tr key={i} className={`border-b border-zinc-900 ${i % 2 === 0 ? 'bg-[#0a0c10]/30' : ''}`}>
+                              <td className="px-3 py-2 text-zinc-200 max-w-[180px] truncate font-medium">
+                                {row.institute.replace('Indian Institute of Technology', 'IIT').replace('National Institute of Technology', 'NIT').replace('Indian Institute of Information Technology', 'IIIT')}
+                              </td>
+                              <td className="px-3 py-2 text-zinc-400 max-w-[140px] truncate">{row.program}</td>
+                              <td className="px-3 py-2"><span className="font-mono bg-zinc-800 text-zinc-300 px-1.5 py-0.5 rounded">{row.quota}</span></td>
+                              <td className="px-3 py-2 text-zinc-400 font-mono">{row.category}</td>
+                              <td className="px-3 py-2 text-zinc-500 text-[10px]">{row.gender === 'Gender-Neutral' ? 'GN' : 'FO'}</td>
+                              <td className="px-3 py-2 text-emerald-400 font-mono font-bold">{row.opening?.toLocaleString()}</td>
+                              <td className="px-3 py-2 text-[#fcd71a] font-mono font-bold">{row.closing?.toLocaleString()}</td>
+                              <td className="px-3 py-2 text-zinc-500 font-mono">{row.nirf ?? '—'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    {csvRows.length > 8 && (
+                      <div className="px-5 py-2.5 border-t border-zinc-800/60 text-[10px] text-zinc-600 font-mono">
+                        + {csvRows.length - 8} more rows (sabhi import honge)
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Import Button + Progress */}
+                {csvRows.length > 0 && !csvDone && (
+                  <div className="space-y-3">
+                    {csvImporting && (
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-[11px] font-mono text-zinc-400">
+                          <span>Importing... {csvProgress}%</span>
+                          <span>{Math.round(csvRows.length * csvProgress / 100)}/{csvRows.length} rows</span>
+                        </div>
+                        <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
+                          <div className="h-full bg-[#fcd71a] transition-all duration-300 rounded-full" style={{ width: `${csvProgress}%` }}></div>
+                        </div>
+                      </div>
+                    )}
+                    <button
+                      onClick={handleCsvImport}
+                      disabled={csvImporting}
+                      className="w-full flex items-center justify-center gap-2 bg-[#fcd71a] hover:bg-[#ebd02c] disabled:opacity-50 disabled:cursor-wait text-[#111625] font-black py-4 rounded-xl uppercase text-xs tracking-wider transition-all"
+                    >
+                      {csvImporting ? (
+                        <><span className="animate-spin">⟳</span> Importing {csvRows.length} records...</>
+                      ) : (
+                        <><Upload size={14}/> Import {csvRows.length} Records into Database</>
+                      )}
+                    </button>
+                  </div>
+                )}
+
+                {/* Success State */}
+                {csvDone && (
+                  <div className={`rounded-2xl p-6 border text-center space-y-3 ${csvDone.fail === 0 ? 'bg-emerald-950/30 border-emerald-800/50' : 'bg-amber-950/30 border-amber-800/50'}`}>
+                    <div className="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center bg-emerald-900/40 border border-emerald-700/40">
+                      <CheckCircle2 size={22} className="text-emerald-400"/>
+                    </div>
+                    <p className="text-base font-black text-white">{csvDone.ok} records import ho gaye! 🎉</p>
+                    {csvDone.fail > 0 && <p className="text-xs text-amber-400">{csvDone.fail} records fail hue (duplicate ya missing fields)</p>}
+                    <div className="flex gap-3 justify-center pt-2">
+                      <button onClick={() => { setCsvRaw(''); setCsvRows([]); setCsvErrors([]); setCsvDone(null); setCsvProgress(0); }}
+                        className="text-xs font-black px-5 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 transition-all">
+                        Naya CSV Upload karo
+                      </button>
+                      <button onClick={() => setView('cutoffs')}
+                        className="text-xs font-black px-5 py-2.5 rounded-xl bg-[#fcd71a] hover:bg-[#ebd02c] text-[#111625] transition-all">
+                        Records Dekho
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {view === 'seats' && (
-              <div className="max-w-2xl animate-fadeIn">
+              <div className="max-w-3xl animate-fadeIn space-y-6">
+
+                {/* Single row form */}
                 <div className="bg-[#0d1117] border border-zinc-800 p-6 rounded-2xl relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-full h-1 bg-purple-500"></div>
-                  <h3 className="font-bold text-sm text-white mb-6 flex items-center gap-2"><School size={16} className="text-purple-400"/> New Seat Matrix Row</h3>
+                  <h3 className="font-bold text-sm text-white mb-6 flex items-center gap-2"><School size={16} className="text-purple-400"/> Single Row — New Seat Entry</h3>
                   <form onSubmit={handleAddSeat} className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                    <div className="sm:col-span-2"><label className="block mb-1.5 text-zinc-400 uppercase text-[10px] tracking-wider">Institute Name</label><input type="text" placeholder="NIT Agartala" value={newSeatInst} onChange={(e) => setNewSeatInst(e.target.value)} className="w-full bg-[#0a0c10] border border-zinc-800 focus:border-purple-500 rounded-xl p-3 text-white outline-none transition-colors" required /></div>
+                    <div className="sm:col-span-2"><label className="block mb-1.5 text-zinc-400 uppercase text-[10px] tracking-wider">Institute Name</label><input type="text" placeholder="National Institute of Technology Agartala" value={newSeatInst} onChange={(e) => setNewSeatInst(e.target.value)} className="w-full bg-[#0a0c10] border border-zinc-800 focus:border-purple-500 rounded-xl p-3 text-white outline-none transition-colors" required /></div>
                     <div className="sm:col-span-2"><label className="block mb-1.5 text-zinc-400 uppercase text-[10px] tracking-wider">Program / Branch</label><input type="text" placeholder="Electrical Engineering" value={newSeatProg} onChange={(e) => setNewSeatProg(e.target.value)} className="w-full bg-[#0a0c10] border border-zinc-800 focus:border-purple-500 rounded-xl p-3 text-white outline-none transition-colors" required /></div>
-                    <div><label className="block mb-1.5 text-zinc-400 uppercase text-[10px] tracking-wider">Quota / Category</label><input type="text" placeholder="OPEN (Neutral)" value={newSeatQuota} onChange={(e) => setNewSeatQuota(e.target.value)} className="w-full bg-[#0a0c10] border border-zinc-800 focus:border-purple-500 rounded-xl p-3 text-white outline-none transition-colors" required /></div>
+                    <div><label className="block mb-1.5 text-zinc-400 uppercase text-[10px] tracking-wider">Quota / Category</label><input type="text" placeholder="OPEN (OS)" value={newSeatQuota} onChange={(e) => setNewSeatQuota(e.target.value)} className="w-full bg-[#0a0c10] border border-zinc-800 focus:border-purple-500 rounded-xl p-3 text-white outline-none transition-colors" required /></div>
                     <div><label className="block mb-1.5 text-zinc-400 uppercase text-[10px] tracking-wider">Total Seats</label><input type="number" placeholder="e.g. 92" value={newSeatCap} onChange={(e) => setNewSeatCap(e.target.value)} className="w-full bg-[#0a0c10] border border-zinc-800 focus:border-purple-500 rounded-xl p-3 text-white outline-none transition-colors" required /></div>
-                    <button type="submit" className="sm:col-span-2 bg-purple-600 hover:bg-purple-700 text-white font-black py-3.5 rounded-xl uppercase text-xs tracking-wider transition-all flex items-center justify-center gap-2 mt-2"><School size={14}/> Add Seat Row to Database</button>
+                    <button type="submit" className="sm:col-span-2 bg-purple-600 hover:bg-purple-700 text-white font-black py-3.5 rounded-xl uppercase text-xs tracking-wider transition-all flex items-center justify-center gap-2 mt-2"><School size={14}/> Add Row to Database</button>
                   </form>
                 </div>
+
+                {/* Divider */}
+                <div className="flex items-center gap-4">
+                  <div className="h-px flex-1 bg-zinc-800"></div>
+                  <span className="text-[11px] font-mono text-zinc-600 uppercase tracking-widest">Ya bulk CSV se</span>
+                  <div className="h-px flex-1 bg-zinc-800"></div>
+                </div>
+
+                {/* Template download */}
+                <div className="bg-[#0d1117] border border-zinc-800 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center shrink-0">
+                    <Download size={18} className="text-purple-400"/>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-black text-white">Step 1 — Template Download karo</p>
+                    <p className="text-xs text-zinc-400 mt-0.5">CSV columns: <span className="font-mono text-zinc-300">institute, program, quota, seats</span></p>
+                  </div>
+                  <button onClick={downloadSeatTemplate} className="shrink-0 flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-black text-xs px-4 py-2.5 rounded-xl transition-all">
+                    <Download size={13}/> Download Template
+                  </button>
+                </div>
+
+                {/* Upload zone */}
+                <div className="bg-[#0d1117] border border-zinc-800 rounded-2xl p-5 space-y-4">
+                  <p className="text-sm font-black text-white flex items-center gap-2"><Upload size={15} className="text-purple-400"/> Step 2 — CSV Upload karo</p>
+                  <label
+                    className={`flex flex-col items-center justify-center gap-3 border-2 border-dashed rounded-2xl py-10 cursor-pointer transition-all ${seatCsvDragOver ? 'border-purple-500 bg-purple-500/5' : 'border-zinc-700 hover:border-zinc-500 bg-[#0a0c10]/50'}`}
+                    onDragOver={(e) => { e.preventDefault(); setSeatCsvDragOver(true); }}
+                    onDragLeave={() => setSeatCsvDragOver(false)}
+                    onDrop={(e) => { e.preventDefault(); setSeatCsvDragOver(false); const f = e.dataTransfer.files[0]; if (f) handleSeatCsvFile(f); }}
+                  >
+                    <input type="file" accept=".csv,text/csv" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleSeatCsvFile(f); }}/>
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all ${seatCsvDragOver ? 'bg-purple-500/20' : 'bg-zinc-800'}`}>
+                      <Upload size={22} className={seatCsvDragOver ? 'text-purple-400' : 'text-zinc-400'}/>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm font-bold text-zinc-300">Drag & drop ya click karke select karo</p>
+                      <p className="text-xs text-zinc-600 mt-1">Sirf .csv files</p>
+                    </div>
+                    {seatCsvRaw && (
+                      <div className="flex items-center gap-2 text-xs font-mono text-purple-400 bg-purple-950/40 px-4 py-2 rounded-xl border border-purple-800/40">
+                        <CheckCircle2 size={13}/> {seatCsvRows.length} valid rows parsed
+                      </div>
+                    )}
+                  </label>
+                  <div>
+                    <p className="text-[10px] text-zinc-500 mb-2 font-mono uppercase tracking-wider">Ya seedha paste karo:</p>
+                    <textarea
+                      rows={4}
+                      placeholder={`institute,program,quota,seats\nNational Institute of Technology Trichy,Computer Science and Engineering,OPEN (OS),45`}
+                      value={seatCsvRaw}
+                      onChange={(e) => { setSeatCsvRaw(e.target.value); setSeatCsvDone(null); parseSeatCSV(e.target.value); }}
+                      className="w-full bg-[#0a0c10] border border-zinc-800 focus:border-purple-500 rounded-xl p-3 text-zinc-300 font-mono text-[11px] outline-none transition-colors resize-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Errors */}
+                {seatCsvErrors.length > 0 && (
+                  <div className="bg-red-950/30 border border-red-800/50 rounded-2xl p-4 space-y-2">
+                    <p className="text-xs font-black text-red-400 flex items-center gap-2"><XCircle size={14}/> {seatCsvErrors.length} error{seatCsvErrors.length > 1 ? 's' : ''}</p>
+                    <ul className="space-y-1">
+                      {seatCsvErrors.slice(0, 6).map((e, i) => <li key={i} className="text-[11px] font-mono text-red-300">{e}</li>)}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Preview */}
+                {seatCsvRows.length > 0 && (
+                  <div className="bg-[#0d1117] border border-zinc-800 rounded-2xl overflow-hidden">
+                    <div className="px-5 py-3 border-b border-zinc-800 flex items-center justify-between">
+                      <p className="text-xs font-black text-white">Preview — first {Math.min(seatCsvRows.length, 8)} of {seatCsvRows.length} rows</p>
+                      <span className="text-[10px] font-mono text-purple-400 bg-purple-950/40 px-3 py-1 rounded-lg border border-purple-800/30">{seatCsvRows.length} rows ready</span>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-[11px]">
+                        <thead>
+                          <tr className="border-b border-zinc-800/60">
+                            {['Institute', 'Program', 'Quota', 'Seats'].map(h => (
+                              <th key={h} className="px-4 py-2.5 text-left text-zinc-500 font-bold uppercase text-[10px] tracking-wider">{h}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {seatCsvRows.slice(0, 8).map((row, i) => (
+                            <tr key={i} className={`border-b border-zinc-900 ${i % 2 === 0 ? 'bg-[#0a0c10]/30' : ''}`}>
+                              <td className="px-4 py-2.5 text-zinc-200 max-w-[200px] truncate font-medium">
+                                {row.institute.replace('Indian Institute of Technology', 'IIT').replace('National Institute of Technology', 'NIT').replace('Indian Institute of Information Technology', 'IIIT')}
+                              </td>
+                              <td className="px-4 py-2.5 text-zinc-400 max-w-[160px] truncate">{row.program}</td>
+                              <td className="px-4 py-2.5"><span className="font-mono bg-zinc-800 text-zinc-300 px-1.5 py-0.5 rounded text-[10px]">{row.quota}</span></td>
+                              <td className="px-4 py-2.5 text-purple-400 font-mono font-black">{row.seats}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    {seatCsvRows.length > 8 && (
+                      <div className="px-5 py-2.5 border-t border-zinc-800/60 text-[10px] text-zinc-600 font-mono">+ {seatCsvRows.length - 8} more rows</div>
+                    )}
+                  </div>
+                )}
+
+                {/* Import button */}
+                {seatCsvRows.length > 0 && !seatCsvDone && (
+                  <div className="space-y-3">
+                    {seatCsvImporting && (
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-[11px] font-mono text-zinc-400">
+                          <span>Importing... {seatCsvProgress}%</span>
+                          <span>{Math.round(seatCsvRows.length * seatCsvProgress / 100)}/{seatCsvRows.length} rows</span>
+                        </div>
+                        <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
+                          <div className="h-full bg-purple-500 transition-all duration-300 rounded-full" style={{ width: `${seatCsvProgress}%` }}></div>
+                        </div>
+                      </div>
+                    )}
+                    <button onClick={handleSeatCsvImport} disabled={seatCsvImporting}
+                      className="w-full flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-wait text-white font-black py-4 rounded-xl uppercase text-xs tracking-wider transition-all">
+                      {seatCsvImporting ? <><span className="animate-spin">⟳</span> Importing {seatCsvRows.length} rows...</> : <><Upload size={14}/> Import {seatCsvRows.length} Seat Rows</>}
+                    </button>
+                  </div>
+                )}
+
+                {/* Success */}
+                {seatCsvDone && (
+                  <div className="bg-purple-950/30 border border-purple-800/50 rounded-2xl p-6 text-center space-y-3">
+                    <div className="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center bg-purple-900/40 border border-purple-700/40">
+                      <CheckCircle2 size={22} className="text-purple-400"/>
+                    </div>
+                    <p className="text-base font-black text-white">{seatCsvDone.ok} seat rows import ho gaye! 🎉</p>
+                    {seatCsvDone.fail > 0 && <p className="text-xs text-amber-400">{seatCsvDone.fail} rows fail hue</p>}
+                    <button onClick={() => { setSeatCsvRaw(''); setSeatCsvRows([]); setSeatCsvErrors([]); setSeatCsvDone(null); setSeatCsvProgress(0); }}
+                      className="text-xs font-black px-5 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 transition-all">
+                      Naya CSV Upload karo
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
@@ -381,3 +889,5 @@ export default function AdminPage() {
     </div>
   );
 }
+
+export default dynamic(() => Promise.resolve(AdminPage), { ssr: false });
