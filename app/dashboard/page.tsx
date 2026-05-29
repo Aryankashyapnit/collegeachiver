@@ -38,6 +38,8 @@ export default function DashboardPage() {
   const [dynamicJosaaRecords, setDynamicJosaaRecords] = useState<any[]>([]);
   const [results, setResults] = useState<ExtendedCollegeData[]>([]);
   const [dynamicSeats, setDynamicSeats] = useState<SeatMatrixRecord[]>([]);
+  const [expandedInstitute, setExpandedInstitute] = useState<string | null>(null);
+  const [seatSearch, setSeatSearch] = useState('');
   const [dynamicDeadlines, setDynamicDeadlines] = useState<any[]>([]);
 
   const [myUpiId] = useState("9296276633-2@ybl");
@@ -354,6 +356,27 @@ export default function DashboardPage() {
   const upiStringUrl = useMemo(() => {
     return `upi://pay?pa=${myUpiId}&pn=${myMerchantName}&am=${premiumPriceToken}&cu=INR`;
   }, [myUpiId, myMerchantName, premiumPriceToken]);
+
+  // Group seat-matrix rows by institute so each college can be expanded to reveal its branch-wise seats
+  const groupedSeats = useMemo(() => {
+    const expanded = expandSearch(seatSearch);
+    const words = expanded.split(/\s+/).filter(Boolean);
+    const map = new Map<string, { institute: string; totalSeats: number; programCount: number; rows: SeatMatrixRecord[] }>();
+    for (const row of dynamicSeats) {
+      const name = row.institute.toLowerCase();
+      if (words.length && !words.every(w => name.includes(w))) continue;
+      const existing = map.get(row.institute);
+      const seats = Number(row.seats) || 0;
+      if (existing) {
+        existing.rows.push(row);
+        existing.totalSeats += seats;
+        existing.programCount += 1;
+      } else {
+        map.set(row.institute, { institute: row.institute, totalSeats: seats, programCount: 1, rows: [row] });
+      }
+    }
+    return Array.from(map.values()).sort((a, b) => a.institute.localeCompare(b.institute));
+  }, [dynamicSeats, seatSearch]);
 
   const navTabs = [
     { id: 'Predictor', label: 'Rank Predictor' },
@@ -1117,28 +1140,74 @@ export default function DashboardPage() {
         <div className="max-w-5xl mx-auto px-6 py-12 animate-fadeIn space-y-8 pb-24 md:pb-12">
           <div className="text-center space-y-2">
             <h2 className="text-3xl font-black text-[#111625]">JoSAA Seat Matrix</h2>
-            <p className="text-xs text-[#8492a6] font-medium">Category-wise seat allocation data</p>
+            <p className="text-xs text-[#8492a6] font-medium">Tap an institute to see its branch-wise seat allocation</p>
           </div>
+
+          {/* Search by institute */}
+          <div className="relative max-w-md mx-auto">
+            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8492a6]" />
+            <input
+              type="text"
+              value={seatSearch}
+              onChange={(e) => { setSeatSearch(e.target.value); setExpandedInstitute(null); }}
+              placeholder="Search institute e.g. IIT Bombay, NIT Trichy..."
+              className="w-full pl-11 pr-4 py-3 bg-white border border-[#eef2f7] focus:border-[#fcd71a] rounded-2xl text-sm font-semibold text-[#111625] outline-none transition-all shadow-xs placeholder:text-[#a3adba] placeholder:font-medium"
+            />
+          </div>
+
           {dynamicSeats.length === 0 ? (
             <div className="text-center py-12 text-zinc-400 font-mono text-sm">No seat data loaded yet.</div>
+          ) : groupedSeats.length === 0 ? (
+            <div className="text-center py-12 text-zinc-400 font-mono text-sm">No institutes match &quot;{seatSearch}&quot;.</div>
           ) : (
-            <div className="overflow-x-auto bg-white rounded-2xl border border-[#eef2f7] shadow-xs">
-              <table className="w-full text-xs">
-                <thead><tr className="bg-[#f8fafc] border-b border-[#eef2f7]">
-                  <th className="text-left p-3 font-bold text-[#485363]">Institute</th>
-                  <th className="text-left p-3 font-bold text-[#485363]">Program</th>
-                  <th className="text-left p-3 font-bold text-[#485363]">Quota</th>
-                  <th className="text-right p-3 font-bold text-[#485363]">Seats</th>
-                </tr></thead>
-                <tbody>{dynamicSeats.map((row, i) => (
-                  <tr key={i} className="border-b border-[#eef2f7] hover:bg-[#fafbfc]">
-                    <td className="p-3 text-[#111625] font-semibold">{row.institute}</td>
-                    <td className="p-3 text-[#5e6b7f]">{row.program}</td>
-                    <td className="p-3"><span className="bg-[#fcd71a]/10 text-[#977914] px-2 py-0.5 rounded font-mono font-bold">{row.quota}</span></td>
-                    <td className="p-3 text-right font-black text-[#111625] font-mono">{row.seats}</td>
-                  </tr>
-                ))}</tbody>
-              </table>
+            <div className="space-y-3">
+              {groupedSeats.map((group) => {
+                const isOpen = expandedInstitute === group.institute;
+                return (
+                  <div key={group.institute} className="bg-white rounded-2xl border border-[#eef2f7] shadow-xs overflow-hidden">
+                    <button
+                      onClick={() => setExpandedInstitute(isOpen ? null : group.institute)}
+                      aria-expanded={isOpen}
+                      className="w-full flex items-center gap-4 p-4 md:p-5 text-left hover:bg-[#fafbfc] transition-colors"
+                    >
+                      <div className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${isOpen ? 'bg-[#fcd71a] text-[#111625]' : 'bg-[#fcd71a]/10 text-[#977914]'}`}>
+                        <School size={18} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-black text-[#111625] truncate">{group.institute}</p>
+                        <p className="text-[11px] text-[#8492a6] font-semibold mt-0.5">{group.programCount} branch{group.programCount > 1 ? 'es' : ''} · {group.totalSeats} total seats</p>
+                      </div>
+                      <span className="shrink-0 hidden sm:inline-flex items-center gap-1 bg-[#111625] text-[#fcd71a] px-3 py-1.5 rounded-lg text-xs font-black font-mono">
+                        {group.totalSeats}
+                      </span>
+                      {isOpen
+                        ? <ChevronUp size={18} className="shrink-0 text-[#485363]" />
+                        : <ChevronDown size={18} className="shrink-0 text-[#485363]" />}
+                    </button>
+
+                    {isOpen && (
+                      <div className="border-t border-[#eef2f7] bg-[#fafbfc] animate-fadeIn">
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-xs">
+                            <thead><tr className="border-b border-[#eef2f7]">
+                              <th className="text-left p-3 font-bold text-[#485363]">Branch / Program</th>
+                              <th className="text-left p-3 font-bold text-[#485363]">Quota</th>
+                              <th className="text-right p-3 font-bold text-[#485363]">Seats</th>
+                            </tr></thead>
+                            <tbody>{group.rows.map((row, i) => (
+                              <tr key={i} className="border-b border-[#eef2f7] last:border-0 hover:bg-white">
+                                <td className="p-3 text-[#111625] font-semibold">{row.program}</td>
+                                <td className="p-3"><span className="bg-[#fcd71a]/10 text-[#977914] px-2 py-0.5 rounded font-mono font-bold">{row.quota}</span></td>
+                                <td className="p-3 text-right font-black text-[#111625] font-mono">{row.seats}</td>
+                              </tr>
+                            ))}</tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
