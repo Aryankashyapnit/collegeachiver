@@ -6,7 +6,15 @@ import dynamic from 'next/dynamic';
 import { supabase } from '../supabaseClient';
 import { PlusCircle, School, Clock, ShieldCheck, BarChart3, Users, Database, Calendar, LogOut, ChevronRight, TrendingUp, Upload, Download, FileText, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 
-type AdminView = 'overview' | 'cutoffs' | 'csv' | 'seats' | 'deadlines' | 'settings';
+type AdminView = 'overview' | 'cutoffs' | 'csv' | 'seats' | 'deadlines' | 'users' | 'settings';
+
+interface TrackedUser {
+  id: string;
+  email: string;
+  name: string;
+  type: string;
+  createdAt: string;
+}
 
 function AdminPage() {
   const [isMounted, setIsMounted] = useState(false);
@@ -14,6 +22,8 @@ function AdminPage() {
   const [counts, setCounts] = useState({ cutoffs: 0, seats: 0, deadlines: 0 });
   const [toast, setToast] = useState('');
   const [missingTables, setMissingTables] = useState<string[]>([]);
+  const [trackedUsers, setTrackedUsers] = useState<TrackedUser[]>([]);
+  const [usersLoading, setUsersLoading] = useState(false);
 
   const [newInst, setNewInst] = useState('');
   const [newProg, setNewProg] = useState('');
@@ -230,8 +240,19 @@ function AdminPage() {
     fetchCounts();
   }, []);
 
+  const fetchTrackedUsers = async () => {
+    setUsersLoading(true);
+    try {
+      const res = await fetch('/api/users');
+      const data = await res.json();
+      if (Array.isArray(data)) setTrackedUsers(data);
+    } catch (e) {}
+    setUsersLoading(false);
+  };
+
   useEffect(() => {
     if (view === 'cutoffs') fetchRecentCutoffs();
+    if (view === 'users' || view === 'overview') fetchTrackedUsers();
   }, [view]);
 
   const fetchRecentCutoffs = async () => {
@@ -293,6 +314,7 @@ function AdminPage() {
 
   const navItems: { id: AdminView; label: string; icon: React.ReactNode }[] = [
     { id: 'overview', label: 'Overview', icon: <BarChart3 size={16} /> },
+    { id: 'users', label: 'Users', icon: <Users size={16} /> },
     { id: 'cutoffs', label: 'Cutoff Data', icon: <Database size={16} /> },
     { id: 'csv', label: 'CSV Bulk Import', icon: <Upload size={16} /> },
     { id: 'seats', label: 'Seat Matrix', icon: <School size={16} /> },
@@ -344,7 +366,7 @@ function AdminPage() {
                 <span>Admin</span><ChevronRight size={10}/><span className="text-[#fcd71a] capitalize">{view}</span>
               </div>
               <h1 className="text-lg font-black text-white capitalize">
-                {view === 'overview' ? 'Dashboard Overview' : view === 'cutoffs' ? 'Inject Cutoff Records' : view === 'csv' ? 'CSV Bulk Import' : view === 'seats' ? 'Inject Seat Matrix Rows' : view === 'deadlines' ? 'Inject Key Deadlines' : 'Gateway Settings'}
+                {view === 'overview' ? 'Dashboard Overview' : view === 'users' ? 'Registered Users' : view === 'cutoffs' ? 'Inject Cutoff Records' : view === 'csv' ? 'CSV Bulk Import' : view === 'seats' ? 'Inject Seat Matrix Rows' : view === 'deadlines' ? 'Inject Key Deadlines' : 'Gateway Settings'}
               </h1>
             </div>
             <div className="flex items-center gap-2 text-[10px] font-mono">
@@ -361,7 +383,7 @@ function AdminPage() {
                     { label: 'Cutoff Records', val: counts.cutoffs, icon: <Database size={18}/>, color: 'text-blue-400' },
                     { label: 'Seat Matrix Rows', val: counts.seats, icon: <School size={18}/>, color: 'text-purple-400' },
                     { label: 'Deadlines Set', val: counts.deadlines, icon: <Calendar size={18}/>, color: 'text-emerald-400' },
-                    { label: 'Live Users', val: '3', icon: <Users size={18}/>, color: 'text-[#fcd71a]' },
+                    { label: 'Total Users', val: trackedUsers.length, icon: <Users size={18}/>, color: 'text-[#fcd71a]' },
                   ].map((stat, i) => (
                     <div key={i} className="bg-[#0d1117] border border-zinc-800/80 p-5 rounded-2xl hover:border-zinc-700 transition-all">
                       <div className={`${stat.color} mb-3`}>{stat.icon}</div>
@@ -384,6 +406,84 @@ function AdminPage() {
                     </button>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {view === 'users' && (
+              <div className="animate-fadeIn space-y-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#fcd71a]/10 border border-[#fcd71a]/30 flex items-center justify-center">
+                      <Users size={18} className="text-[#fcd71a]"/>
+                    </div>
+                    <div>
+                      <p className="text-sm font-black text-white">All Registered Users</p>
+                      <p className="text-[10px] text-zinc-500 font-mono">Demo + Login + Signup — sabka record yahan hai</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-[10px] font-mono text-[#fcd71a] bg-[#fcd71a]/10 px-3 py-1.5 rounded-lg border border-[#fcd71a]/20">{trackedUsers.length} users</span>
+                    <button onClick={fetchTrackedUsers} className="text-[10px] font-mono text-zinc-500 hover:text-[#fcd71a] transition-colors px-3 py-1.5 rounded-lg hover:bg-zinc-800 border border-zinc-800">↻ Refresh</button>
+                  </div>
+                </div>
+
+                {/* Stats Row */}
+                <div className="grid grid-cols-3 gap-4">
+                  {[
+                    { label: 'Demo Logins', val: trackedUsers.filter(u => u.type === 'demo').length, color: 'text-amber-400', bg: 'bg-amber-950/30 border-amber-800/40' },
+                    { label: 'Full Logins', val: trackedUsers.filter(u => u.type === 'login').length, color: 'text-blue-400', bg: 'bg-blue-950/30 border-blue-800/40' },
+                    { label: 'Registrations', val: trackedUsers.filter(u => u.type === 'register').length, color: 'text-emerald-400', bg: 'bg-emerald-950/30 border-emerald-800/40' },
+                  ].map((s, i) => (
+                    <div key={i} className={`${s.bg} border p-4 rounded-2xl text-center`}>
+                      <p className={`text-2xl font-black font-mono ${s.color}`}>{s.val}</p>
+                      <p className="text-[10px] text-zinc-500 font-mono uppercase mt-1">{s.label}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Users Table */}
+                {usersLoading ? (
+                  <div className="text-center py-12 text-zinc-500 text-sm font-mono">Loading users...</div>
+                ) : trackedUsers.length === 0 ? (
+                  <div className="bg-[#0d1117] border border-zinc-800 rounded-2xl p-12 text-center">
+                    <Users size={32} className="text-zinc-700 mx-auto mb-3"/>
+                    <p className="text-sm font-bold text-zinc-400">Abhi tak koi user nahi aaya</p>
+                    <p className="text-xs text-zinc-600 mt-1">Jab koi login/register/demo karega, yahan dikhega</p>
+                  </div>
+                ) : (
+                  <div className="bg-[#0d1117] border border-zinc-800 rounded-2xl overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-[11px]">
+                        <thead>
+                          <tr className="border-b border-zinc-800">
+                            <th className="text-left px-5 py-3 text-zinc-500 font-bold uppercase text-[10px] tracking-wider">#</th>
+                            <th className="text-left px-5 py-3 text-zinc-500 font-bold uppercase text-[10px] tracking-wider">Email / Phone</th>
+                            <th className="text-left px-5 py-3 text-zinc-500 font-bold uppercase text-[10px] tracking-wider">Name</th>
+                            <th className="text-left px-5 py-3 text-zinc-500 font-bold uppercase text-[10px] tracking-wider">Type</th>
+                            <th className="text-left px-5 py-3 text-zinc-500 font-bold uppercase text-[10px] tracking-wider">Date & Time</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {trackedUsers.map((user, i) => (
+                            <tr key={user.id} className={`border-b border-zinc-900 ${i % 2 === 0 ? 'bg-[#0a0c10]/40' : ''} hover:bg-zinc-800/30 transition-colors`}>
+                              <td className="px-5 py-3 text-zinc-600 font-mono">{i + 1}</td>
+                              <td className="px-5 py-3 text-white font-bold">{user.email}</td>
+                              <td className="px-5 py-3 text-zinc-400">{user.name}</td>
+                              <td className="px-5 py-3">
+                                <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${
+                                  user.type === 'demo' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
+                                  user.type === 'register' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                                  'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                                }`}>{user.type}</span>
+                              </td>
+                              <td className="px-5 py-3 text-zinc-500 font-mono text-[10px]">{new Date(user.createdAt).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

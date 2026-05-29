@@ -13,6 +13,16 @@ export default function LoginPage() {
   const [message, setMessage] = useState({ text: '', type: '' });
   const router = useRouter();
 
+  const saveUser = async (userEmail: string, loginType: string) => {
+    try {
+      await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail, type: loginType }),
+      });
+    } catch (e) {}
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -27,6 +37,7 @@ export default function LoginPage() {
 
     if (!password) {
       // Demo Login flow
+      await saveUser(email, 'demo');
       setMessage({ text: 'Demo Access Granted! Redirecting...', type: 'success' });
       localStorage.setItem('demo_session', 'true');
       setTimeout(() => router.push('/dashboard'), 1500);
@@ -39,6 +50,7 @@ export default function LoginPage() {
       if (error) {
         setMessage({ text: error.message, type: 'error' });
       } else {
+        await saveUser(email, 'login');
         setMessage({ text: 'Welcome back! Redirecting...', type: 'success' });
         setTimeout(() => router.push('/dashboard'), 1500);
       }

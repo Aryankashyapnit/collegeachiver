@@ -33,6 +33,13 @@ export default function Register() {
       if (error) {
         setMessage({ text: error.message, type: 'error' });
       } else {
+        try {
+          await fetch('/api/users', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, name, type: 'register' }),
+          });
+        } catch (e) {}
         setMessage({ text: 'Registration successful! Proceeding to Login.', type: 'success' });
         setTimeout(() => {
           router.push('/login');
