@@ -2,6 +2,7 @@
 // @ts-nocheck 
 import { useState, useRef, useMemo, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { School, BarChart3, Layers, Star, AlertCircle, MessageSquare, X, Send, User, ShieldCheck, PlusCircle, Clock, Sparkles,House,CalendarDays,Search, Milestone, ArrowRight, Sparkle, Compass, Flame, Receipt, Percent, BookOpen, CheckCircle2, TrendingUp, Users, Bell, ChevronDown, ChevronUp, Zap, Share2, Copy, Gift, Trophy, Link2, UserPlus, Menu, TrendingDown, Minus } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 import { createClient } from '@supabase/supabase-js';
@@ -25,6 +26,7 @@ interface SeatMatrixRecord {
 }
 
 export default function HomePage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('Home');
   const [rankAdvanced, setRankAdvanced] = useState('');
   const [rankMains, setRankMains] = useState('');
@@ -384,18 +386,8 @@ export default function HomePage() {
             <span className="text-[17px] font-black tracking-tight text-[#111625]">College<span className="text-[#cca01d]">Achiver</span></span>
           </div>
 
-          {/* Desktop nav tabs */}
-          <div className="hidden md:flex items-center bg-[#f4f7fb] rounded-xl px-1.5 py-1.5 gap-0.5 flex-1 mx-6 max-w-fit">
-            {navTabs.map((item) => (
-              <button key={item.id} onClick={() => { setActiveTab(item.id); setCurrentPage(1); }}
-                className={`whitespace-nowrap px-3.5 py-1.5 rounded-lg text-[13px] font-semibold transition-all ${activeTab === item.id ? 'text-[#111625] bg-white shadow-sm font-bold ring-1 ring-[#e2e8f0]' : 'text-[#6b7a90] hover:text-[#111625] hover:bg-white/60'}`}>
-                {item.label}
-              </button>
-            ))}
-          </div>
-
           {/* Right side */}
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2 shrink-0 ml-auto">
             <Link href="/login" className="inline-flex items-center gap-1.5 bg-[#111625] text-[#fcd71a] font-extrabold px-4 py-2 rounded-xl text-xs shadow-sm cursor-pointer hover:bg-zinc-800 transition-all">
               Sign In
             </Link>
@@ -403,22 +395,7 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* MOBILE BOTTOM TAB BAR */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/97 backdrop-blur-xl border-t border-[#e8edf4] shadow-[0_-4px_24px_0_rgba(17,22,37,0.10)]">
-        <div className="flex items-stretch h-[62px]">
-          {bottomNavTabs.map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button key={tab.id} onClick={() => { setActiveTab(tab.id); setCurrentPage(1); }}
-                className="flex-1 flex flex-col items-center justify-center gap-0.5 transition-all relative">
-                {isActive && <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-[#fcd71a] rounded-full"/>}
-                <span className={`transition-all ${isActive ? 'text-[#111625]' : 'text-[#aab4c4]'}`}>{tab.icon}</span>
-                <span className={`text-[10px] font-bold tracking-tight transition-all ${isActive ? 'text-[#111625]' : 'text-[#aab4c4]'}`}>{tab.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      {/* MOBILE BOTTOM TAB BAR REMOVED FOR LANDING PAGE */}
 
       {/* Compare floating bar */}
       {compareList.length > 0 && (
@@ -490,10 +467,10 @@ export default function HomePage() {
                 Enter your JEE rank, pick your category, and instantly see which IITs, NITs & IIITs you can get — based on real JoSAA cutoff data.
               </p>
               <div className="flex flex-wrap gap-3 pt-1">
-                <button onClick={() => setActiveTab('Predictor')} className="bg-[#fcd71a] text-[#111625] font-black text-sm px-6 py-3.5 rounded-2xl shadow-[0_4px_16px_0_rgba(252,215,26,0.45)] hover:bg-[#ebd02c] transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2">
+                <button onClick={() => router.push('/login')} className="bg-[#fcd71a] text-[#111625] font-black text-sm px-6 py-3.5 rounded-2xl shadow-[0_4px_16px_0_rgba(252,215,26,0.45)] hover:bg-[#ebd02c] transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2">
                   <Zap size={15}/> Predict My College
                 </button>
-                <button onClick={() => setActiveTab('Opening/Closing Ranks')} className="bg-white text-[#414b5a] border border-[#dce2ec] font-bold text-sm px-5 py-3.5 rounded-2xl hover:bg-[#f4f7fa] transition-all shadow-sm active:scale-[0.98]">
+                <button onClick={() => router.push('/login')} className="bg-white text-[#414b5a] border border-[#dce2ec] font-bold text-sm px-5 py-3.5 rounded-2xl hover:bg-[#f4f7fa] transition-all shadow-sm active:scale-[0.98]">
                   Browse Cut-offs
                 </button>
               </div>
@@ -576,7 +553,7 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
-            <button onClick={() => setActiveTab('Predictor')} className="bg-[#111625] text-[#fcd71a] font-black text-xs px-7 py-3.5 rounded-xl shadow-lg hover:bg-zinc-800 transition-all flex items-center gap-2 mx-auto">
+            <button onClick={() => router.push('/login')} className="bg-[#111625] text-[#fcd71a] font-black text-xs px-7 py-3.5 rounded-xl shadow-lg hover:bg-zinc-800 transition-all flex items-center gap-2 mx-auto">
               Try the Rank Predictor Now <ArrowRight size={14}/>
             </button>
           </section>
@@ -584,12 +561,12 @@ export default function HomePage() {
           <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-10 sm:pb-12">
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
               {[
-                { icon: <BarChart3 size={18}/>, title: 'Rank Predictor', desc: 'JEE rank → college list in seconds', tab: 'Predictor', color: 'border-blue-200 hover:border-blue-400', iconBg: 'bg-blue-50 text-blue-600' },
-                { icon: <TrendingUp size={18}/>, title: 'Cut-off Explorer', desc: 'Browse all 2,300+ cutoff records', tab: 'Opening/Closing Ranks', color: 'border-purple-200 hover:border-purple-400', iconBg: 'bg-purple-50 text-purple-600' },
-                { icon: <Bell size={18}/>, title: 'Key Deadlines', desc: 'Never miss a counselling date', tab: 'Deadlines', color: 'border-amber-200 hover:border-amber-400', iconBg: 'bg-amber-50 text-amber-600' },
-                { icon: <School size={18}/>, title: 'Seat Matrix', desc: 'Category-wise seat availability', tab: 'Seat Matrix', color: 'border-emerald-200 hover:border-emerald-400', iconBg: 'bg-emerald-50 text-emerald-600' },
+                { icon: <BarChart3 size={18}/>, title: 'Rank Predictor', desc: 'JEE rank → college list in seconds', color: 'border-blue-200 hover:border-blue-400', iconBg: 'bg-blue-50 text-blue-600' },
+                { icon: <TrendingUp size={18}/>, title: 'Cut-off Explorer', desc: 'Browse all 2,300+ cutoff records', color: 'border-purple-200 hover:border-purple-400', iconBg: 'bg-purple-50 text-purple-600' },
+                { icon: <Bell size={18}/>, title: 'Key Deadlines', desc: 'Never miss a counselling date', color: 'border-amber-200 hover:border-amber-400', iconBg: 'bg-amber-50 text-amber-600' },
+                { icon: <School size={18}/>, title: 'Seat Matrix', desc: 'Category-wise seat availability', color: 'border-emerald-200 hover:border-emerald-400', iconBg: 'bg-emerald-50 text-emerald-600' },
               ].map((f, i) => (
-                <button key={i} onClick={() => setActiveTab(f.tab)} className={`bg-white border-2 ${f.color} rounded-xl sm:rounded-2xl p-4 sm:p-6 text-left space-y-2 sm:space-y-3 transition-all duration-300 group hover:shadow-md`}>
+                <button key={i} onClick={() => router.push('/login')} className={`bg-white border-2 ${f.color} rounded-xl sm:rounded-2xl p-4 sm:p-6 text-left space-y-2 sm:space-y-3 transition-all duration-300 group hover:shadow-md`}>
                   <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center ${f.iconBg}`}>{f.icon}</div>
                   <h4 className="font-bold text-[#111625] text-xs sm:text-sm group-hover:text-[#cca01d] transition-colors">{f.title}</h4>
                   <p className="text-[11px] sm:text-xs text-[#6c7789] hidden sm:block">{f.desc}</p>
@@ -660,8 +637,8 @@ export default function HomePage() {
                 <p className="text-sm text-zinc-400 leading-relaxed font-medium">Don't wait until the last minute. Check your predicted colleges now and start building your choice filling strategy.</p>
               </div>
               <div className="flex flex-wrap justify-center gap-3 relative z-10">
-                <button onClick={() => setActiveTab('Predictor')} className="bg-[#fcd71a] text-[#111625] font-black text-xs px-8 py-4 rounded-xl flex items-center gap-2 hover:bg-[#ebd02c] transition-all shadow-lg hover:scale-[1.02]"><Zap size={14}/> Predict My Colleges — It's Free</button>
-                <button onClick={() => setActiveTab('Deadlines')} className="bg-white/10 text-white border border-white/20 font-bold text-xs px-6 py-4 rounded-xl hover:bg-white/20 transition-all">View Deadlines →</button>
+                <button onClick={() => router.push('/login')} className="bg-[#fcd71a] text-[#111625] font-black text-xs px-8 py-4 rounded-xl flex items-center gap-2 hover:bg-[#ebd02c] transition-all shadow-lg hover:scale-[1.02]"><Zap size={14}/> Predict My Colleges — It's Free</button>
+                <button onClick={() => router.push('/login')} className="bg-white/10 text-white border border-white/20 font-bold text-xs px-6 py-4 rounded-xl hover:bg-white/20 transition-all">View Deadlines →</button>
               </div>
             </div>
           </section>
