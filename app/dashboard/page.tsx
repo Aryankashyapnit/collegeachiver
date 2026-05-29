@@ -1160,48 +1160,53 @@ export default function DashboardPage() {
           ) : groupedSeats.length === 0 ? (
             <div className="text-center py-12 text-zinc-400 font-mono text-sm">No institutes match &quot;{seatSearch}&quot;.</div>
           ) : (
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {groupedSeats.map((group) => {
                 const isOpen = expandedInstitute === group.institute;
                 return (
-                  <div key={group.institute} className="bg-white rounded-2xl border border-[#eef2f7] shadow-xs overflow-hidden">
+                  <div
+                    key={group.institute}
+                    className={`rounded-3xl border bg-white overflow-hidden transition-all duration-200 ${isOpen ? 'md:col-span-2 border-[#fcd71a] shadow-lg shadow-[#fcd71a]/10 ring-1 ring-[#fcd71a]/40' : 'border-[#eef2f7] shadow-xs hover:shadow-md hover:border-[#fcd71a]/40'}`}
+                  >
                     <button
                       onClick={() => setExpandedInstitute(isOpen ? null : group.institute)}
                       aria-expanded={isOpen}
-                      className="w-full flex items-center gap-4 p-4 md:p-5 text-left hover:bg-[#fafbfc] transition-colors"
+                      className="w-full flex items-center gap-4 p-5 text-left"
                     >
-                      <div className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${isOpen ? 'bg-[#fcd71a] text-[#111625]' : 'bg-[#fcd71a]/10 text-[#977914]'}`}>
-                        <School size={18} />
+                      <div className={`shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${isOpen ? 'bg-[#fcd71a] text-[#111625]' : 'bg-[#111625] text-[#fcd71a]'}`}>
+                        <School size={20} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-black text-[#111625] truncate">{group.institute}</p>
-                        <p className="text-[11px] text-[#8492a6] font-semibold mt-0.5">{group.programCount} branch{group.programCount > 1 ? 'es' : ''} · {group.totalSeats} total seats</p>
+                        <p className="text-sm font-black text-[#111625] leading-snug line-clamp-2">{group.institute}</p>
+                        <div className="flex items-center gap-2 mt-1.5">
+                          <span className="inline-flex items-center gap-1 bg-[#f1f5f9] text-[#485363] px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wide">
+                            <Layers size={10}/> {group.programCount} branch{group.programCount > 1 ? 'es' : ''}
+                          </span>
+                          <span className="inline-flex items-center gap-1 bg-[#fcd71a]/15 text-[#977914] px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wide font-mono">
+                            {group.totalSeats} seats
+                          </span>
+                        </div>
                       </div>
-                      <span className="shrink-0 hidden sm:inline-flex items-center gap-1 bg-[#111625] text-[#fcd71a] px-3 py-1.5 rounded-lg text-xs font-black font-mono">
-                        {group.totalSeats}
-                      </span>
-                      {isOpen
-                        ? <ChevronUp size={18} className="shrink-0 text-[#485363]" />
-                        : <ChevronDown size={18} className="shrink-0 text-[#485363]" />}
+                      <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors ${isOpen ? 'bg-[#fcd71a]/15 text-[#977914]' : 'bg-[#f1f5f9] text-[#485363]'}`}>
+                        {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                      </div>
                     </button>
 
                     {isOpen && (
-                      <div className="border-t border-[#eef2f7] bg-[#fafbfc] animate-fadeIn">
-                        <div className="overflow-x-auto">
-                          <table className="w-full text-xs">
-                            <thead><tr className="border-b border-[#eef2f7]">
-                              <th className="text-left p-3 font-bold text-[#485363]">Branch / Program</th>
-                              <th className="text-left p-3 font-bold text-[#485363]">Quota</th>
-                              <th className="text-right p-3 font-bold text-[#485363]">Seats</th>
-                            </tr></thead>
-                            <tbody>{group.rows.map((row, i) => (
-                              <tr key={i} className="border-b border-[#eef2f7] last:border-0 hover:bg-white">
-                                <td className="p-3 text-[#111625] font-semibold">{row.program}</td>
-                                <td className="p-3"><span className="bg-[#fcd71a]/10 text-[#977914] px-2 py-0.5 rounded font-mono font-bold">{row.quota}</span></td>
-                                <td className="p-3 text-right font-black text-[#111625] font-mono">{row.seats}</td>
-                              </tr>
-                            ))}</tbody>
-                          </table>
+                      <div className="border-t border-[#f1f5f9] bg-[#fafbfc] p-4 md:p-5 animate-fadeIn">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                          {group.rows.map((row, i) => (
+                            <div key={i} className="bg-white rounded-2xl border border-[#eef2f7] p-4 flex flex-col gap-3 hover:border-[#fcd71a]/50 hover:shadow-xs transition-all">
+                              <p className="text-xs font-bold text-[#111625] leading-snug line-clamp-2 min-h-[2rem]">{row.program}</p>
+                              <div className="flex items-end justify-between gap-2 mt-auto">
+                                <span className="bg-[#fcd71a]/10 text-[#977914] px-2 py-1 rounded-lg font-mono font-bold text-[10px] leading-tight max-w-[60%] line-clamp-2">{row.quota}</span>
+                                <div className="text-right">
+                                  <p className="text-2xl font-black text-[#111625] font-mono leading-none">{row.seats}</p>
+                                  <p className="text-[9px] text-[#a3adba] font-bold uppercase tracking-wider mt-0.5">seats</p>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )}
