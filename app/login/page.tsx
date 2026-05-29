@@ -25,6 +25,15 @@ export default function LoginPage() {
       return;
     }
 
+    if (!password) {
+      // Demo Login flow
+      setMessage({ text: 'Demo Access Granted! Redirecting...', type: 'success' });
+      localStorage.setItem('demo_session', 'true');
+      setTimeout(() => router.push('/dashboard'), 1500);
+      setLoading(false);
+      return;
+    }
+
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
@@ -37,12 +46,6 @@ export default function LoginPage() {
       setMessage({ text: 'Network error. Please try again.', type: 'error' });
     }
     setLoading(false);
-  };
-
-  const handleDemoLogin = () => {
-    setMessage({ text: 'Demo Access Granted! Redirecting...', type: 'success' });
-    localStorage.setItem('demo_session', 'true');
-    setTimeout(() => router.push('/dashboard'), 1500);
   };
 
   return (
@@ -123,25 +126,25 @@ export default function LoginPage() {
           <div className="bg-white/[0.03] border border-white/10 p-6 sm:p-8 rounded-3xl backdrop-blur-xl shadow-2xl">
             <form onSubmit={handleLogin} className="space-y-5">
               <div className="space-y-2">
-                <label className="block text-[11px] font-bold tracking-widest uppercase text-zinc-400">Email Address</label>
+                <label className="block text-[11px] font-bold tracking-widest uppercase text-zinc-400">Email or Phone Number</label>
                 <div className="relative group">
                   <Mail className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-[#fcd71a] transition-colors" />
-                  <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} 
+                  <input type="text" required value={email} onChange={(e) => setEmail(e.target.value)} 
                     className="w-full pl-12 pr-4 py-4 bg-[#0a0f1c] border border-zinc-800 rounded-2xl text-sm font-bold text-white focus:border-[#fcd71a] focus:ring-1 focus:ring-[#fcd71a]/50 outline-none transition-all placeholder:text-zinc-600" 
-                    placeholder="student@example.com" />
+                    placeholder="student@example.com or 9876543210" />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <label className="block text-[11px] font-bold tracking-widest uppercase text-zinc-400">Password</label>
+                  <label className="block text-[11px] font-bold tracking-widest uppercase text-zinc-400">Password (Optional for Demo)</label>
                   <Link href="/forgot-password" className="text-[11px] font-bold text-[#fcd71a] hover:text-white transition-colors">Forgot Password?</Link>
                 </div>
                 <div className="relative group">
                   <Lock className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-[#fcd71a] transition-colors" />
-                  <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} 
+                  <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} 
                     className="w-full pl-12 pr-4 py-4 bg-[#0a0f1c] border border-zinc-800 rounded-2xl text-sm font-bold text-white focus:border-[#fcd71a] focus:ring-1 focus:ring-[#fcd71a]/50 outline-none transition-all placeholder:text-zinc-600" 
-                    placeholder="••••••••" />
+                    placeholder="Leave blank for Demo Login" />
                 </div>
               </div>
 
@@ -149,16 +152,6 @@ export default function LoginPage() {
                 {loading ? 'Authenticating...' : <>Sign In <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></>}
               </button>
             </form>
-
-            <div className="mt-6">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-zinc-800"></div></div>
-                <div className="relative flex justify-center text-[10px] font-bold uppercase tracking-widest"><span className="bg-[#121622] px-4 text-zinc-500">Or</span></div>
-              </div>
-              <button onClick={handleDemoLogin} type="button" className="mt-6 w-full bg-transparent border-2 border-zinc-800 hover:border-[#fcd71a] text-white hover:text-[#fcd71a] font-bold py-3.5 rounded-2xl text-sm transition-all flex items-center justify-center gap-2">
-                <Zap className="w-4 h-4" /> Continue with Demo Account
-              </button>
-            </div>
           </div>
 
           <div className="text-center text-sm font-medium text-zinc-400">

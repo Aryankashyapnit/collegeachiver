@@ -1249,7 +1249,7 @@ export default function DashboardPage() {
       )}
 
       {/* FLOATING AI CHATBOT */}
-      <div className="fixed bottom-6 right-6 z-50 font-sans">
+      <div className="fixed bottom-24 right-4 md:bottom-6 md:right-6 z-50 font-sans">
         {!isChatOpen && (
           <div className="relative">
             <button onClick={() => setIsChatOpen(true)} className="bg-[#111625] text-white p-4 rounded-2xl shadow-2xl border-2 border-[#fcd71a] hover:scale-105 transition-all flex items-center gap-2 pr-5">
