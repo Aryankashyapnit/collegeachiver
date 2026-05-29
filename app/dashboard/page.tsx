@@ -97,7 +97,8 @@ export default function DashboardPage() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
+      const isDemo = localStorage.getItem('demo_session') === 'true';
+      if (!session && !isDemo) {
         router.push('/login');
       }
     });
@@ -403,7 +404,7 @@ export default function DashboardPage() {
 
           {/* Right side */}
           <div className="flex items-center gap-3 shrink-0">
-            <button onClick={async () => { await supabase.auth.signOut(); router.push('/'); }} className="inline-flex items-center gap-1.5 bg-red-500/10 text-red-500 font-extrabold px-4 py-2 rounded-xl text-xs shadow-sm cursor-pointer hover:bg-red-500/20 transition-all border border-red-500/20">
+            <button onClick={async () => { localStorage.removeItem('demo_session'); await supabase.auth.signOut(); router.push('/'); }} className="inline-flex items-center gap-1.5 bg-red-500/10 text-red-500 font-extrabold px-4 py-2 rounded-xl text-xs shadow-sm cursor-pointer hover:bg-red-500/20 transition-all border border-red-500/20">
               Sign Out
             </button>
           </div>
