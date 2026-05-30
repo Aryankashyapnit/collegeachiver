@@ -113,6 +113,7 @@ export default function HomePage() {
   
   // ✅ NEW: Individual state for Seat Matrix accordion bug fix
   const [expandedSeatInst, setExpandedSeatInst] = useState<string | null>(null);
+  const [seatMatrixCategory, setSeatMatrixCategory] = useState<string>('IIT');
 
   const [compareList, setCompareList] = useState<any[]>([]);
   const [showCompareModal, setShowCompareModal] = useState(false);
@@ -289,11 +290,46 @@ export default function HomePage() {
           if (homeState === 'All India') {
             matchesQuota = col.quota === 'OS' || col.quota === 'AI';
           } else {
-            const isHomeInstitute = instName.includes(homeState.toLowerCase());
+            const stateKeywords: Record<string, string[]> = {
+              'Andhra Pradesh': ['andhra pradesh', 'tadepalligudem', 'kurnool', 'sri city'],
+              'Arunachal Pradesh': ['arunachal', 'yupia'],
+              'Assam': ['assam', 'silchar', 'guwahati'],
+              'Bihar': ['bihar', 'patna', 'bhagalpur'],
+              'Chhattisgarh': ['chhattisgarh', 'raipur'],
+              'Delhi': ['delhi', 'new delhi'],
+              'Goa': ['goa', 'farmagudi'],
+              'Gujarat': ['gujarat', 'surat', 'vadodara', 'gandhinagar'],
+              'Haryana': ['haryana', 'kurukshetra', 'sonepat'],
+              'Himachal Pradesh': ['himachal', 'hamirpur', 'una'],
+              'Jharkhand': ['jharkhand', 'jamshedpur', 'ranchi', 'dhanbad'],
+              'Karnataka': ['karnataka', 'surathkal', 'dharwad', 'raichur'],
+              'Kerala': ['kerala', 'calicut', 'kottayam'],
+              'Madhya Pradesh': ['madhya pradesh', 'bhopal', 'gwalior', 'jabalpur', 'indore'],
+              'Maharashtra': ['maharashtra', 'nagpur', 'pune', 'mumbai'],
+              'Manipur': ['manipur', 'imphal'],
+              'Meghalaya': ['meghalaya', 'shillong'],
+              'Mizoram': ['mizoram', 'aizawl'],
+              'Nagaland': ['nagaland', 'dimapur'],
+              'Odisha': ['odisha', 'rourkela', 'bhubaneswar'],
+              'Punjab': ['punjab', 'jalandhar', 'rupnagar', 'chandigarh'],
+              'Rajasthan': ['rajasthan', 'jaipur', 'kota', 'jodhpur'],
+              'Sikkim': ['sikkim', 'ravangla'],
+              'Tamil Nadu': ['tamil nadu', 'trichy', 'tiruchirappalli', 'kancheepuram'],
+              'Telangana': ['telangana', 'warangal', 'hyderabad'],
+              'Tripura': ['tripura', 'agartala'],
+              'Uttarakhand': ['uttarakhand', 'roorkee', 'srinagar'],
+              'Uttar Pradesh': ['uttar pradesh', 'allahabad', 'kanpur', 'lucknow', 'varanasi', 'prayagraj', 'amethi'],
+              'West Bengal': ['west bengal', 'durgapur', 'kharagpur', 'kalyani', 'shibpur'],
+              'Chandigarh': ['chandigarh'],
+              'Puducherry': ['puducherry', 'karaikal'],
+            };
+            const keywords = stateKeywords[homeState] || [homeState.toLowerCase()];
+            const isHomeInstitute = keywords.some(k => instName.includes(k));
+            
             if (isHomeInstitute) {
               matchesQuota = col.quota === 'HS' || col.quota === 'AI';
             } else {
-              matchesQuota = col.quota === 'OS' || col.quota === 'AI';
+              return false; // hide completely if not from selected state
             }
           }
           
@@ -464,13 +500,25 @@ export default function HomePage() {
       groups[row.institute].totalSeats += row.seats;
       groups[row.institute].branches.push(row);
     });
-    return Object.entries(groups).map(([institute, data]) => ({
+    let allGroups = Object.entries(groups).map(([institute, data]) => ({
       institute,
       totalSeats: data.totalSeats,
       totalBranches: data.branches.length,
       branches: data.branches
     })).sort((a, b) => a.institute.localeCompare(b.institute));
-  }, [dynamicSeats]);
+    
+    // Filter by seatMatrixCategory
+    return allGroups.filter(g => {
+      const name = g.institute.toLowerCase();
+      if (seatMatrixCategory === 'IIT') return name.includes('indian institute of technology') || name.includes('iisc');
+      if (seatMatrixCategory === 'NIT') return name.includes('national institute of technology');
+      if (seatMatrixCategory === 'IIIT') return name.includes('indian institute of information technology');
+      if (seatMatrixCategory === 'GFTI') {
+        return !name.includes('indian institute of technology') && !name.includes('national institute of technology') && !name.includes('indian institute of information technology') && !name.includes('iisc');
+      }
+      return true;
+    });
+  }, [dynamicSeats, seatMatrixCategory]);
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#f8faff] via-[#fafbfc] to-[#f4f7fb] text-[#111625] antialiased selection:bg-[#fcd71a]/30 font-sans font-medium">
@@ -755,8 +803,8 @@ export default function HomePage() {
           <div className="bg-white border border-[#e2e8f0] rounded-3xl p-6 md:p-8 shadow-xl relative overflow-hidden">
             <div className={`absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r transition-all duration-300 ${
               predictorMode === 'advanced' 
-                ? 'from-[#3b82f6] via-blue-700 to-[#3b82f6]' 
-                : 'from-[#a855f7] via-purple-700 to-[#a855f7]'
+                ? 'from-[#fcd71a] via-[#e0b90b] to-[#fcd71a]' 
+                : 'from-[#fcd71a] via-[#e0b90b] to-[#fcd71a]'
             }`}></div>
 
             {/* Gorgeous Segmented Tabs */}
@@ -766,8 +814,8 @@ export default function HomePage() {
                 onClick={() => { setPredictorMode('advanced'); setResults([]); setHasSearched(false); }}
                 className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-black transition-all ${
                   predictorMode === 'advanced'
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : 'text-[#475569] hover:bg-slate-200/60'
+                    ? 'bg-[#fcd71a] text-[#111625] shadow-md'
+                    : 'text-[#475569] hover:bg-[#fcd71a]/15'
                 }`}
               >
                 🔥 JEE Advanced (IITs)
@@ -777,8 +825,8 @@ export default function HomePage() {
                 onClick={() => { setPredictorMode('mains'); setResults([]); setHasSearched(false); }}
                 className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-black transition-all ${
                   predictorMode === 'mains'
-                    ? 'bg-purple-600 text-white shadow-md'
-                    : 'text-[#475569] hover:bg-slate-200/60'
+                    ? 'bg-[#fcd71a] text-[#111625] shadow-md'
+                    : 'text-[#475569] hover:bg-[#fcd71a]/15'
                 }`}
               >
                 ⚡ JEE Mains (NIT/IIIT/GFTI)
@@ -788,26 +836,26 @@ export default function HomePage() {
             <form onSubmit={handlePredict} className="space-y-6 text-left text-xs font-semibold text-[#485363]">
               <div className="transition-all duration-300">
                 {predictorMode === 'advanced' ? (
-                  <div className="relative bg-blue-50/20 border-2 border-blue-100 hover:border-blue-300 focus-within:border-blue-500 rounded-2xl p-4 transition-all">
+                  <div className="relative bg-[#fcd71a]/5 border-2 border-[#fcd71a]/30 hover:border-[#fcd71a]/60 focus-within:border-[#fcd71a] rounded-2xl p-4 transition-all">
                     <div className="flex items-center gap-2 mb-3">
-                      <div className="w-6 h-6 rounded-lg bg-blue-600 flex items-center justify-center shrink-0"><span className="text-white text-[9px] font-black">ADV</span></div>
-                      <span className="text-[11px] font-black uppercase tracking-widest text-blue-700">JEE Advanced Rank</span>
-                      <span className="ml-auto text-[9px] font-mono text-blue-500 bg-blue-50/60 px-2 py-0.5 rounded-full border border-blue-100">IITs Only</span>
+                      <div className="w-6 h-6 rounded-lg bg-[#fcd71a] flex items-center justify-center shrink-0"><span className="text-[#111625] text-[9px] font-black">ADV</span></div>
+                      <span className="text-[11px] font-black uppercase tracking-widest text-[#8a6d00]">JEE Advanced Rank</span>
+                      <span className="ml-auto text-[9px] font-mono text-[#8a6d00] bg-[#fcd71a]/10 px-2 py-0.5 rounded-full border border-[#fcd71a]/20">IITs Only</span>
                     </div>
                     <label className="block mb-1.5 text-[10px] font-bold tracking-wide uppercase text-[#8492a6]">CRL / Category Rank</label>
-                    <input type="number" placeholder="e.g. 2500" value={rankAdvanced} onChange={(e) => setRankAdvanced(e.target.value)} className="w-full px-4 py-3 bg-white border border-[#e2e8f0] focus:border-blue-400 rounded-xl text-sm font-bold text-black outline-none transition-all" required />
-                    {rankAdvanced && <p className="mt-1.5 text-[10px] text-blue-500 font-bold">✓ JEE Advanced rank set: {parseInt(rankAdvanced).toLocaleString()}</p>}
+                    <input type="number" placeholder="e.g. 2500" value={rankAdvanced} onChange={(e) => setRankAdvanced(e.target.value)} className="w-full px-4 py-3 bg-white border border-[#e2e8f0] focus:border-[#fcd71a] rounded-xl text-sm font-bold text-black outline-none transition-all" required />
+                    {rankAdvanced && <p className="mt-1.5 text-[10px] text-[#8a6d00] font-bold">✓ JEE Advanced rank set: {parseInt(rankAdvanced).toLocaleString()}</p>}
                   </div>
                 ) : (
-                  <div className="relative bg-purple-50/20 border-2 border-purple-100 hover:border-purple-300 focus-within:border-purple-500 rounded-2xl p-4 transition-all">
+                  <div className="relative bg-[#fcd71a]/5 border-2 border-[#fcd71a]/30 hover:border-[#fcd71a]/60 focus-within:border-[#fcd71a] rounded-2xl p-4 transition-all">
                     <div className="flex items-center gap-2 mb-3">
-                      <div className="w-6 h-6 rounded-lg bg-purple-600 flex items-center justify-center shrink-0"><span className="text-white text-[9px] font-black">MNS</span></div>
-                      <span className="text-[11px] font-black uppercase tracking-widest text-purple-700">JEE Mains Rank</span>
-                      <span className="ml-auto text-[9px] font-mono text-purple-500 bg-purple-50/60 px-2 py-0.5 rounded-full border border-purple-100">NITs · IIITs · GFTIs</span>
+                      <div className="w-6 h-6 rounded-lg bg-[#111625] flex items-center justify-center shrink-0"><span className="text-[#fcd71a] text-[9px] font-black">MNS</span></div>
+                      <span className="text-[11px] font-black uppercase tracking-widest text-[#111625]">JEE Mains Rank</span>
+                      <span className="ml-auto text-[9px] font-mono text-[#111625] bg-zinc-100 px-2 py-0.5 rounded-full border border-zinc-200">NITs · IIITs · GFTIs</span>
                     </div>
                     <label className="block mb-1.5 text-[10px] font-bold tracking-wide uppercase text-[#8492a6]">CRL / Category Rank</label>
-                    <input type="number" placeholder="e.g. 12500" value={rankMains} onChange={(e) => setRankMains(e.target.value)} className="w-full px-4 py-3 bg-white border border-[#e2e8f0] focus:border-purple-400 rounded-xl text-sm font-bold text-black outline-none transition-all" required />
-                    {rankMains && <p className="mt-1.5 text-[10px] text-purple-500 font-bold">✓ JEE Mains rank set: {parseInt(rankMains).toLocaleString()}</p>}
+                    <input type="number" placeholder="e.g. 12500" value={rankMains} onChange={(e) => setRankMains(e.target.value)} className="w-full px-4 py-3 bg-white border border-[#e2e8f0] focus:border-[#111625] rounded-xl text-sm font-bold text-black outline-none transition-all" required />
+                    {rankMains && <p className="mt-1.5 text-[10px] text-[#111625] font-bold">✓ JEE Mains rank set: {parseInt(rankMains).toLocaleString()}</p>}
                   </div>
                 )}
               </div>
@@ -841,8 +889,8 @@ export default function HomePage() {
               <button type="submit" disabled={isPredicting} className={`w-full font-black py-4 rounded-2xl text-xs uppercase tracking-widest shadow-lg hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer ${
                 isPredicting ? 'bg-zinc-700 text-zinc-400 cursor-not-allowed shadow-none' :
                 predictorMode === 'advanced' 
-                  ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/10' 
-                  : 'bg-purple-600 hover:bg-purple-700 text-white shadow-purple-500/10'
+                  ? 'bg-[#fcd71a] hover:bg-[#ebd02c] text-[#111625] shadow-[#fcd71a]/20' 
+                  : 'bg-[#111625] hover:bg-zinc-800 text-[#fcd71a] shadow-zinc-800/20'
               }`}>
                 {isPredicting ? '⏳ Predicting your colleges...' : (predictorMode === 'advanced' ? '🚀 Predict IIT Colleges (JEE Advanced)' : '🚀 Predict NIT / IIIT / GFTI Colleges (JEE Mains)')}
               </button>
@@ -1240,6 +1288,22 @@ export default function HomePage() {
             <h2 className="text-3xl font-black text-[#111625]">JoSAA Seat Matrix</h2>
             <p className="text-xs text-[#8492a6] font-medium">Category-wise seat allocation data</p>
           </div>
+          <div className="flex justify-center gap-3 flex-wrap">
+            {['IIT', 'NIT', 'IIIT', 'GFTI'].map(cat => (
+              <button
+                key={cat}
+                onClick={() => { setSeatMatrixCategory(cat); setExpandedSeatInst(null); }}
+                className={`px-5 py-2.5 rounded-xl text-xs font-black transition-all ${
+                  seatMatrixCategory === cat
+                    ? 'bg-[#fcd71a] text-[#111625] shadow-md'
+                    : 'bg-white border border-[#e2e8f0] text-[#475569] hover:bg-[#fcd71a]/15'
+                }`}
+              >
+                {cat} Colleges
+              </button>
+            ))}
+          </div>
+
           {dynamicSeats.length === 0 ? (
             <div className="text-center py-12 text-zinc-400 font-mono text-sm">No seat data loaded yet.</div>
           ) : (
