@@ -1,16 +1,16 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
-  "/api/users/route": "app/api/users/route.js",
-  "/admin/page": "app/admin/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/contact/page": "app/contact/page.js",
   "/about/page": "app/about/page.js",
+  "/contact/page": "app/contact/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/api/users/route": "app/api/users/route.js",
   "/dashboard/page": "app/dashboard/page.js",
-  "/privacy/page": "app/privacy/page.js",
-  "/forgot-password/page": "app/forgot-password/page.js",
+  "/admin/page": "app/admin/page.js",
   "/register/page": "app/register/page.js",
+  "/forgot-password/page": "app/forgot-password/page.js",
   "/login/page": "app/login/page.js",
+  "/privacy/page": "app/privacy/page.js",
+  "/page": "app/page.js",
   "/terms/page": "app/terms/page.js",
-  "/reset-password/page": "app/reset-password/page.js",
-  "/page": "app/page.js"
+  "/reset-password/page": "app/reset-password/page.js"
 }

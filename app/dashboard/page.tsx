@@ -32,11 +32,50 @@ export default function DashboardPage() {
   const [rankMains, setRankMains] = useState('');
   const [category, setCategory] = useState('OPEN');
   const [gender, setGender] = useState('Gender-Neutral');
-  const [homeState, setHomeState] = useState('Other State');
+  const [homeState, setHomeState] = useState('All India');
   const [hasSearched, setHasSearched] = useState(false);
   const [predictorMode, setPredictorMode] = useState<'advanced' | 'mains'>('advanced');
 
   const [dynamicJosaaRecords, setDynamicJosaaRecords] = useState<any[]>([]);
+
+  // List of all Indian states, union territories, and All India option for JEE Mains
+  const ALL_STATES = [
+    'All India',
+    'Andhra Pradesh',
+    'Arunachal Pradesh',
+    'Assam',
+    'Bihar',
+    'Chhattisgarh',
+    'Delhi',
+    'Goa',
+    'Gujarat',
+    'Haryana',
+    'Himachala Pradesh',
+    'Jharkhand',
+    'Karnataka',
+    'Kerala',
+    'Madhya Pradesh',
+    'Maharashtra',
+    'Manipur',
+    'Meghalaya',
+    'Mizoram',
+    'Nagaland',
+    'Odisha',
+    'Punjab',
+    'Rajasthan',
+    'Sikkim',
+    'Tamil Nadu',
+    'Telangana',
+    'Tripura',
+    'Uttarakhand',
+    'Uttar Pradesh',
+    'West Bengal',
+    'Andaman & Nicobar Islands',
+    'Chandigarh',
+    'Dadra & Nagar Haveli and Daman & Diu',
+    'Lakshadweep',
+    'Puducherry'
+  ];
   const [results, setResults] = useState<ExtendedCollegeData[]>([]);
   const [dynamicSeats, setDynamicSeats] = useState<SeatMatrixRecord[]>([]);
   const [dynamicDeadlines, setDynamicDeadlines] = useState<any[]>([]);
@@ -829,12 +868,13 @@ export default function DashboardPage() {
                 <div>
                   <label className="block mb-2 font-bold tracking-wide uppercase text-[10px] text-[#8492a6]">Home State</label>
                   <select value={homeState} onChange={(e) => setHomeState(e.target.value)} className="w-full px-4 py-3 bg-[#f8fafc] border border-[#e2e8f0] focus:border-[#fcd71a] focus:bg-white rounded-xl font-bold text-black outline-none text-xs">
-                    <option value="Other State">Other State (OS) / AI</option>
-                    <option value="Bihar">Bihar</option>
-                    <option value="Uttar Pradesh">Uttar Pradesh</option>
-                    <option value="Delhi">Delhi</option>
-                    <option value="Tripura">Tripura</option>
-                    <option value="Maharashtra">Maharashtra</option>
+                    {predictorMode === 'advanced' ? (
+                      <option value="All India">All India (AI)</option>
+                    ) : (
+                      ALL_STATES.map((state) => (
+                        <option key={state} value={state}>{state}</option>
+                      ))
+                    )}
                   </select>
                 </div>
               </div>
