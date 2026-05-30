@@ -34,6 +34,7 @@ export default function HomePage() {
   const [gender, setGender] = useState('Gender-Neutral');
   const [homeState, setHomeState] = useState('Other State');
   const [hasSearched, setHasSearched] = useState(false);
+  const [predictorMode, setPredictorMode] = useState<'advanced' | 'mains'>('advanced');
 
   const [dynamicJosaaRecords, setDynamicJosaaRecords] = useState<any[]>([]);
   const [results, setResults] = useState<ExtendedCollegeData[]>([]);
@@ -201,7 +202,8 @@ export default function HomePage() {
 
   const handlePredict = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!rankAdvanced && !rankMains) return alert("Kam se kam ek rank toh bharo bhai — JEE Advanced ya JEE Mains!");
+    if (predictorMode === 'advanced' && !rankAdvanced) return alert("Pehle JEE Advanced rank fill kijiye!");
+    if (predictorMode === 'mains' && !rankMains) return alert("Pehle JEE Mains rank fill kijiye!");
     setHasSearched(true);
 
     const buildResults = (userRank: number, examLabel: string) => {
@@ -222,7 +224,7 @@ export default function HomePage() {
         
         // IITs only use All India (AI) quota
         if (isIITorIISc) {
-          return col.quota === 'AI' && col.closing >= userRank;
+          return col.quota === 'AI' && col.closing * 1.15 >= userRank;
         }
         
         // NITs, IIITs, GFTIs use HS/OS matching
@@ -267,16 +269,32 @@ export default function HomePage() {
           matchesQuota = col.quota === 'OS' || col.quota === 'AI';
         }
         
-        return matchesQuota && col.closing >= userRank;
+        return matchesQuota && col.closing * 1.15 >= userRank;
       }).map((col: any) => {
-        const safetyMargin = col.closing - userRank;
-        const chance: 'High' | 'Medium' | 'Low' = safetyMargin > 8000 ? 'High' : 'Medium';
-        return { ...col, chance, _examLabel: examLabel };
+        let chance: 'High' | 'Medium' | 'Low' = 'Low';
+        let probability = 0;
+        
+        if (userRank <= col.closing) {
+          const ratio = userRank / col.closing;
+          if (ratio <= 0.8) {
+            chance = 'High';
+            probability = Math.round(90 + (1 - ratio / 0.8) * 9); // 90% to 99%
+          } else {
+            chance = 'Medium';
+            probability = Math.round(60 + (1 - (ratio - 0.8) / 0.2) * 29); // 60% to 89%
+          }
+        } else {
+          chance = 'Low';
+          const ratioOver = (userRank - col.closing) / (col.closing * 0.15);
+          probability = Math.round(15 + (1 - ratioOver) * 44); // 15% to 59%
+        }
+        
+        return { ...col, chance, probability, _examLabel: examLabel };
       }).sort((a: any, b: any) => a.closing - b.closing);
     };
 
-    const advResults = rankAdvanced ? buildResults(parseInt(rankAdvanced), 'JEE Advanced') : [];
-    const mainsResults = rankMains ? buildResults(parseInt(rankMains), 'JEE Mains') : [];
+    const advResults = (predictorMode === 'advanced' && rankAdvanced) ? buildResults(parseInt(rankAdvanced), 'JEE Advanced') : [];
+    const mainsResults = (predictorMode === 'mains' && rankMains) ? buildResults(parseInt(rankMains), 'JEE Mains') : [];
     setResults([...advResults, ...mainsResults]);
     setTimeout(() => { predictorRef.current?.scrollIntoView({ behavior: 'smooth' }); }, 100);
   };
@@ -699,33 +717,68 @@ export default function HomePage() {
         <div className="animate-fadeIn pb-20 max-w-4xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 space-y-6 sm:space-y-10">
           <div className="text-center space-y-2">
             <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-[#111625]">Rank Prediction Cockpit</h2>
-            <p className="text-xs text-[#8492a6] font-medium">Dono exam ka rank bharo — results ek saath dikhenge</p>
+            <p className="text-xs text-[#8492a6] font-medium">Select your exam and calculate your matches with realistic round-sliding & probability indexing</p>
           </div>
           <div className="bg-white border border-[#e2e8f0] rounded-3xl p-6 md:p-8 shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#fcd71a] via-[#111625] to-[#fcd71a]"></div>
+            <div className={`absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r transition-all duration-300 ${
+              predictorMode === 'advanced' 
+                ? 'from-[#3b82f6] via-blue-700 to-[#3b82f6]' 
+                : 'from-[#a855f7] via-purple-700 to-[#a855f7]'
+            }`}></div>
+
+            {/* Gorgeous Segmented Tabs */}
+            <div className="flex bg-[#f1f5f9] p-1.5 rounded-2xl max-w-sm mx-auto mb-6 border border-[#e2e8f0]">
+              <button
+                type="button"
+                onClick={() => { setPredictorMode('advanced'); setResults([]); setHasSearched(false); }}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-black transition-all ${
+                  predictorMode === 'advanced'
+                    ? 'bg-blue-600 text-white shadow-md'
+                    : 'text-[#475569] hover:bg-slate-200/60'
+                }`}
+              >
+                🔥 JEE Advanced (IITs)
+              </button>
+              <button
+                type="button"
+                onClick={() => { setPredictorMode('mains'); setResults([]); setHasSearched(false); }}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-black transition-all ${
+                  predictorMode === 'mains'
+                    ? 'bg-purple-600 text-white shadow-md'
+                    : 'text-[#475569] hover:bg-slate-200/60'
+                }`}
+              >
+                ⚡ JEE Mains (NIT/IIIT/GFTI)
+              </button>
+            </div>
+
             <form onSubmit={handlePredict} className="space-y-6 text-left text-xs font-semibold text-[#485363]">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="relative bg-[#f8fafc] border-2 border-[#e2e8f0] hover:border-[#fcd71a]/60 focus-within:border-[#fcd71a] rounded-2xl p-4 transition-all">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-6 h-6 rounded-lg bg-blue-600 flex items-center justify-center shrink-0"><span className="text-white text-[9px] font-black">ADV</span></div>
-                    <span className="text-[11px] font-black uppercase tracking-widest text-blue-700">JEE Advanced</span>
-                    <span className="ml-auto text-[9px] font-mono text-[#a0abbc] bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">IITs · IISc</span>
+              <div className="transition-all duration-300">
+                {predictorMode === 'advanced' ? (
+                  <div className="relative bg-blue-50/20 border-2 border-blue-100 hover:border-blue-300 focus-within:border-blue-500 rounded-2xl p-4 transition-all">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-6 h-6 rounded-lg bg-blue-600 flex items-center justify-center shrink-0"><span className="text-white text-[9px] font-black">ADV</span></div>
+                      <span className="text-[11px] font-black uppercase tracking-widest text-blue-700">JEE Advanced Rank</span>
+                      <span className="ml-auto text-[9px] font-mono text-blue-500 bg-blue-50/60 px-2 py-0.5 rounded-full border border-blue-100">IITs Only</span>
+                    </div>
+                    <label className="block mb-1.5 text-[10px] font-bold tracking-wide uppercase text-[#8492a6]">CRL / Category Rank</label>
+                    <input type="number" placeholder="e.g. 2500" value={rankAdvanced} onChange={(e) => setRankAdvanced(e.target.value)} className="w-full px-4 py-3 bg-white border border-[#e2e8f0] focus:border-blue-400 rounded-xl text-sm font-bold text-black outline-none transition-all" required />
+                    {rankAdvanced && <p className="mt-1.5 text-[10px] text-blue-500 font-bold">✓ JEE Advanced rank set: {parseInt(rankAdvanced).toLocaleString()}</p>}
                   </div>
-                  <label className="block mb-1.5 text-[10px] font-bold tracking-wide uppercase text-[#8492a6]">CRL / Category Rank</label>
-                  <input type="number" placeholder="e.g. 2500" value={rankAdvanced} onChange={(e) => setRankAdvanced(e.target.value)} className="w-full px-4 py-3 bg-white border border-[#e2e8f0] focus:border-blue-400 rounded-xl text-sm font-bold text-black outline-none transition-all" />
-                  {rankAdvanced && <p className="mt-1.5 text-[10px] text-blue-500 font-bold">✓ JEE Advanced rank set: {parseInt(rankAdvanced).toLocaleString()}</p>}
-                </div>
-                <div className="relative bg-[#f8fafc] border-2 border-[#e2e8f0] hover:border-[#fcd71a]/60 focus-within:border-[#fcd71a] rounded-2xl p-4 transition-all">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-6 h-6 rounded-lg bg-purple-600 flex items-center justify-center shrink-0"><span className="text-white text-[9px] font-black">MNS</span></div>
-                    <span className="text-[11px] font-black uppercase tracking-widest text-purple-700">JEE Mains</span>
-                    <span className="ml-auto text-[9px] font-mono text-[#a0abbc] bg-purple-50 px-2 py-0.5 rounded-full border border-purple-100">NITs · IIITs</span>
+                ) : (
+                  <div className="relative bg-purple-50/20 border-2 border-purple-100 hover:border-purple-300 focus-within:border-purple-500 rounded-2xl p-4 transition-all">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-6 h-6 rounded-lg bg-purple-600 flex items-center justify-center shrink-0"><span className="text-white text-[9px] font-black">MNS</span></div>
+                      <span className="text-[11px] font-black uppercase tracking-widest text-purple-700">JEE Mains Rank</span>
+                      <span className="ml-auto text-[9px] font-mono text-purple-500 bg-purple-50/60 px-2 py-0.5 rounded-full border border-purple-100">NITs · IIITs · GFTIs</span>
+                    </div>
+                    <label className="block mb-1.5 text-[10px] font-bold tracking-wide uppercase text-[#8492a6]">CRL / Category Rank</label>
+                    <input type="number" placeholder="e.g. 12500" value={rankMains} onChange={(e) => setRankMains(e.target.value)} className="w-full px-4 py-3 bg-white border border-[#e2e8f0] focus:border-purple-400 rounded-xl text-sm font-bold text-black outline-none transition-all" required />
+                    {rankMains && <p className="mt-1.5 text-[10px] text-purple-500 font-bold">✓ JEE Mains rank set: {parseInt(rankMains).toLocaleString()}</p>}
                   </div>
-                  <label className="block mb-1.5 text-[10px] font-bold tracking-wide uppercase text-[#8492a6]">CRL / Category Rank</label>
-                  <input type="number" placeholder="e.g. 12500" value={rankMains} onChange={(e) => setRankMains(e.target.value)} className="w-full px-4 py-3 bg-white border border-[#e2e8f0] focus:border-purple-400 rounded-xl text-sm font-bold text-black outline-none transition-all" />
-                  {rankMains && <p className="mt-1.5 text-[10px] text-purple-500 font-bold">✓ JEE Mains rank set: {parseInt(rankMains).toLocaleString()}</p>}
-                </div>
+                )}
               </div>
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block mb-2 font-bold tracking-wide uppercase text-[10px] text-[#8492a6]">Category</label>
@@ -751,8 +804,12 @@ export default function HomePage() {
                   </select>
                 </div>
               </div>
-              <button type="submit" className="w-full bg-[#111625] text-[#fcd71a] font-extrabold py-4 rounded-xl text-xs uppercase tracking-widest shadow-md hover:bg-zinc-800 transition-all">
-                🚀 Predict Colleges for Both Exams
+              <button type="submit" className={`w-full font-black py-4 rounded-2xl text-xs uppercase tracking-widest shadow-lg hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer ${
+                predictorMode === 'advanced' 
+                  ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/10' 
+                  : 'bg-purple-600 hover:bg-purple-700 text-white shadow-purple-500/10'
+              }`}>
+                {predictorMode === 'advanced' ? '🚀 Predict IIT Colleges (JEE Advanced)' : '🚀 Predict NIT / IIIT / GFTI Colleges (JEE Mains)'}
               </button>
             </form>
           </div>
@@ -793,8 +850,14 @@ export default function HomePage() {
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-2 mb-1 flex-wrap">
                                     <span className="text-[9px] font-black px-2 py-0.5 bg-blue-600 text-white rounded-md uppercase tracking-wider">{instTag}</span>
-                                    <span className={`text-[9px] font-mono font-black px-2 py-0.5 rounded-md uppercase border ${college.chance === 'High' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>
-                                      {college.chance === 'High' ? '✓ Safe Bet' : '~ Worth Trying'}
+                                    <span className={`text-[9px] font-mono font-black px-2 py-0.5 rounded-md uppercase border ${
+                                      college.chance === 'High' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                                      college.chance === 'Medium' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                                      'bg-blue-50 text-blue-700 border-blue-200'
+                                    }`}>
+                                      {college.chance === 'High' ? `✓ Safe Bet (${college.probability}%)` :
+                                       college.chance === 'Medium' ? `~ Fair Match (${college.probability}%)` :
+                                       `⚡ Ambitious (${college.probability}%)`}
                                     </span>
                                   </div>
                                   <h4 className="font-black text-[#111625] text-sm tracking-tight leading-snug">{college.institute}</h4>
