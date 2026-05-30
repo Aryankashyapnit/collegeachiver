@@ -284,45 +284,17 @@ export default function HomePage() {
           if (isIITorIISc) {
             return col.quota === 'AI' && col.closing * 1.15 >= userRank;
           }
-          
+
           let matchesQuota = false;
-          if (homeState === 'Bihar') {
-            const isBiharInstitute = instName.includes('patna') || instName.includes('bhagalpur') || instName.includes('bihar');
-            if (isBiharInstitute) {
-              matchesQuota = col.quota === 'HS' || col.quota === 'AI';
-            } else {
-              matchesQuota = col.quota === 'OS' || col.quota === 'AI';
-            }
-          } else if (homeState === 'Uttar Pradesh') {
-            const isUPInstitute = instName.includes('allahabad') || instName.includes('kanpur') || instName.includes('varanasi') || instName.includes('lucknow');
-            if (isUPInstitute) {
-              matchesQuota = col.quota === 'HS' || col.quota === 'AI';
-            } else {
-              matchesQuota = col.quota === 'OS' || col.quota === 'AI';
-            }
-          } else if (homeState === 'Delhi') {
-            const isDelhiInstitute = instName.includes('delhi');
-            if (isDelhiInstitute) {
-              matchesQuota = col.quota === 'HS' || col.quota === 'AI';
-            } else {
-              matchesQuota = col.quota === 'OS' || col.quota === 'AI';
-            }
-          } else if (homeState === 'Tripura') {
-            const isTripuraInstitute = instName.includes('agartala') || instName.includes('tripura');
-            if (isTripuraInstitute) {
-              matchesQuota = col.quota === 'HS' || col.quota === 'AI';
-            } else {
-              matchesQuota = col.quota === 'OS' || col.quota === 'AI';
-            }
-          } else if (homeState === 'Maharashtra') {
-            const isMaharashtraInstitute = instName.includes('nagpur') || instName.includes('bombay') || instName.includes('pune');
-            if (isMaharashtraInstitute) {
-              matchesQuota = col.quota === 'HS' || col.quota === 'AI';
-            } else {
-              matchesQuota = col.quota === 'OS' || col.quota === 'AI';
-            }
-          } else {
+          if (homeState === 'All India') {
             matchesQuota = col.quota === 'OS' || col.quota === 'AI';
+          } else {
+            const isHomeInstitute = instName.includes(homeState.toLowerCase());
+            if (isHomeInstitute) {
+              matchesQuota = col.quota === 'HS' || col.quota === 'AI';
+            } else {
+              matchesQuota = col.quota === 'OS' || col.quota === 'AI';
+            }
           }
           
           return matchesQuota && col.closing * 1.15 >= userRank;
