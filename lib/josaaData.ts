@@ -1,3 +1,5 @@
+import bulkCutoffs from './bulkCutoffs.json';
+
 export interface CollegeData {
   id: number;
   institute: string;
@@ -90,5 +92,12 @@ export const massiveJosaaData: CollegeData[] = [
   // PEC Chandigarh (Top GFTI)
   { id: 56, institute: "Punjab Engineering College, Chandigarh", program: "Computer Science & Engineering (4 Years, Bachelor of Technology)", quota: "AI", category: "OPEN", gender: "Gender-Neutral", opening: 8000, closing: 14000, fee: "1.9L/yr", placement: "15.5 LPA", nirf: 82 },
   // SPA New Delhi (Top Architecture GFTI)
-  { id: 57, institute: "School of Planning and Architecture, New Delhi", program: "Bachelor of Architecture (5 Years, Bachelor of Architecture)", quota: "AI", category: "OPEN", gender: "Gender-Neutral", opening: 100, closing: 950, fee: "1.2L/yr", placement: "6.5 LPA", nirf: 5 }
+  { id: 57, institute: "School of Planning and Architecture, New Delhi", program: "Bachelor of Architecture (5 Years, Bachelor of Architecture)", quota: "AI", category: "OPEN", gender: "Gender-Neutral", opening: 100, closing: 950, fee: "1.2L/yr", placement: "6.5 LPA", nirf: 5 },
+  // FRESH NEW DATA 2026
+  { id: 58, institute: "Indian Institute of Technology Roorkee", program: "Computer Science and Engineering (4 Years, Bachelor of Technology)", quota: "AI", category: "OPEN", gender: "Gender-Neutral", opening: 250, closing: 412, fee: "2.2L/yr", placement: "22.5 LPA", nirf: 7 },
+  { id: 59, institute: "Indian Institute of Technology Guwahati", program: "Computer Science and Engineering (4 Years, Bachelor of Technology)", quota: "AI", category: "OPEN", gender: "Gender-Neutral", opening: 400, closing: 601, fee: "2.1L/yr", placement: "21.0 LPA", nirf: 8 },
+  { id: 60, institute: "National Institute of Technology Surathkal", program: "Computer Science and Engineering (4 Years, Bachelor of Technology)", quota: "OS", category: "OPEN", gender: "Gender-Neutral", opening: 900, closing: 1600, fee: "1.4L/yr", placement: "20.5 LPA", nirf: 12 },
+  { id: 61, institute: "National Institute of Technology Warangal", program: "Computer Science and Engineering (4 Years, Bachelor of Technology)", quota: "OS", category: "OPEN", gender: "Gender-Neutral", opening: 1000, closing: 2000, fee: "1.3L/yr", placement: "20.0 LPA", nirf: 21 },
+  { id: 62, institute: "Indian Institute of Information Technology Pune", program: "Computer Science and Engineering (4 Years, Bachelor of Technology)", quota: "AI", category: "OPEN", gender: "Gender-Neutral", opening: 12000, closing: 16000, fee: "2.5L/yr", placement: "16.0 LPA", nirf: 150 },
+  ...(bulkCutoffs as CollegeData[])
 ];

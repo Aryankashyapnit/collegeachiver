@@ -7,6 +7,7 @@ import { School, BarChart3, Layers, Star, AlertCircle, MessageSquare, X, Send, U
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 import { createClient } from '@supabase/supabase-js';
 import { CollegeData, massiveJosaaData } from '../lib/josaaData';
+import bulkSeats from '../lib/bulkSeats.json';
 
 const supabaseUrl = "https://ygyosdmzubwswnhuhere.supabase.co";
 const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlneW9zZG16dWJ3c3duaHVoZXJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3ODAzMDUsImV4cCI6MjA5NTM1NjMwNX0.1jSqaJKatV4lx9JCEi_dAHP6qJFBrPQl8XJ7bqDJeVY";
@@ -143,6 +144,12 @@ export default function HomePage() {
     { id: 10, institute: 'Birla Institute of Technology, Patna Campus', program: 'Computer Science & Engineering', quota: 'OPEN (HS)', seats: 55 },
     { id: 11, institute: 'National Institute of Technology Trichy', program: 'Computer Science and Engineering', quota: 'OPEN (OS)', seats: 45 },
     { id: 12, institute: 'National Institute of Technology Agartala', program: 'Computer Science & Engineering', quota: 'OPEN (OS)', seats: 32 },
+    { id: 13, institute: 'Indian Institute of Technology Roorkee', program: 'Computer Science and Engineering', quota: 'OPEN (AI)', seats: 55 },
+    { id: 14, institute: 'Indian Institute of Technology Guwahati', program: 'Computer Science and Engineering', quota: 'OPEN (AI)', seats: 42 },
+    { id: 15, institute: 'National Institute of Technology Surathkal', program: 'Computer Science and Engineering', quota: 'OPEN (OS)', seats: 38 },
+    { id: 16, institute: 'National Institute of Technology Warangal', program: 'Computer Science and Engineering', quota: 'OPEN (OS)', seats: 41 },
+    { id: 17, institute: 'Indian Institute of Information Technology Pune', program: 'Computer Science and Engineering', quota: 'OPEN (AI)', seats: 30 },
+    ...(bulkSeats as SeatMatrixRecord[])
   ];
 
   useEffect(() => {
