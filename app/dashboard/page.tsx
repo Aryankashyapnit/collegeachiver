@@ -1151,7 +1151,7 @@ export default function DashboardPage() {
                 const isExpanded = expandedInstitute === institute;
 
                 return (
-                  <div key={institute} className="bg-white border border-[#eef2f7] rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all hover:border-[#fcd71a]/40 group flex flex-col h-full">
+                  <div key={institute} className="bg-white border border-[#eef2f7] rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all hover:border-[#fcd71a]/40 group flex flex-col self-start">
                     <button 
                       onClick={() => setExpandedInstitute(isExpanded ? null : institute)}
                       className="w-full flex items-center p-5 gap-4 text-left"

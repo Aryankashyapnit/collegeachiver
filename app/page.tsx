@@ -65,7 +65,13 @@ export default function HomePage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [liveCount, setLiveCount] = useState(247);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  // Cutoff charts state
   const [expandedChartId, setExpandedChartId] = useState<string | null>(null);
+  
+  // ✅ NEW: Individual state for Seat Matrix accordion bug fix
+  const [expandedSeatInst, setExpandedSeatInst] = useState<string | null>(null);
+
   const [compareList, setCompareList] = useState<any[]>([]);
   const [showCompareModal, setShowCompareModal] = useState(false);
   const [referralName, setReferralName] = useState('');
@@ -87,12 +93,8 @@ export default function HomePage() {
   const FALLBACK_SEATS = [
     { id: 1, institute: 'Indian Institute of Technology Bombay', program: 'Computer Science and Engineering', quota: 'OPEN (AI)', seats: 59 },
     { id: 2, institute: 'Indian Institute of Technology Delhi', program: 'Computer Science and Engineering', quota: 'OPEN (AI)', seats: 62 },
-    { id: 3, institute: 'Indian Institute of Technology Madras', program: 'Computer Science and Engineering', quota: 'OPEN (AI)', seats: 83 },
-    { id: 4, institute: 'National Institute of Technology Trichy', program: 'Computer Science and Engineering', quota: 'OPEN (OS)', seats: 45 },
-    { id: 5, institute: 'National Institute of Technology Agartala', program: 'Computer Science & Engineering', quota: 'OPEN (OS)', seats: 32 },
-    { id: 6, institute: 'National Institute of Technology Agartala', program: 'Electronics and Communication Engineering', quota: 'OPEN (OS)', seats: 28 },
-    { id: 7, institute: 'National Institute of Technology Agartala', program: 'Electrical Engineering', quota: 'OPEN (HS)', seats: 24 },
-    { id: 8, institute: 'IIIT Hyderabad', program: 'Computer Science and Engineering', quota: 'OPEN (AI)', seats: 120 },
+    { id: 3, institute: 'National Institute of Technology Trichy', program: 'Computer Science and Engineering', quota: 'OPEN (OS)', seats: 45 },
+    { id: 4, institute: 'National Institute of Technology Agartala', program: 'Computer Science & Engineering', quota: 'OPEN (OS)', seats: 32 },
   ];
 
   useEffect(() => {
@@ -174,7 +176,7 @@ export default function HomePage() {
     setReferralCount(Math.floor(Math.random() * 3));
   };
 
-  const getReferralLink = () => `${window.location.origin}/?ref=${referralCode}`;
+  const getReferralLink = () => typeof window !== 'undefined' ? `${window.location.origin}/?ref=${referralCode}` : '';
 
   const copyReferralLink = async () => {
     await navigator.clipboard.writeText(getReferralLink());
@@ -187,7 +189,7 @@ export default function HomePage() {
       `• ${c.institute.replace('Indian Institute of Technology', 'IIT').replace('National Institute of Technology', 'NIT')} — ${c.program.split(' ').slice(0, 3).join(' ')}`
     ).join('\n');
     const rankLine = [rankAdvanced && `JEE Adv: #${parseInt(rankAdvanced).toLocaleString()}`, rankMains && `JEE Mains: #${parseInt(rankMains).toLocaleString()}`].filter(Boolean).join(' | ');
-    const msg = `🎓 *CollegeAchiver Prediction Result*\n\n*My Rank:* ${rankLine}\n*Category:* ${category}\n\n*Top Colleges I Can Get:*\n${topColleges || '• Check your results on the site!'}\n\n🔍 Check your JEE rank predictions free at:\n${window.location.origin}\n\n_Powered by CollegeAchiver — JoSAA 2026_`;
+    const msg = `🎓 *CollegeAchiver Prediction Result*\n\n*My Rank:* ${rankLine}\n*Category:* ${category}\n\n*Top Colleges I Can Get:*\n${topColleges || '• Check your results on the site!'}\n\n🔍 Check your JEE rank predictions free at:\n${typeof window !== 'undefined' ? window.location.origin : ''}\n\n_Powered by CollegeAchiver — JoSAA 2026_`;
     return `https://wa.me/?text=${encodeURIComponent(msg)}`;
   };
 
@@ -199,7 +201,6 @@ export default function HomePage() {
     const buildResults = (userRank: number, examLabel: string) => {
       const isAdvanced = examLabel === 'JEE Advanced';
       return dynamicJosaaRecords.filter((col: any) => {
-        // IIT / IISc → only via JEE Advanced; NIT/IIIT/GFTI → only via JEE Mains
         const isIITorIISc =
           col.institute.includes('Indian Institute of Technology') ||
           col.institute.includes('Indian Institute of Science') ||
@@ -307,7 +308,6 @@ export default function HomePage() {
     }, 1200);
   };
 
-  // Expand short forms before searching so "iit bombay" matches "Indian Institute of Technology Bombay"
   const expandSearch = (q: string) => q.toLowerCase()
     .replace(/\biit\s*/g, 'indian institute of technology ')
     .replace(/\bnit\s*/g, 'national institute of technology ')
@@ -348,24 +348,23 @@ export default function HomePage() {
     return `upi://pay?pa=${myUpiId}&pn=${myMerchantName}&am=${premiumPriceToken}&cu=INR`;
   }, [myUpiId, myMerchantName, premiumPriceToken]);
 
-  const navTabs = [
-    { id: 'Home', label: 'Home' },
-    { id: 'Predictor', label: 'Rank Predictor' },
-    { id: 'Counselling Guide', label: 'Premium Circle' },
-    { id: 'Opening/Closing Ranks', label: 'Cut-offs' },
-    { id: 'Deadlines', label: 'Deadlines' },
-    { id: 'Seat Matrix', label: 'Seat Matrix' },
-    { id: 'Refer & Earn', label: '🎁 Refer & Earn' },
-  ];
-
-  // Mobile bottom nav tabs
-  const bottomNavTabs = [
-    { id: 'Home', label: 'Home', icon: <House size={19}/> },
-    { id: 'Predictor', label: 'Predict', icon: <BarChart3 size={19}/> },
-    { id: 'Opening/Closing Ranks', label: 'Cut-offs', icon: <TrendingUp size={19}/> },
-    { id: 'Deadlines', label: 'Dates', icon: <CalendarDays size={19}/> },
-    { id: 'Counselling Guide', label: 'Premium', icon: <Star size={19}/> },
-  ];
+  // ✅ NEW: Logic to group seat matrix by institute for the shiny new card design
+  const groupedSeats = useMemo(() => {
+    const groups: Record<string, { totalSeats: number, branches: SeatMatrixRecord[] }> = {};
+    dynamicSeats.forEach(row => {
+      if (!groups[row.institute]) {
+        groups[row.institute] = { totalSeats: 0, branches: [] };
+      }
+      groups[row.institute].totalSeats += row.seats;
+      groups[row.institute].branches.push(row);
+    });
+    return Object.entries(groups).map(([institute, data]) => ({
+      institute,
+      totalSeats: data.totalSeats,
+      totalBranches: data.branches.length,
+      branches: data.branches
+    })).sort((a, b) => a.institute.localeCompare(b.institute));
+  }, [dynamicSeats]);
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#f8faff] via-[#fafbfc] to-[#f4f7fb] text-[#111625] antialiased selection:bg-[#fcd71a]/30 font-sans font-medium">
@@ -394,8 +393,6 @@ export default function HomePage() {
           </div>
         </div>
       </nav>
-
-      {/* MOBILE BOTTOM TAB BAR REMOVED FOR LANDING PAGE */}
 
       {/* Compare floating bar */}
       {compareList.length > 0 && (
@@ -484,7 +481,6 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Hero image — hidden on very small screens, shown from sm */}
             <div className="lg:col-span-6 hidden sm:flex justify-center relative">
               <div className="bg-white p-3 rounded-3xl shadow-[0_8px_48px_0_rgba(17,22,37,0.12)] border border-[#ebf0f6] relative max-w-lg w-full overflow-hidden">
                 <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=700&q=80" className="rounded-2xl h-[240px] sm:h-[300px] md:h-[360px] object-cover w-full" alt="Students collaborating" />
@@ -499,7 +495,6 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Mobile-only compact hero visual */}
             <div className="sm:hidden grid grid-cols-3 gap-2.5 mt-2">
               {[
                 { val: '17K+', label: 'Cutoff Records', color: 'bg-blue-50 text-blue-700 border-blue-100' },
@@ -514,7 +509,6 @@ export default function HomePage() {
             </div>
           </section>
 
-          {/* STATS BAR */}
           <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-4 sm:pb-6">
             <div className="bg-[#111625] rounded-2xl sm:rounded-3xl p-5 sm:p-7 grid grid-cols-2 md:grid-cols-4 gap-4 text-center relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-[#1a1f2e] to-[#0d0f16] opacity-60 pointer-events-none"></div>
@@ -561,10 +555,10 @@ export default function HomePage() {
           <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-10 sm:pb-12">
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
               {[
-                { icon: <BarChart3 size={18}/>, title: 'Rank Predictor', desc: 'JEE rank → college list in seconds', color: 'border-blue-200 hover:border-blue-400', iconBg: 'bg-blue-50 text-blue-600' },
-                { icon: <TrendingUp size={18}/>, title: 'Cut-off Explorer', desc: 'Browse all 2,300+ cutoff records', color: 'border-purple-200 hover:border-purple-400', iconBg: 'bg-purple-50 text-purple-600' },
-                { icon: <Bell size={18}/>, title: 'Key Deadlines', desc: 'Never miss a counselling date', color: 'border-amber-200 hover:border-amber-400', iconBg: 'bg-amber-50 text-amber-600' },
-                { icon: <School size={18}/>, title: 'Seat Matrix', desc: 'Category-wise seat availability', color: 'border-emerald-200 hover:border-emerald-400', iconBg: 'bg-emerald-50 text-emerald-600' },
+                { icon: <BarChart3 size={18}/>, title: 'Rank Predictor', desc: 'JEE rank → college list in seconds', tab: 'Predictor', color: 'border-blue-200 hover:border-blue-400', iconBg: 'bg-blue-50 text-blue-600' },
+                { icon: <TrendingUp size={18}/>, title: 'Cut-off Explorer', desc: 'Browse all 2,300+ cutoff records', tab: 'Opening/Closing Ranks', color: 'border-purple-200 hover:border-purple-400', iconBg: 'bg-purple-50 text-purple-600' },
+                { icon: <Bell size={18}/>, title: 'Key Deadlines', desc: 'Never miss a counselling date', tab: 'Deadlines', color: 'border-amber-200 hover:border-amber-400', iconBg: 'bg-amber-50 text-amber-600' },
+                { icon: <School size={18}/>, title: 'Seat Matrix', desc: 'Category-wise seat availability', tab: 'Seat Matrix', color: 'border-emerald-200 hover:border-emerald-400', iconBg: 'bg-emerald-50 text-emerald-600' },
               ].map((f, i) => (
                 <button key={i} onClick={() => router.push('/login')} className={`bg-white border-2 ${f.color} rounded-xl sm:rounded-2xl p-4 sm:p-6 text-left space-y-2 sm:space-y-3 transition-all duration-300 group hover:shadow-md`}>
                   <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center ${f.iconBg}`}>{f.icon}</div>
@@ -1083,7 +1077,7 @@ export default function HomePage() {
 
       {/* TAB 6: SEAT MATRIX */}
       {activeTab === 'Seat Matrix' && (
-        <div className="max-w-5xl mx-auto px-6 py-12 animate-fadeIn space-y-8 pb-24 md:pb-12">
+        <div className="max-w-7xl mx-auto px-6 py-12 animate-fadeIn space-y-8 pb-24 md:pb-12">
           <div className="text-center space-y-2">
             <h2 className="text-3xl font-black text-[#111625]">JoSAA Seat Matrix</h2>
             <p className="text-xs text-[#8492a6] font-medium">Category-wise seat allocation data</p>
@@ -1091,23 +1085,67 @@ export default function HomePage() {
           {dynamicSeats.length === 0 ? (
             <div className="text-center py-12 text-zinc-400 font-mono text-sm">No seat data loaded yet.</div>
           ) : (
-            <div className="overflow-x-auto bg-white rounded-2xl border border-[#eef2f7] shadow-xs">
-              <table className="w-full text-xs">
-                <thead><tr className="bg-[#f8fafc] border-b border-[#eef2f7]">
-                  <th className="text-left p-3 font-bold text-[#485363]">Institute</th>
-                  <th className="text-left p-3 font-bold text-[#485363]">Program</th>
-                  <th className="text-left p-3 font-bold text-[#485363]">Quota</th>
-                  <th className="text-right p-3 font-bold text-[#485363]">Seats</th>
-                </tr></thead>
-                <tbody>{dynamicSeats.map((row, i) => (
-                  <tr key={i} className="border-b border-[#eef2f7] hover:bg-[#fafbfc]">
-                    <td className="p-3 text-[#111625] font-semibold">{row.institute}</td>
-                    <td className="p-3 text-[#5e6b7f]">{row.program}</td>
-                    <td className="p-3"><span className="bg-[#fcd71a]/10 text-[#977914] px-2 py-0.5 rounded font-mono font-bold">{row.quota}</span></td>
-                    <td className="p-3 text-right font-black text-[#111625] font-mono">{row.seats}</td>
-                  </tr>
-                ))}</tbody>
-              </table>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {groupedSeats.map((group, i) => {
+                const isOpen = expandedSeatInst === group.institute;
+                return (
+                  <div key={i} className={`bg-white rounded-3xl border transition-all duration-300 ${isOpen ? 'border-[#fcd71a] shadow-lg ring-4 ring-[#fcd71a]/10' : 'border-[#eef2f7] hover:border-zinc-300 hover:shadow-md'}`}>
+                    
+                    {/* Header Card Area */}
+                    <div className="p-5 sm:p-6 flex items-start sm:items-center justify-between cursor-pointer gap-4" onClick={() => setExpandedSeatInst(isOpen ? null : group.institute)}>
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5">
+                        <div className="w-12 h-12 rounded-2xl bg-[#111625] flex items-center justify-center shrink-0 shadow-sm">
+                          <School size={22} className="text-[#fcd71a]" />
+                        </div>
+                        <div>
+                          <h3 className="font-black text-[#111625] text-[15px] sm:text-base leading-snug">{group.institute}</h3>
+                          <div className="flex items-center gap-2 mt-2 flex-wrap">
+                            <span className="flex items-center gap-1.5 text-[10px] font-bold text-zinc-500 bg-zinc-100 border border-zinc-200 px-2.5 py-1 rounded-md tracking-wide">
+                              <Layers size={11}/> {group.totalBranches} BRANCHES
+                            </span>
+                            <span className="flex items-center gap-1.5 text-[10px] font-bold text-[#8a6d00] bg-[#fcd71a]/20 border border-[#fcd71a]/40 px-2.5 py-1 rounded-md tracking-wide">
+                              <Users size={11}/> {group.totalSeats} SEATS
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <button className={`w-9 h-9 rounded-full flex items-center justify-center transition-all shrink-0 ${isOpen ? 'bg-[#fcd71a] text-[#111625]' : 'bg-zinc-50 text-zinc-400 hover:bg-zinc-100 border border-zinc-200'}`}>
+                        {isOpen ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}
+                      </button>
+                    </div>
+                    
+                    {/* Accordion / Dropdown Area */}
+                    {isOpen && (
+                      <div className="border-t border-[#eef2f7] p-5 sm:p-6 bg-[#fafbfc]/50 animate-fadeIn">
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left text-xs">
+                            <thead>
+                              <tr className="text-[10px] font-black text-zinc-400 uppercase tracking-wider border-b border-zinc-200">
+                                <th className="pb-3 pr-4">Program</th>
+                                <th className="pb-3 px-2">Quota</th>
+                                <th className="pb-3 pl-2 text-right">Seats</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-zinc-100">
+                              {group.branches.map((b, j) => (
+                                <tr key={j} className="hover:bg-white transition-colors">
+                                  <td className="py-3.5 pr-4 text-[#485363] font-semibold leading-relaxed max-w-[200px]">{b.program}</td>
+                                  <td className="py-3.5 px-2">
+                                    <span className="text-[10px] font-black text-[#8a6d00] bg-[#fcd71a]/15 border border-[#fcd71a]/30 px-2.5 py-1 rounded-lg inline-block whitespace-nowrap">
+                                      {b.quota}
+                                    </span>
+                                  </td>
+                                  <td className="py-3.5 pl-2 text-right font-black text-[#111625] text-sm">{b.seats}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
