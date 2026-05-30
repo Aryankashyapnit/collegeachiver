@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { School, BarChart3, Layers, Star, AlertCircle, MessageSquare, X, Send, User, ShieldCheck, PlusCircle, Clock, Sparkles,House,CalendarDays,Search, Milestone, ArrowRight, Sparkle, Compass, Flame, Receipt, Percent, BookOpen, CheckCircle2, TrendingUp, Users, Bell, ChevronDown, ChevronUp, Zap, Share2, Copy, Gift, Trophy, Link2, UserPlus, Menu, TrendingDown, Minus } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 import { createClient } from '@supabase/supabase-js';
-import { CollegeData } from '../lib/josaaData';
+import { CollegeData, massiveJosaaData } from '../../lib/josaaData';
 
 const supabaseUrl = "https://ygyosdmzubwswnhuhere.supabase.co";
 const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlneW9zZG16dWJ3c3duaHVoZXJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3ODAzMDUsImV4cCI6MjA5NTM1NjMwNX0.1jSqaJKatV4lx9JCEi_dAHP6qJFBrPQl8XJ7bqDJeVY";
@@ -32,7 +32,7 @@ export default function DashboardPage() {
   const [rankMains, setRankMains] = useState('');
   const [category, setCategory] = useState('OPEN');
   const [gender, setGender] = useState('Gender-Neutral');
-  const [homeState, setHomeState] = useState('OS');
+  const [homeState, setHomeState] = useState('Other State');
   const [hasSearched, setHasSearched] = useState(false);
 
   const [dynamicJosaaRecords, setDynamicJosaaRecords] = useState<any[]>([]);
@@ -89,12 +89,16 @@ export default function DashboardPage() {
   const FALLBACK_SEATS = [
     { id: 1, institute: 'Indian Institute of Technology Bombay', program: 'Computer Science and Engineering', quota: 'OPEN (AI)', seats: 59 },
     { id: 2, institute: 'Indian Institute of Technology Delhi', program: 'Computer Science and Engineering', quota: 'OPEN (AI)', seats: 62 },
-    { id: 3, institute: 'Indian Institute of Technology Madras', program: 'Computer Science and Engineering', quota: 'OPEN (AI)', seats: 83 },
-    { id: 4, institute: 'National Institute of Technology Trichy', program: 'Computer Science and Engineering', quota: 'OPEN (OS)', seats: 45 },
-    { id: 5, institute: 'National Institute of Technology Agartala', program: 'Computer Science & Engineering', quota: 'OPEN (OS)', seats: 32 },
-    { id: 6, institute: 'National Institute of Technology Agartala', program: 'Electronics and Communication Engineering', quota: 'OPEN (OS)', seats: 28 },
-    { id: 7, institute: 'National Institute of Technology Agartala', program: 'Electrical Engineering', quota: 'OPEN (HS)', seats: 24 },
-    { id: 8, institute: 'IIIT Hyderabad', program: 'Computer Science and Engineering', quota: 'OPEN (AI)', seats: 120 },
+    { id: 3, institute: 'Indian Institute of Technology Patna', program: 'Computer Science and Engineering', quota: 'OPEN (AI)', seats: 48 },
+    { id: 4, institute: 'Indian Institute of Technology Patna', program: 'Electrical and Electronics Engineering', quota: 'OPEN (AI)', seats: 50 },
+    { id: 5, institute: 'National Institute of Technology Patna', program: 'Computer Science & Engineering', quota: 'OPEN (HS)', seats: 68 },
+    { id: 6, institute: 'National Institute of Technology Patna', program: 'Computer Science & Engineering', quota: 'OPEN (OS)', seats: 68 },
+    { id: 7, institute: 'National Institute of Technology Patna', program: 'Electronics and Communication Engineering', quota: 'OPEN (HS)', seats: 60 },
+    { id: 8, institute: 'National Institute of Technology Patna', program: 'Electronics and Communication Engineering', quota: 'OPEN (OS)', seats: 60 },
+    { id: 9, institute: 'Indian Institute of Information Technology Bhagalpur', program: 'Computer Science and Engineering', quota: 'OPEN (AI)', seats: 40 },
+    { id: 10, institute: 'Birla Institute of Technology, Patna Campus', program: 'Computer Science & Engineering', quota: 'OPEN (HS)', seats: 55 },
+    { id: 11, institute: 'National Institute of Technology Trichy', program: 'Computer Science and Engineering', quota: 'OPEN (OS)', seats: 45 },
+    { id: 12, institute: 'National Institute of Technology Agartala', program: 'Computer Science & Engineering', quota: 'OPEN (OS)', seats: 32 },
   ];
 
   useEffect(() => {
@@ -117,9 +121,7 @@ export default function DashboardPage() {
         supabase.from('admission_schedules').select('*').order('id', { ascending: true })
       ]);
 
-      if (!josaaError && josaaData && josaaData.length > 0) {
-        setDynamicJosaaRecords(josaaData as CollegeData[]);
-      }
+      setDynamicJosaaRecords(!josaaError && josaaData && josaaData.length > 0 ? josaaData as CollegeData[] : massiveJosaaData);
       setDynamicSeats(!seatsError && seatsData && seatsData.length > 0 ? seatsData as SeatMatrixRecord[] : FALLBACK_SEATS);
       setDynamicDeadlines(!deadlinesError && deadlinesData && deadlinesData.length > 0 ? deadlinesData : FALLBACK_DEADLINES);
     };
@@ -208,19 +210,67 @@ export default function DashboardPage() {
     const buildResults = (userRank: number, examLabel: string) => {
       const isAdvanced = examLabel === 'JEE Advanced';
       return dynamicJosaaRecords.filter((col: any) => {
-        // IIT / IISc → only via JEE Advanced; NIT/IIIT/GFTI → only via JEE Mains
         const isIITorIISc =
           col.institute.includes('Indian Institute of Technology') ||
           col.institute.includes('Indian Institute of Science') ||
           col.institute.includes('IISc');
         if (isAdvanced && !isIITorIISc) return false;
         if (!isAdvanced && isIITorIISc) return false;
-        return (
-          col.category === category &&
-          col.gender === gender &&
-          (col.quota === homeState || col.quota === 'AI') &&
-          col.closing >= userRank
-        );
+        
+        // Match Category and Gender Pool
+        if (col.category !== category || col.gender !== gender) return false;
+        
+        // Smart Quota Match based on chosen Home State
+        const instName = col.institute.toLowerCase();
+        
+        // IITs only use All India (AI) quota
+        if (isIITorIISc) {
+          return col.quota === 'AI' && col.closing >= userRank;
+        }
+        
+        // NITs, IIITs, GFTIs use HS/OS matching
+        let matchesQuota = false;
+        if (homeState === 'Bihar') {
+          const isBiharInstitute = instName.includes('patna') || instName.includes('bhagalpur') || instName.includes('bihar');
+          if (isBiharInstitute) {
+            matchesQuota = col.quota === 'HS' || col.quota === 'AI';
+          } else {
+            matchesQuota = col.quota === 'OS' || col.quota === 'AI';
+          }
+        } else if (homeState === 'Uttar Pradesh') {
+          const isUPInstitute = instName.includes('allahabad') || instName.includes('kanpur') || instName.includes('varanasi') || instName.includes('lucknow');
+          if (isUPInstitute) {
+            matchesQuota = col.quota === 'HS' || col.quota === 'AI';
+          } else {
+            matchesQuota = col.quota === 'OS' || col.quota === 'AI';
+          }
+        } else if (homeState === 'Delhi') {
+          const isDelhiInstitute = instName.includes('delhi');
+          if (isDelhiInstitute) {
+            matchesQuota = col.quota === 'HS' || col.quota === 'AI';
+          } else {
+            matchesQuota = col.quota === 'OS' || col.quota === 'AI';
+          }
+        } else if (homeState === 'Tripura') {
+          const isTripuraInstitute = instName.includes('agartala') || instName.includes('tripura');
+          if (isTripuraInstitute) {
+            matchesQuota = col.quota === 'HS' || col.quota === 'AI';
+          } else {
+            matchesQuota = col.quota === 'OS' || col.quota === 'AI';
+          }
+        } else if (homeState === 'Maharashtra') {
+          const isMaharashtraInstitute = instName.includes('nagpur') || instName.includes('bombay') || instName.includes('pune');
+          if (isMaharashtraInstitute) {
+            matchesQuota = col.quota === 'HS' || col.quota === 'AI';
+          } else {
+            matchesQuota = col.quota === 'OS' || col.quota === 'AI';
+          }
+        } else {
+          // Other State (default) or other states match OS or AI
+          matchesQuota = col.quota === 'OS' || col.quota === 'AI';
+        }
+        
+        return matchesQuota && col.closing >= userRank;
       }).map((col: any) => {
         const safetyMargin = col.closing - userRank;
         const chance: 'High' | 'Medium' | 'Low' = safetyMargin > 8000 ? 'High' : 'Medium';
@@ -724,9 +774,14 @@ export default function DashboardPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block mb-2 font-bold tracking-wide uppercase text-[10px] text-[#8492a6]">Quota</label>
+                  <label className="block mb-2 font-bold tracking-wide uppercase text-[10px] text-[#8492a6]">Home State</label>
                   <select value={homeState} onChange={(e) => setHomeState(e.target.value)} className="w-full px-4 py-3 bg-[#f8fafc] border border-[#e2e8f0] focus:border-[#fcd71a] focus:bg-white rounded-xl font-bold text-black outline-none text-xs">
-                    <option value="OS">Other State (OS) / AI</option><option value="HS">Home State (HS)</option>
+                    <option value="Other State">Other State (OS) / AI</option>
+                    <option value="Bihar">Bihar</option>
+                    <option value="Uttar Pradesh">Uttar Pradesh</option>
+                    <option value="Delhi">Delhi</option>
+                    <option value="Tripura">Tripura</option>
+                    <option value="Maharashtra">Maharashtra</option>
                   </select>
                 </div>
               </div>
