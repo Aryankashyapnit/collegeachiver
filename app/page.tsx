@@ -38,6 +38,7 @@ export default function HomePage() {
   const [predictorMode, setPredictorMode] = useState<'advanced' | 'mains'>('advanced');
 
   const [dynamicJosaaRecords, setDynamicJosaaRecords] = useState<any[]>([]);
+  const [isPredicting, setIsPredicting] = useState(false);
 
   // List of all Indian states, union territories, and All India option for JEE Mains
   const ALL_STATES = [
@@ -160,8 +161,8 @@ export default function HomePage() {
         { data: seatsData, error: seatsError },
         { data: deadlinesData, error: deadlinesError }
       ] = await Promise.all([
-        supabase.from('josaadata_record').select('*'),
-        supabase.from('seat_matrices').select('*').order('id', { ascending: false }),
+        supabase.from('josaadata_record').select('*').limit(2000),
+        supabase.from('seat_matrices').select('*').order('id', { ascending: false }).limit(2000),
         supabase.from('admission_schedules').select('*').order('id', { ascending: true })
       ]);
 
@@ -246,103 +247,117 @@ export default function HomePage() {
     return `https://wa.me/?text=${encodeURIComponent(msg)}`;
   };
 
-  const handlePredict = (e: React.FormEvent) => {
+  const handlePredict = async (e: React.FormEvent) => {
     e.preventDefault();
     if (predictorMode === 'advanced' && !rankAdvanced) return alert("Pehle JEE Advanced rank fill kijiye!");
     if (predictorMode === 'mains' && !rankMains) return alert("Pehle JEE Mains rank fill kijiye!");
-    setHasSearched(true);
+    
+    setIsPredicting(true);
+    const rankVal = predictorMode === 'advanced' ? parseInt(rankAdvanced) : parseInt(rankMains);
+    const examLabel = predictorMode === 'advanced' ? 'JEE Advanced' : 'JEE Mains';
 
-    const buildResults = (userRank: number, examLabel: string) => {
-      const isAdvanced = examLabel === 'JEE Advanced';
-      return dynamicJosaaRecords.filter((col: any) => {
-        const isIITorIISc =
-          col.institute.includes('Indian Institute of Technology') ||
-          col.institute.includes('Indian Institute of Science') ||
-          col.institute.includes('IISc');
-        if (isAdvanced && !isIITorIISc) return false;
-        if (!isAdvanced && isIITorIISc) return false;
-        
-        // Match Category and Gender Pool
-        if (col.category !== category || col.gender !== gender) return false;
-        
-        // Smart Quota Match based on chosen Home State
-        const instName = col.institute.toLowerCase();
-        
-        // IITs only use All India (AI) quota
-        if (isIITorIISc) {
-          return col.quota === 'AI' && col.closing * 1.15 >= userRank;
-        }
-        
-        // NITs, IIITs, GFTIs use HS/OS matching
-        let matchesQuota = false;
-        if (homeState === 'Bihar') {
-          const isBiharInstitute = instName.includes('patna') || instName.includes('bhagalpur') || instName.includes('bihar');
-          if (isBiharInstitute) {
-            matchesQuota = col.quota === 'HS' || col.quota === 'AI';
-          } else {
-            matchesQuota = col.quota === 'OS' || col.quota === 'AI';
-          }
-        } else if (homeState === 'Uttar Pradesh') {
-          const isUPInstitute = instName.includes('allahabad') || instName.includes('kanpur') || instName.includes('varanasi') || instName.includes('lucknow');
-          if (isUPInstitute) {
-            matchesQuota = col.quota === 'HS' || col.quota === 'AI';
-          } else {
-            matchesQuota = col.quota === 'OS' || col.quota === 'AI';
-          }
-        } else if (homeState === 'Delhi') {
-          const isDelhiInstitute = instName.includes('delhi');
-          if (isDelhiInstitute) {
-            matchesQuota = col.quota === 'HS' || col.quota === 'AI';
-          } else {
-            matchesQuota = col.quota === 'OS' || col.quota === 'AI';
-          }
-        } else if (homeState === 'Tripura') {
-          const isTripuraInstitute = instName.includes('agartala') || instName.includes('tripura');
-          if (isTripuraInstitute) {
-            matchesQuota = col.quota === 'HS' || col.quota === 'AI';
-          } else {
-            matchesQuota = col.quota === 'OS' || col.quota === 'AI';
-          }
-        } else if (homeState === 'Maharashtra') {
-          const isMaharashtraInstitute = instName.includes('nagpur') || instName.includes('bombay') || instName.includes('pune');
-          if (isMaharashtraInstitute) {
-            matchesQuota = col.quota === 'HS' || col.quota === 'AI';
-          } else {
-            matchesQuota = col.quota === 'OS' || col.quota === 'AI';
-          }
-        } else {
-          // Other State (default) or other states match OS or AI
-          matchesQuota = col.quota === 'OS' || col.quota === 'AI';
-        }
-        
-        return matchesQuota && col.closing * 1.15 >= userRank;
-      }).map((col: any) => {
-        let chance: 'High' | 'Medium' | 'Low' = 'Low';
-        let probability = 0;
-        
-        if (userRank <= col.closing) {
-          const ratio = userRank / col.closing;
-          if (ratio <= 0.8) {
-            chance = 'High';
-            probability = Math.round(90 + (1 - ratio / 0.8) * 9); // 90% to 99%
-          } else {
-            chance = 'Medium';
-            probability = Math.round(60 + (1 - (ratio - 0.8) / 0.2) * 29); // 60% to 89%
-          }
-        } else {
-          chance = 'Low';
-          const ratioOver = (userRank - col.closing) / (col.closing * 0.15);
-          probability = Math.round(15 + (1 - ratioOver) * 44); // 15% to 59%
-        }
-        
-        return { ...col, chance, probability, _examLabel: examLabel };
-      }).sort((a: any, b: any) => a.closing - b.closing);
-    };
+    try {
+      // Fetch perfectly targeted cutoff records from the database
+      const { data: dbRecords, error } = await supabase
+        .from('josaadata_record')
+        .select('*')
+        .eq('category', category)
+        .eq('gender', gender)
+        .gte('closing', Math.round(rankVal / 1.15));
 
-    const advResults = (predictorMode === 'advanced' && rankAdvanced) ? buildResults(parseInt(rankAdvanced), 'JEE Advanced') : [];
-    const mainsResults = (predictorMode === 'mains' && rankMains) ? buildResults(parseInt(rankMains), 'JEE Mains') : [];
-    setResults([...advResults, ...mainsResults]);
-    setTimeout(() => { predictorRef.current?.scrollIntoView({ behavior: 'smooth' }); }, 100);
+      const recordsToUse = (!error && dbRecords && dbRecords.length > 0) ? dbRecords : massiveJosaaData;
+
+      const buildResults = (userRank: number, label: string) => {
+        const isAdvanced = label === 'JEE Advanced';
+        return recordsToUse.filter((col: any) => {
+          const isIITorIISc =
+            col.institute.includes('Indian Institute of Technology') ||
+            col.institute.includes('Indian Institute of Science') ||
+            col.institute.includes('IISc');
+          if (isAdvanced && !isIITorIISc) return false;
+          if (!isAdvanced && isIITorIISc) return false;
+          
+          if (col.category !== category || col.gender !== gender) return false;
+          
+          const instName = col.institute.toLowerCase();
+          
+          if (isIITorIISc) {
+            return col.quota === 'AI' && col.closing * 1.15 >= userRank;
+          }
+          
+          let matchesQuota = false;
+          if (homeState === 'Bihar') {
+            const isBiharInstitute = instName.includes('patna') || instName.includes('bhagalpur') || instName.includes('bihar');
+            if (isBiharInstitute) {
+              matchesQuota = col.quota === 'HS' || col.quota === 'AI';
+            } else {
+              matchesQuota = col.quota === 'OS' || col.quota === 'AI';
+            }
+          } else if (homeState === 'Uttar Pradesh') {
+            const isUPInstitute = instName.includes('allahabad') || instName.includes('kanpur') || instName.includes('varanasi') || instName.includes('lucknow');
+            if (isUPInstitute) {
+              matchesQuota = col.quota === 'HS' || col.quota === 'AI';
+            } else {
+              matchesQuota = col.quota === 'OS' || col.quota === 'AI';
+            }
+          } else if (homeState === 'Delhi') {
+            const isDelhiInstitute = instName.includes('delhi');
+            if (isDelhiInstitute) {
+              matchesQuota = col.quota === 'HS' || col.quota === 'AI';
+            } else {
+              matchesQuota = col.quota === 'OS' || col.quota === 'AI';
+            }
+          } else if (homeState === 'Tripura') {
+            const isTripuraInstitute = instName.includes('agartala') || instName.includes('tripura');
+            if (isTripuraInstitute) {
+              matchesQuota = col.quota === 'HS' || col.quota === 'AI';
+            } else {
+              matchesQuota = col.quota === 'OS' || col.quota === 'AI';
+            }
+          } else if (homeState === 'Maharashtra') {
+            const isMaharashtraInstitute = instName.includes('nagpur') || instName.includes('bombay') || instName.includes('pune');
+            if (isMaharashtraInstitute) {
+              matchesQuota = col.quota === 'HS' || col.quota === 'AI';
+            } else {
+              matchesQuota = col.quota === 'OS' || col.quota === 'AI';
+            }
+          } else {
+            matchesQuota = col.quota === 'OS' || col.quota === 'AI';
+          }
+          
+          return matchesQuota && col.closing * 1.15 >= userRank;
+        }).map((col: any) => {
+          let chance: 'High' | 'Medium' | 'Low' = 'Low';
+          let probability = 0;
+          
+          if (userRank <= col.closing) {
+            const ratio = userRank / col.closing;
+            if (ratio <= 0.8) {
+              chance = 'High';
+              probability = Math.round(90 + (1 - ratio / 0.8) * 9);
+            } else {
+              chance = 'Medium';
+              probability = Math.round(60 + (1 - (ratio - 0.8) / 0.2) * 29);
+            }
+          } else {
+            chance = 'Low';
+            const ratioOver = (userRank - col.closing) / (col.closing * 0.15);
+            probability = Math.round(15 + (1 - ratioOver) * 44);
+          }
+          
+          return { ...col, chance, probability, _examLabel: label };
+        }).sort((a: any, b: any) => a.closing - b.closing);
+      };
+
+      const finalResults = buildResults(rankVal, examLabel);
+      setResults(finalResults);
+      setHasSearched(true);
+      setTimeout(() => { predictorRef.current?.scrollIntoView({ behavior: 'smooth' }); }, 100);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsPredicting(false);
+    }
   };
 
   const chatHistoryRef = useRef<{ sender: string; text: string }[]>([]);
@@ -851,12 +866,13 @@ export default function HomePage() {
                   </select>
                 </div>
               </div>
-              <button type="submit" className={`w-full font-black py-4 rounded-2xl text-xs uppercase tracking-widest shadow-lg hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer ${
+              <button type="submit" disabled={isPredicting} className={`w-full font-black py-4 rounded-2xl text-xs uppercase tracking-widest shadow-lg hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer ${
+                isPredicting ? 'bg-zinc-700 text-zinc-400 cursor-not-allowed shadow-none' :
                 predictorMode === 'advanced' 
                   ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/10' 
                   : 'bg-purple-600 hover:bg-purple-700 text-white shadow-purple-500/10'
               }`}>
-                {predictorMode === 'advanced' ? '🚀 Predict IIT Colleges (JEE Advanced)' : '🚀 Predict NIT / IIIT / GFTI Colleges (JEE Mains)'}
+                {isPredicting ? '⏳ Predicting your colleges...' : (predictorMode === 'advanced' ? '🚀 Predict IIT Colleges (JEE Advanced)' : '🚀 Predict NIT / IIIT / GFTI Colleges (JEE Mains)')}
               </button>
             </form>
           </div>
